@@ -48,23 +48,22 @@ public class DNode {
         if( ret2 == null ) {
             nodes.put( ret2 = ret, ret );
             ret2.domNum = ++nextDomNum;
+            nodeSet.add(ret2);
+            exprSet.add(ret2.expr);
         }
         Group.v( ret2 );
         return ret2;
     }
 
     public static Set nodes() {
-        return new HashSet(nodes.values());
+        return nodeSet;
     }
     public static Set exprs() {
-        HashSet ret = new HashSet();
-        for( Iterator dnodeIt = nodes.values().iterator(); dnodeIt.hasNext(); ) {
-            final DNode dnode = (DNode) dnodeIt.next();
-            ret.add( dnode.expr );
-        }
-        return ret;
+        return exprSet;
     }
 
+    private static Set exprSet = new HashSet();
+    private static Set nodeSet = new HashSet();
     private static Map nodes = new HashMap();
     private DNode( BDDExpr expr, Type dom ) {
         this.expr = expr;
