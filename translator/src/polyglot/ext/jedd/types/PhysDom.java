@@ -40,6 +40,9 @@ public class PhysDom {
     public Set mustEqualEdges = new HashSet();
     public Set allPhys = new HashSet();
 
+    private String satSolver = System.getProperty("user.home")+System.getProperty("file.separator")+"sat";
+    public void setSatSolver( String s ) { satSolver = s; }
+
     static class SetLit {
         Set set;
         private SetLit( Set set ) {
