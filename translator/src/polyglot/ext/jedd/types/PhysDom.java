@@ -188,6 +188,11 @@ public class PhysDom {
     public static class Clause extends HashSet {
         public Clause() {
         }
+        private boolean isConflict = false;
+        public Clause( boolean isConflict ) {
+            this.isConflict = isConflict;
+        }
+        public boolean isConflict() { return isConflict; }
         public void setComment( String comment ) {
             this.comment = comment;
         }
@@ -353,7 +358,7 @@ public class PhysDom {
                         if( nl1 == null ) nl1 = (NegLiteral) lit;
                         else nl2 = (NegLiteral) lit;
                     }
-                    if( cl.comment.indexOf("[CONFLICT]") < 0 ) continue line;
+                    if( !cl.isConflict() ) continue line;
                     System.err.println( "Conflict between\n"+
                             nl1.lit.dnode.toLongString()+"\nand\n"+
                             nl2.lit.dnode.toLongString()+"\nover physical domain "+
@@ -499,7 +504,7 @@ public class PhysDom {
         // (xa ==> ~ya) /\ (ya ==> ~xa) = (~ya \/ ~xa)
         for( Iterator physIt = allPhys.iterator(); physIt.hasNext(); ) {
             final Type phys = (Type) physIt.next();
-            Clause clause = new Clause();
+            Clause clause = new Clause(true);
             if( INCLUDE_COMMENTS ) clause.setComment( 
                     "[CONFLICT] Conflict edge between "+node1.toLongString()+" and "+node2.toLongString()+" for "+phys);
             clause.add( NegLiteral.v( node1, phys ) );
