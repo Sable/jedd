@@ -32,7 +32,7 @@ public class SableBackend extends Backend {
 
     private JBddManager manager;
     void init() {
-        manager = new JBddManager(1*1000*1000, 100*1000, 4, 0);
+        manager = new JBddManager();
     }
 
     protected int totalBits = 0;
