@@ -45,7 +45,7 @@ public class JeddLocalDeclExt_c extends JeddExt_c implements JeddTypeCheck, Jedd
             if( !(n.localInstance().type() instanceof BDDType) ) 
                 throw new SemanticException( "Attempt to initialize non-BDD with BDD." );
             if( !n.init().type().isImplicitCastValid( n.localInstance().type() ) )
-                throw new SemanticException( "Incompatible type of BDD initializer." );
+                throw new SemanticException( "Incompatible type of BDD initializer; initializer has type "+n.init().type()+"." );
             return n.init( (Expr) nf.FixPhys( n.init().position(), n.init() ).typeCheck( tc ) );
         }
     }

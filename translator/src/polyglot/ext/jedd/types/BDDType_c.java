@@ -37,16 +37,11 @@ public class BDDType_c extends ReferenceType_c implements BDDType {
             final Type[] pair = (Type[]) pairIt.next();
             if( pair[0] == null ) 
                 ret.append( "<unknown>" );
-            else if( pair[0] instanceof ClassType ) 
-                ret.append( ((ClassType)pair[0]).fullName() );
             else
                 ret.append( pair[0].toString() );
             if( pair[1] != null ) {
                 ret.append(":");
-                if( pair[1] instanceof ClassType ) 
-                    ret.append( ((ClassType)pair[1]).fullName() );
-                else
-                    ret.append( pair[1].toString() );
+                ret.append( pair[1].toString() );
             }
             if( pairIt.hasNext() ) ret.append(", ");
         }
