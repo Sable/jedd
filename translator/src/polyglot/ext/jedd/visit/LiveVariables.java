@@ -100,6 +100,9 @@ public class LiveVariables extends DataFlow
         if( out == null ) throw new RuntimeException();
         return itemToMap( out, succEdgeKeys );
     }
+    public Item confluence(List inItems, Term node, FlowGraph fg) {
+        return confluence(inItems, node);
+    }
     public Item confluence(List inItems, Term node) {
         DataFlowItem out = new DataFlowItem();
         for( Iterator itemIt = inItems.iterator(); itemIt.hasNext(); ) {
