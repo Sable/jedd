@@ -63,9 +63,9 @@ found_bdd:
                         DNode.v( fj.localInstance(), domain ) );
             }
         }
-        if( di.returnType() instanceof BDDType ) {
-            BDDType ti = (BDDType) di.returnType();
-            BDDType tj = (BDDType) dj.returnType();
+        if( mi.returnType() instanceof BDDType ) {
+            BDDType ti = (BDDType) mi.returnType();
+            BDDType tj = (BDDType) mj.returnType();
             for( Iterator domainIt = ti.map().keySet().iterator(); domainIt.hasNext(); ) {
                 final Type domain = (Type) domainIt.next();
                 addMustEqualEdge( DNode.v( mi, domain ), DNode.v( mj, domain ) );
@@ -77,7 +77,7 @@ found_bdd:
         && t2 instanceof BDDType ) {
             BDDType bt1 = (BDDType) t1;
             BDDType bt2 = (BDDType) t2;
-            return bt1.map().equals( bt2.map() );
+            return bt1.map().keySet().equals( bt2.map().keySet() );
         }
         return super.equals(t1, t2);
     }
