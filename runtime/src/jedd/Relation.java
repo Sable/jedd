@@ -22,10 +22,32 @@ package jedd;
 import java.util.*;
 
 public interface Relation {
-    public void kill();
+    /** Returns the number of tuples in the relation. */
     public long size();
+    /** Returns the number of BDD nodes used to represent the relation. */
     public int numNodes();
+    /** Returns an iterator over the tuples in the relation. Each tuple
+     * is returned as an Object array of its components. The argument to this
+     * method must be an array containing the attributes of this relation.
+     * In each tuple array returned by the iterator, the components will
+     * appear in the same order as the order of the attributes in the
+     * wanted argument to this method.
+     *
+     * When a relation only has a single attribute, it is easier to iterate
+     * over it using the other iterator method. The present iterator is more
+     * general in that it works for relations with arbitrary numbers of
+     * attributes.
+     */
     public Iterator iterator(Attribute[] wanted);
+    /** Returns an iterator over the components in the relation. This method
+     * may only be used on relations having exactly one attribute. The
+     * iterator returns the single component of each tuple, one tuple at a
+     * time.
+     *
+     * This iterator is easier to use than the iterator above, but works only
+     * on relations with a single attribute.
+     */
     public Iterator iterator();
+    /** Returns a string representation listing all the tuples in the relation. */
     public String toString();
 }

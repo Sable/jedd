@@ -19,9 +19,18 @@
 
 package jedd;
 
+/** A numberer converts objects to unique non-negative integers, and vice-versa.
+ * The Jedd programmer must implement numberers for domains used in the program.
+ */
 public interface Numberer {
+    /** Tells the numberer that a new object needs to be assigned a number. */
     public void add( Object o );
-    public Object get( int number );
+    /** Should return the number that was assigned to object o that was
+     * previously passed as an argument to add().
+     */
     public int get( Object o );
+    /** Should return the object that was assigned the number number. */
+    public Object get( int number );
+    /** Should return the number of objects that have been assigned numbers. */
     public int size();
 }
