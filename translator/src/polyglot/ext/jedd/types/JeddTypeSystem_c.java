@@ -37,6 +37,8 @@ public class JeddTypeSystem_c extends TypeSystem_c implements JeddTypeSystem {
         super.checkOverride(mi, mj);
     }
     public void makeBDDFormalsConform(MethodInstance mi, MethodInstance mj) throws SemanticException {
+        if( mi == mj ) return;
+
 found_bdd:
         {
             for( Iterator tIt = mi.formalTypes().iterator(); tIt.hasNext(); ) {
