@@ -96,7 +96,7 @@ public abstract class Relprod_c extends Expr_c implements Relprod, JeddGenerateJ
     public Node typeCheck( TypeChecker tc ) throws SemanticException {
 
         if( !( lhs.type() instanceof BDDType) || !( rhs.type() instanceof BDDType ) ) {
-            throw new SemanticException( "Arguments of replace must be BDDs." );
+            throw new SemanticException( "Arguments of join or composition must be BDDs." );
         }
 
         JeddTypeSystem ts = (JeddTypeSystem) tc.typeSystem();
@@ -120,6 +120,9 @@ public abstract class Relprod_c extends Expr_c implements Relprod, JeddGenerateJ
                 throw new SemanticException( "Duplicate attribute "+domain+" in attributes to be compared." );
             if( !domain.type().isSubtype( ts.attribute() ) ) 
                 throw new SemanticException( ""+domain+" does not extend jedd.Attribute" );
+            if( !lmap.containsKey( domain.type() ) ) {
+                throw new SemanticException( "LHS does not have attribute "+domain+"; it has type "+lhs.type() );
+            }
         }
         seenAlready = new HashSet();
         for( Iterator domainIt = rdomains.iterator(); domainIt.hasNext(); ) {
@@ -128,6 +131,9 @@ public abstract class Relprod_c extends Expr_c implements Relprod, JeddGenerateJ
                 throw new SemanticException( "Duplicate attribute "+domain+" in attributes to be compared." );
             if( !domain.type().isSubtype( ts.attribute() ) ) 
                 throw new SemanticException( ""+domain+" does not extend jedd.Attribute" );
+            if( !rmap.containsKey( domain.type() ) ) {
+                throw new SemanticException( "RHS does not have attribute "+domain+"; it has type "+rhs.type() );
+            }
         }
 
         // make sure all attributes in result are unique.
