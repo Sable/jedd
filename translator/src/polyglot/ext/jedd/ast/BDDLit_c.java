@@ -68,6 +68,7 @@ public class BDDLit_c extends Lit_c implements BDDLit, JeddGenerateJava
         JeddTypeSystem ts = (JeddTypeSystem) tc.typeSystem();
         JeddNodeFactory nf = (JeddNodeFactory) tc.nodeFactory();
 
+        Set seenAttrs = new HashSet();
         List pairs = new LinkedList();
         for( Iterator pieceIt = pieces.iterator(); pieceIt.hasNext(); ) {
             final BDDLitPiece piece = (BDDLitPiece) pieceIt.next();
@@ -79,6 +80,8 @@ public class BDDLit_c extends Lit_c implements BDDLit, JeddGenerateJava
             if( newPair[1] != null && !newPair[1].isSubtype( ts.physicalDomain() ) ) 
                 throw new SemanticException( ""+newPair[1]+" does not extend jedd.PhysicalDomain" );
             pairs.add( newPair );
+            if( !seenAttrs.add( newPair[0] ) ) throw new SemanticException(
+                    "Duplicate attribute "+newPair[0] );
         }
         BDDLit_c ret = (BDDLit_c) type(ts.BDDType(pairs));
         ret.pieces = pieces;

@@ -21,9 +21,7 @@ package jedd;
 import java.util.*;
 
 public class Jedd {
-    // set profiler to null to turn off profiling
-    //static final JeddProfiler profiler = null;
-    static final JeddProfiler profiler = JeddProfiler.v();
+    static JeddProfiler profiler = null;
 
     private static Jedd instance = new Jedd();
     private Jedd() {
@@ -31,6 +29,9 @@ public class Jedd {
     }
     public static Jedd v() {
         return instance;
+    }
+    public void enableProfiling() {
+        profiler = JeddProfiler.v();
     }
     public int replace( Relation r,
         PhysicalDomain[] from, PhysicalDomain[] to ) {
@@ -56,17 +57,32 @@ public class Jedd {
         JeddNative.delRef( r );
         return ret;
     }
-    public int relprod( int r1, int r2,
+    public int compose( int r1, int r2,
             PhysicalDomain[] d ) {
-        int ret = relprodImpl( r1, r2, d );
+        int ret = composeImpl( r1, r2, d );
         JeddNative.addRef( ret );
         JeddNative.delRef( r1 );
         JeddNative.delRef( r2 );
         return ret;
     }
-    public int relprod( int r1, Relation r2,
+    public int compose( int r1, Relation r2,
             PhysicalDomain[] d ) {
-        int ret = relprodImpl( r1, r2.bdd, d );
+        int ret = composeImpl( r1, r2.bdd, d );
+        JeddNative.addRef( ret );
+        JeddNative.delRef( r1 );
+        return ret;
+    }
+    public int join( int r1, int r2,
+            PhysicalDomain[] d ) {
+        int ret = joinImpl( r1, r2 );
+        JeddNative.addRef( ret );
+        JeddNative.delRef( r1 );
+        JeddNative.delRef( r2 );
+        return ret;
+    }
+    public int join( int r1, Relation r2,
+            PhysicalDomain[] d ) {
+        int ret = joinImpl( r1, r2.bdd );
         JeddNative.addRef( ret );
         JeddNative.delRef( r1 );
         return ret;
@@ -237,13 +253,20 @@ public class Jedd {
 
         return ret;
     }
-    private int relprodImpl( int r1, int r2,
+    private int composeImpl( int r1, int r2,
             PhysicalDomain[] d ) {
         int[] cd = convertDomains(d);
 
-        if( profiler != null ) profiler.start( "relprod", r1, r2 );
+        if( profiler != null ) profiler.start( "compose", r1, r2 );
         int ret = JeddNative.relprod( r1, r2, cd.length, cd );
-        if( profiler != null ) profiler.finish( "relprod", ret );
+        if( profiler != null ) profiler.finish( "compose", ret );
+
+        return ret;
+    }
+    private int joinImpl( int r1, int r2 ) {
+        if( profiler != null ) profiler.start( "join", r1, r2 );
+        int ret = JeddNative.and( r1, r2 );
+        if( profiler != null ) profiler.finish( "join", ret );
 
         return ret;
     }

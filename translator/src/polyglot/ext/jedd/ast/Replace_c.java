@@ -58,7 +58,7 @@ public class Replace_c extends FixPhys_c implements Replace, JeddGenerateJava, J
         for( Iterator pairIt = domainPairs.iterator(); pairIt.hasNext(); ) {
             final TypeNode[] pair = (TypeNode[]) pairIt.next();
             print(pair[0],w,tr);
-            w.write(" => ");
+            w.write("=>");
             print(pair[1],w,tr);
             if( pairIt.hasNext() ) {
                 w.write(",");
@@ -85,6 +85,7 @@ public class Replace_c extends FixPhys_c implements Replace, JeddGenerateJava, J
         Map exprMap = exprType.map();
         for( Iterator pairIt = domainPairs.iterator(); pairIt.hasNext(); ) {
             final TypeNode[] pair = (TypeNode[]) pairIt.next();
+            if( pair[0] == null ) continue;
             if( !pair[0].type().isSubtype( ts.domain() ) ) {
                 throw new SemanticException( "Attempt to replace a non-domain" );
             }
@@ -101,6 +102,7 @@ outer:
             Type[] newDomain = new Type[2];
             for( Iterator pairIt = domainPairs.iterator(); pairIt.hasNext(); ) {
                 final TypeNode[] pair = (TypeNode[]) pairIt.next();
+                if( pair[0] == null ) continue;
                 if( !pair[0].type().equals( exprPair[0] ) ) continue;
                 if( pair[1] == null ) continue outer;
                 if( pair[1].type().isSubtype( ts.physicalDomain() ) ) {
@@ -126,6 +128,11 @@ outer:
                 }
             }
         }
+        for( Iterator pairIt = domainPairs.iterator(); pairIt.hasNext(); ) {
+            final TypeNode[] pair = (TypeNode[]) pairIt.next();
+            if( pair[0] != null ) continue;
+            newDomains.add( new Type[] { pair[1].type(), null } );
+        }
         return type( ts.BDDType( newDomains ) );
     }
     public Node physicalDomains( PhysicalDomains pd ) {
@@ -140,6 +147,7 @@ outer:
             Type[] newDomain = new Type[2];
             for( Iterator pairIt = domainPairs.iterator(); pairIt.hasNext(); ) {
                 final TypeNode[] pair = (TypeNode[]) pairIt.next();
+                if( pair[0] == null ) continue;
                 if( !pair[0].type().equals( exprPair[0] ) ) continue;
                 if( pair[1] == null ) continue outer;
                 if( pair[1].type().isSubtype( ts.physicalDomain() ) ) {
@@ -175,6 +183,7 @@ outer:
             Type phys = pair[1];
             for( Iterator repPairIt = domainPairs().iterator(); repPairIt.hasNext(); ) {
                 final TypeNode[] repPair = (TypeNode[]) repPairIt.next();
+                if( repPair[0] == null ) continue;
                 if( !repPair[0].type().equals( pair[0] ) ) continue;
                 if( repPair[1] == null ) {
                     project.add( nf.Call( p, nf.CanonicalTypeNode( p, phys ), "v" ) );

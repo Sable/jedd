@@ -28,7 +28,7 @@ import polyglot.util.*;
 import polyglot.visit.*;
 import java.util.*;
 
-public class Relprod_c extends Expr_c implements Relprod, JeddGenerateJava, JeddPhysicalDomains
+public abstract class Relprod_c extends Expr_c implements Relprod, JeddGenerateJava, JeddPhysicalDomains
 {
     Expr lhs;
     Expr rhs;
@@ -71,7 +71,7 @@ public class Relprod_c extends Expr_c implements Relprod, JeddGenerateJava, Jedd
             if( domainIt.hasNext() ) w.write(", ");
         }
         w.write(" } ");
-        w.write(" >< ");
+        w.write(" "+symbol()+" ");
         rhs.prettyPrint( w, tr );
         w.write(" { ");
         for( Iterator domainIt = rdomains.iterator(); domainIt.hasNext(); ) {
@@ -100,17 +100,35 @@ public class Relprod_c extends Expr_c implements Relprod, JeddGenerateJava, Jedd
         if( ldomains.size() != rdomains.size() ) {
             throw new SemanticException( "Lists of domains to be equated are of different lengths" );
         }
-        
 
-        // make sure all abstract domains are unique.
-        HashSet seenAlready = new HashSet();
+        HashSet seenAlready;
+        seenAlready = new HashSet();
+        for( Iterator domainIt = ldomains.iterator(); domainIt.hasNext(); ) {
+            final Type domain = (Type) domainIt.next();
+            if( !seenAlready.add(domain) )
+                throw new SemanticException( "Duplicate attribute "+domain+" in attributes to be compared." );
+            if( !domain.isSubtype( ts.domain() ) ) 
+                throw new SemanticException( ""+domain+" does not extend jedd.Domain" );
+        }
+        seenAlready = new HashSet();
+        for( Iterator domainIt = rdomains.iterator(); domainIt.hasNext(); ) {
+            final Type domain = (Type) domainIt.next();
+            if( !seenAlready.add(domain) )
+                throw new SemanticException( "Duplicate attribute "+domain+" in attributes to be compared." );
+            if( !domain.isSubtype( ts.domain() ) ) 
+                throw new SemanticException( ""+domain+" does not extend jedd.Domain" );
+        }
+
+        // make sure all attributes in result are unique.
+        seenAlready = new HashSet();
         List resultingType = new LinkedList();
         for( Iterator domainIt = lmap.keySet().iterator(); domainIt.hasNext(); ) {
             final Type domain = (Type) domainIt.next();
-            if( isInDomains( domain, ldomains ) ) continue;
+            if( !keepMatchedDomains() 
+            &&  isInDomains( domain, ldomains ) ) continue;
             resultingType.add( new Type[] { domain, null } );
             if( !seenAlready.add( domain ) ) {
-                throw new SemanticException( "Resulting type has duplicate domain "+domain );
+                throw new SemanticException( "Resulting type has duplicate attribute "+domain );
             }
         }
         for( Iterator domainIt = rmap.keySet().iterator(); domainIt.hasNext(); ) {
@@ -118,9 +136,10 @@ public class Relprod_c extends Expr_c implements Relprod, JeddGenerateJava, Jedd
             if( isInDomains( domain, rdomains ) ) continue;
             resultingType.add( new Type[] { domain, null } );
             if( !seenAlready.add( domain ) ) {
-                throw new SemanticException( "Resulting type has duplicate domain "+domain );
+                throw new SemanticException( "Resulting type has duplicate attribute "+domain );
             }
         }
+
 
         return type( ts.BDDType( resultingType ) );
     }
@@ -141,7 +160,8 @@ public class Relprod_c extends Expr_c implements Relprod, JeddGenerateJava, Jedd
         for( Iterator domainIt = lmap.keySet().iterator(); domainIt.hasNext(); ) {
 
             final Type domain = (Type) domainIt.next();
-            if( isInDomains( domain, ldomains ) ) continue;
+            if( !keepMatchedDomains()
+            &&  isInDomains( domain, ldomains ) ) continue;
             ts.addMustEqualEdge( DNode.v( this, domain ), DNode.v( lhs, domain ) );
         }
         for( Iterator domainIt = rmap.keySet().iterator(); domainIt.hasNext(); ) {
@@ -179,7 +199,7 @@ public class Relprod_c extends Expr_c implements Relprod, JeddGenerateJava, Jedd
         return nf.Call( 
                 n.position(),
                 getJedd,
-                "relprod",
+                function(),
                 nf.Call( n.position(), getJedd, "read", n.lhs() ),
                 n.rhs(),
                 nf.NewArray(
@@ -191,5 +211,8 @@ public class Relprod_c extends Expr_c implements Relprod, JeddGenerateJava, Jedd
                     )
                 ).type( n.type() );
     }
+    protected abstract String symbol();
+    protected abstract String function();
+    protected abstract boolean keepMatchedDomains();
 }
 

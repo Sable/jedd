@@ -36,4 +36,5 @@ public interface JeddTypeSystem extends TypeSystem {
     public BDDType sameDomains( BDDType t );
     public BDDType cloneDomains( BDDType t );
     public Map instance2Decl();
+    public void makeBDDFormalsConform(MethodInstance mi, MethodInstance mj) throws SemanticException;
 }

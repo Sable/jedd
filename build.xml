@@ -222,7 +222,7 @@
             <fileset dir="translator/generated/polyglot/ext/jedd/parse" includes="Grm.java,sym.java"/>
         </replaceregexp>
     </target>
-    <target name="cup-dep" depends="settings">
+    <target name="cup-dep" depends="ppg-translator,settings">
         <dependset>
             <srcfileset dir="translator/generated/polyglot/ext/jedd/parse" includes="jedd_ppg.cup"/>
             <targetfileset dir="translator/generated/polyglot/ext/jedd/parse"
@@ -236,7 +236,7 @@
         </condition>
     </target>
 
-    <target name="ppg-translator" depends="settings,ppg-dep,flex-translator" unless="cup-up-to-date">
+    <target name="ppg-translator" depends="settings,ppg-dep,flex-translator" unless="ppg-up-to-date">
         <mkdir dir="translator/generated/polyglot/ext/jedd/parse"/>
         <java classname="ppg.PPG"
             fork="true"
@@ -257,7 +257,7 @@
                 includes="jedd_ppg.cup"/>
         </dependset>
         <available property="ppg-up-to-date"
-            file="generated/polyglot/ext/jedd/parse/jedd_ppg.cup"/>
+            file="translator/generated/polyglot/ext/jedd/parse/jedd_ppg.cup"/>
     </target>
 
     <target name="clean" depends="settings">

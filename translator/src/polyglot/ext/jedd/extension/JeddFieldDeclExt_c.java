@@ -53,13 +53,13 @@ public class JeddFieldDeclExt_c extends JeddExt_c implements JeddTypeCheck, Jedd
         JeddTypeSystem ts = pd.jeddTypeSystem();
 
         FieldDecl n = (FieldDecl) node();
-        if( n.init() == null ) return n;
         if( !( n.declType() instanceof BDDType ) ) return n;
         BDDType t = (BDDType) n.declType();
         for( Iterator domainIt = t.map().keySet().iterator(); domainIt.hasNext(); ) {
             final Type domain = (Type) domainIt.next();
-            ts.addMustEqualEdge( DNode.v( n.init(), domain ),
-                    DNode.v( n.fieldInstance(), domain ) );
+            DNode dnode = DNode.v( n.fieldInstance(), domain );
+            if( n.init() != null )
+                ts.addMustEqualEdge( DNode.v( n.init(), domain ), dnode );
         }
         return n;
     }

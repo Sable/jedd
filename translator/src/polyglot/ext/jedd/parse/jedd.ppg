@@ -18,7 +18,6 @@ parser Grm extends polyglot.ext.jl.parse.Grm {:
 :};
 
 non terminal TypeNode attribute;
-non terminal TypeNode attribute_opt;
 non terminal TypeNode colon_attribute_opt;
 non terminal LinkedList attribute_tail;
 non terminal BDDTypeNode relation_type;
@@ -52,6 +51,11 @@ relation_type ::=
             b.addFirst(a);
             RESULT = parser.nf.BDDTypeNode( parser.pos(p), b );
         :}
+        |
+        LT:p GT
+        {:
+            RESULT = parser.nf.BDDTypeNode( parser.pos(p), new LinkedList() );
+        :}
         ;
 
 attribute_phys ::=
@@ -78,12 +82,6 @@ attribute ::=
         class_or_interface_type:a
         {: RESULT = a; :}
     ;
-
-attribute_opt ::=
-        attribute:a
-        {: RESULT = a; :}
-        |
-        ;
 
 colon_attribute_opt ::=
         COLON attribute:a
@@ -117,11 +115,11 @@ relation_expr_or_relprod ::=
 relprod ::=
         relation_expr_or_relprod:a attribute_list:b GT LT
         relation_expr:c attribute_list:d
-        {: RESULT = parser.nf.Relprod( parser.pos(a), a, c, b, d ); :}
+        {: RESULT = parser.nf.Join( parser.pos(a), a, c, b, d ); :}
         |
         relation_expr_or_relprod:a attribute_list:b LT GT
         relation_expr:c attribute_list:d
-        {: RESULT = parser.nf.Relprod( parser.pos(a), a, c, b, d ); :}
+        {: RESULT = parser.nf.Compose( parser.pos(a), a, c, b, d ); :}
         ;
 
 replace ::=
@@ -134,9 +132,19 @@ replace ::=
         ;
 
 replacement ::=
-        attribute:a ARROW attribute_opt:b
+        attribute:a ARROW attribute:b
         {:
             TypeNode[] ret = { a, b };
+            RESULT = ret;
+        :}
+        | attribute:a ARROW
+        {:
+            TypeNode[] ret = { a, null };
+            RESULT = ret;
+        :}
+        | ARROW attribute:b 
+        {:
+            TypeNode[] ret = { null, b };
             RESULT = ret;
         :}
         ;
@@ -156,6 +164,9 @@ replacement_tail ::=
 
 attribute_list ::= LBRACE attribute:a attribute_tail:b RBRACE 
             {: b.addFirst( a ); RESULT = b; :}
+            |
+            LBRACE RBRACE
+            {: RESULT = new LinkedList(); :}
             ;
 
 

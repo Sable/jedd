@@ -19,6 +19,7 @@
 
 package polyglot.ext.jedd.types;
 
+import polyglot.util.*;
 import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.ext.jl.ast.*;
@@ -41,6 +42,9 @@ public abstract class BDDExpr {
         public void throwSemanticException( String s ) throws SemanticException {
             throw new SemanticException( s, mi.position() );
         }
+        public Position position() {
+            return mi.position();
+        }
     }
     private static class VIExpr extends BDDExpr {
         VarInstance vi;
@@ -56,6 +60,9 @@ public abstract class BDDExpr {
         }
         public void throwSemanticException( String s ) throws SemanticException {
             throw new SemanticException( s, vi.position() );
+        }
+        public Position position() {
+            return vi.position();
         }
     }
     private static class ExprExpr extends BDDExpr {
@@ -75,6 +82,9 @@ public abstract class BDDExpr {
         public void throwSemanticException( String s ) throws SemanticException {
             throw new SemanticException( s, ex.position() );
         }
+        public Position position() {
+            return ex.position();
+        }
     }
     private static BDDExpr v( BDDExpr ret ) {
         BDDExpr ret2 = (BDDExpr) instances.get( ret );
@@ -87,6 +97,7 @@ public abstract class BDDExpr {
     private static Map instances = new HashMap();
     public abstract BDDType getType();
     protected abstract Object obj();
+    public abstract Position position();
     public int hashCode() {
         return obj().hashCode();
     }

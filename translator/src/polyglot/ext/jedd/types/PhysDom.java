@@ -155,9 +155,27 @@ public class PhysDom {
 
     Set cnf = new HashSet();
 
+    public static class Clause extends HashSet {
+        public Clause( String comment ) {
+            this.comment = comment;
+        }
+        String comment;
+        public String toString() {
+            StringBuffer ret = new StringBuffer();
+            ret.append( "c "+comment+"\n" );
+            for( Iterator litIt = this.iterator(); litIt.hasNext(); ) {
+                final Object lit = (Object) litIt.next();
+                ret.append( lit.toString()+" " );
+            }
+            ret.append( "0" );
+            return ret.toString();
+        }
+    }
+
 
     public void findAssignment() throws SemanticException {
         printDomainsDot();
+        printDomainsRsf();
 
         createLiterals();
 
@@ -175,6 +193,9 @@ public class PhysDom {
         recordPhys();
 
         printDomainsDot();
+        printDomainsRsf();
+
+        printStats();
     }
 
     Set solution = new HashSet();
@@ -186,15 +207,9 @@ public class PhysDom {
             PrintWriter file = new PrintWriter(
                     new FileOutputStream( tmpFile ) );
             file.println( "p cnf "+numvars+" "+cnf.size() );
-            boolean first = true;
             for( Iterator clauseIt = cnf.iterator(); clauseIt.hasNext(); ) {
-                final Set clause = (Set) clauseIt.next();
-                if( !first ) file.println( "0" );
-                first = false;
-                for( Iterator litIt = clause.iterator(); litIt.hasNext(); ) {
-                    final Object lit = (Object) litIt.next();
-                    file.println( lit.toString() );
-                }
+                final Clause clause = (Clause) clauseIt.next();
+                file.println( clause.toString() );
             }
             file.close();
             Process p = Runtime.getRuntime().exec(satSolver+" "+tmpFile.getAbsolutePath());
@@ -240,7 +255,7 @@ public class PhysDom {
                 Integer i = (Integer) litNumMap.get( lit );
                 if( pos[i.intValue()] ) solution.add( lit );
             }
-            tmpFile.delete();
+            //tmpFile.delete();
         } catch( IOException e ) {
             throw new RuntimeException( e.toString() );
         }
@@ -306,7 +321,7 @@ public class PhysDom {
         // Each dnode must be assigned to at least one phys
         for( Iterator dnodeIt = DNode.nodes().iterator(); dnodeIt.hasNext(); ) {
             final DNode dnode = (DNode) dnodeIt.next();
-            Set clause = new HashSet();
+            Set clause = new Clause("[PHYS>=1] At least one phys for "+dnode);
             for( Iterator physIt = allPhys.iterator(); physIt.hasNext(); ) {
                 final Type phys = (Type) physIt.next();
                 clause.add( Literal.v( dnode, phys ) );
@@ -322,7 +337,7 @@ public class PhysDom {
                 for( Iterator phys2It = allPhys.iterator(); phys2It.hasNext(); ) {
                     final Type phys2 = (Type) phys2It.next();
                     if( phys == phys2 ) continue;
-                    Set clause = new HashSet();
+                    Set clause = new Clause("[PHYS<=1] At most one phys for "+dnode);
                     clause.add( NegLiteral.v( dnode, phys ) );
                     clause.add( NegLiteral.v( dnode, phys2 ) );
                     cnf.add( clause );
@@ -341,12 +356,12 @@ public class PhysDom {
         // (xa ==> ya) /\ (ya ==> xa) = (ya \/ ~xa) /\ (xa \/ ~ya)
         for( Iterator physIt = allPhys.iterator(); physIt.hasNext(); ) {
             final Type phys = (Type) physIt.next();
-            Set clause = new HashSet();
+            Set clause = new Clause("[MUSTEQUAL] Must equal edge between "+node1+" and "+node2+" for "+phys);
             clause.add( Literal.v( node1, phys ) );
             clause.add( NegLiteral.v( node2, phys ) );
             cnf.add( clause );
 
-            clause = new HashSet();
+            clause = new Clause("[MUSTEQUAL] Must equal edge between "+node1+" and "+node2+" for "+phys);
             clause.add( NegLiteral.v( node1, phys ) );
             clause.add( Literal.v( node2, phys ) );
             cnf.add( clause );
@@ -368,15 +383,17 @@ public class PhysDom {
         }
     }
 
+    static int conflictEdgeCount;
     private void addConflictEdge( DNode node1, DNode node2 ) {
         // (xa ==> ~ya) /\ (ya ==> ~xa) = (~ya \/ ~xa)
         for( Iterator physIt = allPhys.iterator(); physIt.hasNext(); ) {
             final Type phys = (Type) physIt.next();
-            Set clause = new HashSet();
+            Set clause = new Clause("[CONFLICT] Conflict edge between "+node1.toLongString()+" and "+node2.toLongString()+" for "+phys);
             clause.add( NegLiteral.v( node1, phys ) );
             clause.add( NegLiteral.v( node2, phys ) );
             cnf.add( clause );
         }
+        conflictEdgeCount++;
     }
 
     public Type phys(DNode d) {
@@ -454,7 +471,7 @@ outer:          for( Iterator newPathIt = ((Set)pathMap.get(node)).iterator(); n
 
             {
                 // at least one path must be active for each node
-                Set clause = new HashSet();
+                Set clause = new Clause("[PATH>=1] At least one path for "+node);
                 for( Iterator pathIt = paths.iterator(); pathIt.hasNext(); ) {
                     final Set path = (Set) pathIt.next();
                     clause.add( SetLit.v( path ) );
@@ -473,7 +490,7 @@ outer:          for( Iterator newPathIt = ((Set)pathMap.get(node)).iterator(); n
                     for( Iterator nodeOnPathIt = path.iterator(); nodeOnPathIt.hasNext(); ) {
                         final DNode nodeOnPath = (DNode) nodeOnPathIt.next();
                         // a ==> b /\ c /\ d = (b \/ ~a) /\ (c \/ ~a) /\ (d \/ ~a)
-                        Set clause = new HashSet();
+                        Set clause = new Clause("[NODEONPATH] Node "+nodeOnPath+" to node "+node);
                         clause.add( NegSetLit.v(path) );
                         clause.add( Literal.v( nodeOnPath, phys ) );
                         cnf.add(clause);
@@ -483,6 +500,7 @@ outer:          for( Iterator newPathIt = ((Set)pathMap.get(node)).iterator(); n
         }
     }
 
+    static int specifiedAttributes = 0;
     public void setupSpecifiedAssignment() {
         for( Iterator exprIt = DNode.exprs().iterator(); exprIt.hasNext(); ) {
             final BDDExpr expr = (BDDExpr) exprIt.next();
@@ -493,9 +511,12 @@ outer:          for( Iterator newPathIt = ((Set)pathMap.get(node)).iterator(); n
                 Type phys = (Type) map.get(domain);
                 DNode dnode = DNode.v(expr,domain);
                 if( phys != null ) {
-                    Set clause = new HashSet();
+                    Set clause = new Clause("[SPECIFIED] "+dnode+" specified to be "+phys);
                     clause.add( Literal.v( dnode, phys ) );
-                    cnf.add( clause );
+                    if( cnf.add( clause ) ) {;
+                        System.out.println( ""+dnode+" specified to be "+phys );
+                        specifiedAttributes++;
+                    }
                 }
             }
         }
@@ -518,6 +539,38 @@ outer:          for( Iterator newPathIt = ((Set)pathMap.get(node)).iterator(); n
         }
     }
 
+    public void printDomainsRsf() {
+        try {
+            PrintWriter file = new PrintWriter(
+                    new FileOutputStream( new File("domainassign.rsf") ) );
+            int snum = 0;
+            file.println( "n!type "+(++snum)+"!Root Collapse" );
+            for( Iterator exprIt = DNode.exprs().iterator(); exprIt.hasNext(); ) {
+                final BDDExpr expr = (BDDExpr) exprIt.next();
+                file.println( "n!type "+(++snum)+"!\""+expr+" line="+expr.position().file()+":"+expr.position().line()+"\" Expr"  );
+                file.println( "a!level 1!"+snum+" "+snum+"!Foo" );
+                for( Iterator dIt = DNode.nodes().iterator(); dIt.hasNext(); ) {
+                    final DNode d = (DNode) dIt.next();
+                    if( d.expr != expr ) continue;
+                    Type phys = (Type) expr.getType().map().get(d.dom);
+                    String phs = phys == null ? "null":phys.toString();
+                    file.println( "n!type "+(d.domNum+1000)+"!\""+d.toShortString()+":"+phs+"\" Dom" );
+                    file.println( "a!level "+snum+"!"+(d.domNum+1000)+" "+(d.domNum+1000)+"!Foo" );
+                }
+            }
+            for( Iterator eIt = mustEqualEdges.iterator(); eIt.hasNext(); ) {
+                final DNode[] e = (DNode[]) eIt.next();
+                file.println( "a!MustEqual "+(e[0].domNum+1000)+"!"+(++snum)+" "+(e[1].domNum+1000)+"!Foo" );
+            }
+            for( Iterator eIt = assignEdges.iterator(); eIt.hasNext(); ) {
+                final DNode[] e = (DNode[]) eIt.next();
+                file.println( "a!Assign "+(e[0].domNum+1000)+"!"+(++snum)+" "+(e[1].domNum+1000)+"!Foo" );
+            }
+            file.close();
+        } catch( IOException e ) {
+            throw new RuntimeException( e.toString() );
+        }
+    }
     public void printDomainsDot() {
         try {
             PrintWriter file = new PrintWriter(
@@ -532,7 +585,7 @@ outer:          for( Iterator newPathIt = ((Set)pathMap.get(node)).iterator(); n
             for( Iterator exprIt = DNode.exprs().iterator(); exprIt.hasNext(); ) {
                 final BDDExpr expr = (BDDExpr) exprIt.next();
                 file.println( " subgraph cluster"+ snum++ +" {" );
-                file.println( "  label=\""+expr+"\";" );
+                file.println( "  label=\""+expr+":"+expr.position().file()+":"+expr.position().line()+"\";" );
                 BDDType t = expr.getType();
                 Map map = t.map();
                 for( Iterator dIt = DNode.nodes().iterator(); dIt.hasNext(); ) {
@@ -559,5 +612,31 @@ outer:          for( Iterator newPathIt = ((Set)pathMap.get(node)).iterator(); n
         } catch( IOException e ) {
             throw new RuntimeException( e.toString() );
         }
+    }
+    public void printStats() {
+        int exprs=0, nodes=0, nonrep=0, nonrepnodes=0;
+        for( Iterator exprIt = DNode.exprs().iterator(); exprIt.hasNext(); ) {
+            final BDDExpr expr = (BDDExpr) exprIt.next();
+            exprs++;
+            if( !( expr.obj() instanceof FixPhys ) ) {
+                nonrep++;
+            }
+        }
+        for( Iterator nodeIt = DNode.nodes().iterator(); nodeIt.hasNext(); ) {
+            final DNode node = (DNode) nodeIt.next();
+            nodes++;
+            if( !( node.expr.obj() instanceof FixPhys ) ) {
+                nonrepnodes++;
+            }
+        }
+        System.out.println( "Must equal edges: "+mustEqualEdges.size() );
+        System.out.println( "Assignment edges: "+assignEdges.size() );
+        System.out.println( "Conflict edges: "+conflictEdgeCount/2 );
+        System.out.println( "Expressions: "+exprs );
+        System.out.println( "Non-replaces: "+nonrep );
+        System.out.println( "Attributes: "+nodes );
+        System.out.println( "Non-rep attributes: "+nonrepnodes );
+        System.out.println( "Specified attributes: "+specifiedAttributes );
+        System.out.println( "Physical domains: "+allPhys.size() );
     }
 }

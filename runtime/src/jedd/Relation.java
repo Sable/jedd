@@ -139,6 +139,87 @@ public class Relation {
         return JeddNative.satCount(bdd, vars);
     }
 
+    public Iterator iterator(Domain[] wanted) {
+        if( domains.length != wanted.length ) {
+            throw new RuntimeException( "Domain count doesn't match" );
+        }
+        PhysicalDomain[] physWanted = new PhysicalDomain[wanted.length];
+        for( int i=0; i < wanted.length; i++ ) {
+            for( int j = 0; j < domains.length; j++ ) {
+                if( domains[j] == wanted[i] )
+                    physWanted[i] = phys[j];
+            }
+        }
+        return new MultiRelationIterator( bdd, physWanted, wanted );
+    }
+    
+    class MultiRelationIterator implements Iterator {
+        MultiRelationIterator( int bdd, PhysicalDomain[] phys, Domain[] domain ) {
+            this.phys = phys;
+            this.domain = domain;
+            this.ret = new Object[domain.length];
+            this.ret2 = new Object[domain.length];
+            ncubes = JeddNative.numPaths( bdd );
+            nbits = JeddNative.numBits();
+            cubes = new int[ ncubes * nbits ];
+            JeddNative.allCubes( bdd, cubes );
+            curcube = new int[nbits];
+            if( ncubes > 0 ) newCube();
+        }
+        private int[] cubes;
+        private int ncubes;
+        private int nbits;
+        private int current = 0;
+        private int[] curcube;
+        private Object[] ret;
+        private Object[] ret2;
+        private PhysicalDomain[] phys;
+        private Domain[] domain;
+
+        public boolean hasNext() { return current < ncubes*nbits; }
+        private void newCube() {
+            
+            for( int j = 0; j < phys.length; j++ ) {
+                for( int i = phys[j].firstBit(); i < phys[j].bitAfterLast(); i++ ) {
+                    if( cubes[i+current] == 1 ) curcube[i] = 1;
+                    else curcube[i] = 0;
+                }
+            }
+            curCubeToObject();
+        }
+        private void curCubeToObject() {
+            for( int i = 0; i < domain.length; i++ )
+                ret[i] = domain[i].numberer().get( phys[i].readBits( curcube ) );
+        }
+        private void advance() {
+            if( current >= ncubes*nbits ) throw new RuntimeException( "advancing past end of iterator" );
+
+            for( int j = 0; j < phys.length; j++ ) {
+                for( int i = phys[j].bitAfterLast()-1; i >= phys[j].firstBit(); i-- ) {
+                    if( cubes[current+i] == 0 ) continue;
+                    if( cubes[current+i] == 1 ) continue;
+                    if( curcube[i] == 1 ) curcube[i] = 0;
+                    else {
+                        curcube[i] = 1;
+                        curCubeToObject();
+                        return;
+                    }
+                }
+            }
+            current += nbits;
+            if( current < ncubes*nbits ) newCube();
+        }
+        public Object next() {
+            for( int i = 0; i < domain.length; i++ ) ret2[i] = ret[i];
+            //debug();
+            advance();
+            return ret2;
+        }
+        public void remove() {
+            throw new UnsupportedOperationException();
+        }
+    }
+
     public Iterator iterator() {
         if( domains.length != 1 ) {
             throw new RuntimeException( "Can only get iterator over single-domain BDD." );
@@ -165,8 +246,6 @@ public class Relation {
         private Object ret;
         private PhysicalDomain phys;
         private Domain domain;
-
-
 
         public boolean hasNext() { return current < ncubes*nbits; }
         private void newCube() {
@@ -258,7 +337,7 @@ public class Relation {
                     new Domain[] { domains[domain] },
                     new PhysicalDomain[] { phys[domain] } );
             JeddNative.addRef(bdd);
-            int restrictedBdd = Jedd.v().relprod( bdd, literal, new PhysicalDomain[] { phys[domain] } );
+            int restrictedBdd = Jedd.v().compose( bdd, literal, new PhysicalDomain[] { phys[domain] } );
             toString( prefix + o + ((domain == domains.length - 1) ? "]" : ", "),
                     b,
                     domain + 1,

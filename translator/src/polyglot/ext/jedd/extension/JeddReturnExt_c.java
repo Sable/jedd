@@ -29,8 +29,19 @@ import polyglot.util.*;
 import polyglot.visit.*;
 import java.util.*;
 
-public class JeddReturnExt_c extends JeddExt_c implements JeddPhysicalDomains
+public class JeddReturnExt_c extends JeddExt_c implements JeddPhysicalDomains, JeddTypeCheck
 {
+    public Node typeCheck(TypeChecker tc) throws SemanticException {
+        JeddTypeSystem ts = (JeddTypeSystem) tc.typeSystem();
+        JeddNodeFactory nf = (JeddNodeFactory) tc.nodeFactory();
+
+        Return n = (Return) node();
+        if( n.expr() == null ) return n.typeCheck(tc);
+        Type t = n.expr().type();
+        if( !(t instanceof BDDType ) ) return n.typeCheck(tc);
+        n = n.expr( (Expr) nf.FixPhys( n.expr().position(), n.expr() ).typeCheck(tc) );
+        return n;
+    }
     public Node generateJava( JeddTypeSystem ts, JeddNodeFactory nf ) throws SemanticException {
         Return n = (Return) node();
 
@@ -52,7 +63,7 @@ public class JeddReturnExt_c extends JeddExt_c implements JeddPhysicalDomains
         BDDType type = (BDDType) n.expr().type();
         for( Iterator domainIt = type.map().keySet().iterator(); domainIt.hasNext(); ) {
             final Type domain = (Type) domainIt.next();
-            ts.addAssignEdge( DNode.v( n.expr(), domain ), DNode.v( mi, domain ) );
+            ts.addMustEqualEdge( DNode.v( n.expr(), domain ), DNode.v( mi, domain ) );
         }
 
         return n;

@@ -56,6 +56,9 @@ public class JeddExtFactory_c extends AbstractExtFactory_c {
     public Ext extFormalImpl() {
         return new JeddFormalExt_c();
     }
+    public Ext extConstructorCallImpl() {
+        return new JeddConstructorCallExt_c();
+    }
     public Ext extCallImpl() {
         return new JeddCallExt_c();
     }

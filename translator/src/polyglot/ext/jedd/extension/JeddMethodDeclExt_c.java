@@ -28,15 +28,29 @@ import polyglot.util.*;
 import polyglot.visit.*;
 import java.util.*;
 
-public class JeddMethodDeclExt_c extends JeddExt_c implements JeddTypeCheck
+public class JeddMethodDeclExt_c extends JeddExt_c implements JeddTypeCheck, MethodDeclMap
 {
     public Node typeCheck( TypeChecker tc ) throws SemanticException {
         JeddTypeSystem ts = (JeddTypeSystem) tc.typeSystem();
 
         MethodDecl n = (MethodDecl) node();
 
+        n = (MethodDecl) n.typeCheck(tc);
+        for( Iterator mjIt = ts.overrides( n.methodInstance() ).iterator(); mjIt.hasNext(); ) {
+            final MethodInstance mj = (MethodInstance) mjIt.next();
+            ts.makeBDDFormalsConform(n.methodInstance(), mj);
+        }
+        for( Iterator mjIt = ts.implemented( n.methodInstance() ).iterator(); mjIt.hasNext(); ) {
+            final MethodInstance mj = (MethodInstance) mjIt.next();
+            ts.makeBDDFormalsConform(n.methodInstance(), mj);
+        }
+        return n;
+    }
+    public Node methodDeclMap( JeddTypeSystem ts, JeddNodeFactory nf ) throws SemanticException {
+        MethodDecl n = (MethodDecl) node();
+
         ts.instance2Decl().put( n.methodInstance(), n );
-        return n.typeCheck(tc);
+        return n;
     }
 }
 

@@ -17,20 +17,35 @@
  * Boston, MA 02111-1307, USA.
  */
 
-package polyglot.ext.jedd.extension;
+package polyglot.ext.jedd.visit;
 
-import polyglot.ast.*;
-import polyglot.ext.jl.ast.*;
 import polyglot.ext.jedd.ast.*;
+import polyglot.ext.jedd.extension.*;
 import polyglot.ext.jedd.types.*;
-import polyglot.ext.jedd.visit.*;
+import polyglot.ast.*;
 import polyglot.types.*;
+import polyglot.util.*;
 import polyglot.frontend.*;
 import polyglot.visit.*;
-import polyglot.util.*;
+import java.util.*;
 
-public interface JeddExt extends Ext {
-    public Node physicalDomains(PhysicalDomains pd) throws SemanticException;
-    public Node generateJava(JeddTypeSystem ts, JeddNodeFactory nf) throws SemanticException;
-    public Node methodDeclMap( JeddTypeSystem ts, JeddNodeFactory nf ) throws SemanticException;
+public class MethodDeclMapPass extends ContextVisitor
+{
+    public MethodDeclMapPass( Job job, TypeSystem ts, NodeFactory nf ) {
+        super(job, ts, nf);
+    }
+    public Node leaveCall(Node old, Node n, NodeVisitor v) throws SemanticException {
+        n = super.leaveCall(old, n, v);
+
+        if (n.ext() instanceof JeddExt) {
+            return ((JeddExt) n.ext()).methodDeclMap((JeddTypeSystem) typeSystem(),
+                                              (JeddNodeFactory) nodeFactory());
+        } else if( n instanceof MethodDeclMap ) {
+            return ((MethodDeclMap) n).methodDeclMap((JeddTypeSystem) typeSystem(),
+                                              (JeddNodeFactory) nodeFactory());
+        }
+
+        return n;
+    }
 }
+

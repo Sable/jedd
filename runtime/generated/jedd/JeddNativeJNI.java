@@ -36,4 +36,5 @@ class JeddNativeJNI {
   public final static native void info();
   public final static native void reportOrdering(int jarg1, int[] jarg2);
   public final static native void gbc();
+  public final static native void getShape(int jarg1, int[] jarg2);
 }

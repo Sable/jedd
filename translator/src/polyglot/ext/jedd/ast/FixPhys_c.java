@@ -45,8 +45,42 @@ public class FixPhys_c extends Expr_c implements FixPhys, JeddGenerateJava, Jedd
         return ret.type( type );
     }
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
+        BDDType type = (BDDType) type();
+        BDDType exprType = (BDDType) expr().type();
+        Map map = type.map();
+
+        List from = new LinkedList();
+        List to = new LinkedList();
+        for( Iterator pairIt = exprType.domainPairs().iterator(); pairIt.hasNext(); ) {
+            final Type[] pair = (Type[]) pairIt.next();
+            Type phys = (Type) map.get( pair[0] );
+            if( phys == null && pair[1] == null ) continue;
+            if( phys != null && phys.equals( pair[1] ) ) continue;
+            from.add( pair[1] );
+            to.add( phys );
+        }
+
         w.begin(0);
+        if( !from.isEmpty() ) {
+            w.write("(");
+            w.write("(");
+            Iterator itf = from.iterator();
+            Iterator itt = to.iterator();
+            while( itf.hasNext() ) {
+                Type tf = (Type) itf.next();
+                Type tt = (Type) itt.next();
+                w.write(tf==null?"unassigned":tf.toString());
+                w.write("=>");
+                w.write(tt==null?"unassigned":tt.toString());
+                if( itf.hasNext() ) {
+                    w.write(",");
+                    w.allowBreak(0, " ");
+                }
+            }
+            w.write(")");
+        }
         printSubExpr(expr, w, tr);
+        if( !from.isEmpty() ) w.write(")");
         w.end();
     }
     public Node typeCheck( TypeChecker tc ) throws SemanticException {

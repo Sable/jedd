@@ -1,0 +1,1 @@
+/usr/sbin/thttpd -d /home/olhotak/jedd/profile_view -p 8080 -c '*.cgi'

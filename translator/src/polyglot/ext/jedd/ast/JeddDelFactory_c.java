@@ -53,4 +53,10 @@ public class JeddDelFactory_c extends AbstractDelFactory_c {
     public JL delConstructorDeclImpl() {
         return new JeddDel_c();
     }
+    public JL delCallImpl() {
+        return new JeddDel_c();
+    }
+    public JL delConstructorCallImpl() {
+        return new JeddDel_c();
+    }
 }

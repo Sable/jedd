@@ -35,10 +35,10 @@ public class BDDType_c extends ReferenceType_c implements BDDType {
         ret.append("<");
         for( Iterator pairIt = domainPairs.iterator(); pairIt.hasNext(); ) {
             final Type[] pair = (Type[]) pairIt.next();
-            ret.append( pair[0].toString() );
+            ret.append( ((ClassType)pair[0]).fullName() );
             if( pair[1] != null ) {
                 ret.append(":");
-                ret.append( pair[1].toString() );
+                ret.append( ((ClassType)pair[1]).fullName() );
             }
             if( pairIt.hasNext() ) ret.append(", ");
         }
@@ -52,11 +52,13 @@ public class BDDType_c extends ReferenceType_c implements BDDType {
         return isImplicitCastValidImpl(toType);
     }
     public boolean isImplicitCastValidImpl(Type toType) {
+        if( toType instanceof NullType ) return false;
         if( descendsFromImpl(toType) ) return true;
         if( !( toType instanceof BDDType ) ) return false;
         BDDType to = (BDDType) toType;
         if( map().keySet().equals( to.map().keySet() ) ) return true;
         if( map().keySet().isEmpty() ) return true;
+        if( to.map().keySet().isEmpty() ) return true;
         return false;
     }
     public Map map() {

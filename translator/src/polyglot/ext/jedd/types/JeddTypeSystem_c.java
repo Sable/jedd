@@ -33,6 +33,45 @@ public class JeddTypeSystem_c extends TypeSystem_c implements JeddTypeSystem {
     public BDDType BDDType( List domainPairs ) {
         return new BDDType_c( this, domainPairs );
     }
+    public void checkOverride(MethodInstance mi, MethodInstance mj) throws SemanticException {
+        super.checkOverride(mi, mj);
+    }
+    public void makeBDDFormalsConform(MethodInstance mi, MethodInstance mj) throws SemanticException {
+found_bdd:
+        {
+            for( Iterator tIt = mi.formalTypes().iterator(); tIt.hasNext(); ) {
+                final Type t = (Type) tIt.next();
+                if( t instanceof BDDType ) break found_bdd;
+            }
+            if( mi.returnType() instanceof BDDType ) break found_bdd;
+            return;
+        }
+        MethodDecl di = (MethodDecl) instance2Decl.get(mi);
+        MethodDecl dj = (MethodDecl) instance2Decl.get(mj);
+        if( dj == null ) return;
+        Iterator itI = di.formals().iterator();
+        Iterator itJ = dj.formals().iterator();
+        while(itI.hasNext()) {
+            Formal fi = (Formal) itI.next();
+            Formal fj = (Formal) itJ.next();
+            if( !(fi.type() instanceof BDDType) ) continue;
+            BDDType ti = (BDDType) fi.type();
+            BDDType tj = (BDDType) fj.type();
+            for( Iterator domainIt = ti.map().keySet().iterator(); domainIt.hasNext(); ) {
+                final Type domain = (Type) domainIt.next();
+                addMustEqualEdge( DNode.v( fi.localInstance(), domain ),
+                        DNode.v( fj.localInstance(), domain ) );
+            }
+        }
+        if( di.returnType() instanceof BDDType ) {
+            BDDType ti = (BDDType) di.returnType();
+            BDDType tj = (BDDType) dj.returnType();
+            for( Iterator domainIt = ti.map().keySet().iterator(); domainIt.hasNext(); ) {
+                final Type domain = (Type) domainIt.next();
+                addMustEqualEdge( DNode.v( mi, domain ), DNode.v( mj, domain ) );
+            }
+        }
+    }
     public boolean equals( TypeObject t1, TypeObject t2 ) {
         if( t1 instanceof BDDType 
         && t2 instanceof BDDType ) {
@@ -228,5 +267,18 @@ public class JeddTypeSystem_c extends TypeSystem_c implements JeddTypeSystem {
     private Map instance2Decl = new HashMap();
     public Map instance2Decl() {
         return instance2Decl;
+    }
+
+    protected NullType createNull() {
+        return new NullType_c( this ) {
+            public boolean isImplicitCastValidImpl(Type toType) {
+                if( toType instanceof BDDType ) return false;
+                return super.isImplicitCastValidImpl(toType);
+            }
+            public boolean isCastValidImpl(Type toType) {
+                if( toType instanceof BDDType ) return false;
+                return super.isImplicitCastValidImpl(toType);
+            }
+        };
     }
 }

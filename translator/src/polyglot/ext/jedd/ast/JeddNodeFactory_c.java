@@ -47,9 +47,13 @@ public class JeddNodeFactory_c extends NodeFactory_c implements JeddNodeFactory 
         Node ret = new FixPhys_c( pos, expr );
         return (FixPhys) ret;
     }
-    public Relprod Relprod( Position pos, Expr lhs, Expr rhs, List ldomains, List rdomains ) {
-        Node ret = new Relprod_c( pos, lhs, rhs, ldomains, rdomains );
-        return (Relprod) ret;
+    public Join Join( Position pos, Expr lhs, Expr rhs, List ldomains, List rdomains ) {
+        Node ret = new Join_c( pos, lhs, rhs, ldomains, rdomains );
+        return (Join) ret;
+    }
+    public Compose Compose( Position pos, Expr lhs, Expr rhs, List ldomains, List rdomains ) {
+        Node ret = new Compose_c( pos, lhs, rhs, ldomains, rdomains );
+        return (Compose) ret;
     }
     public BDDLit BDDLit( Position pos, List pieces ) {
         Node ret = new BDDLit_c(pos, pieces);

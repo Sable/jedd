@@ -25,4 +25,5 @@ public abstract class Domain {
     public String name() {
         return this.getClass().getName();
     }
+    public String toString() { return name(); }
 }

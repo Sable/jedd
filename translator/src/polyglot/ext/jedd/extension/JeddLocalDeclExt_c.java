@@ -53,13 +53,13 @@ public class JeddLocalDeclExt_c extends JeddExt_c implements JeddTypeCheck, Jedd
         JeddTypeSystem ts = pd.jeddTypeSystem();
 
         LocalDecl n = (LocalDecl) super.physicalDomains(pd);
-        if( n.init() == null ) return n;
         if( !( n.declType() instanceof BDDType ) ) return n;
         BDDType t = (BDDType) n.declType();
         for( Iterator domainIt = t.map().keySet().iterator(); domainIt.hasNext(); ) {
             final Type domain = (Type) domainIt.next();
-            ts.addMustEqualEdge( DNode.v( n.init(), domain ),
-                    DNode.v( n.localInstance(), domain ) );
+            DNode dnode = DNode.v( n.localInstance(), domain );
+            if( n.init() != null )
+                ts.addMustEqualEdge( DNode.v( n.init(), domain ), dnode );
         }
         return n;
     }

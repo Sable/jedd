@@ -57,14 +57,6 @@ public class JeddBinaryExt_c extends JeddExt_c implements JeddTypeCheck, JeddPhy
                 return n.type( ts.sameDomains( rt ) );
             if( rt.map().keySet().isEmpty() )
                 return n.type( ts.sameDomains( lt ) );
-            if( op == Binary.BIT_AND ) {
-                if( rt.map().keySet().containsAll( lt.map().keySet() ) ) {
-                    return n.type( ts.sameDomains( rt ) );
-                }
-                if( lt.map().keySet().containsAll( rt.map().keySet() ) ) {
-                    return n.type( ts.sameDomains( lt ) );
-                }
-            }
             throw new SemanticException( "Incompatible types for "+op+
                 " : lhs has type "+lt+" while rhs has type "+rt+"." );
         }

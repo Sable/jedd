@@ -19,25 +19,11 @@
 
 package polyglot.ext.jedd.ast;
 
-import polyglot.ast.*;
 import polyglot.ext.jl.ast.*;
-import polyglot.types.Flags;
-import polyglot.types.Package;
-import polyglot.types.Type;
-import polyglot.types.Qualifier;
-import polyglot.util.*;
+import polyglot.ast.*;
 import java.util.*;
 
-/**
- * NodeFactory for jedd extension.
- */
-public interface JeddNodeFactory extends NodeFactory {
-    public BDDTypeNode BDDTypeNode( Position pos, List domainPairs );
-    public Replace Replace( Position pos, Expr expr, List domainPairs );
-    public FixPhys FixPhys( Position pos, Expr expr );
-    public Join Join( Position pos, Expr lhs, Expr rhs, List ldomains, List rdomains );
-    public Compose Compose( Position pos, Expr lhs, Expr rhs, List ldomains, List rdomains );
-    public BDDLit BDDLit( Position pos, List pieces );
-    public BDDLitPiece BDDLitPiece( Position pos, Expr e, TypeNode domain, TypeNode phys );
-    public BDDTrueFalse BDDTrueFalse( Position pos, boolean value );
+public interface Join extends Relprod
+{
 }
+

@@ -198,3 +198,31 @@ extern void reportOrdering( int n, int vars[] ) {
 extern void gbc() {
     bdd_gbc();
 }
+
+#include "kernel.h"
+
+void bdd_markshape(int i, int shape[]);
+
+extern void getShape( int bdd, int shape[] ) {
+    CHECK(bdd);
+    bdd_markshape(bdd, shape);
+    bdd_unmark(bdd);
+}
+
+void bdd_markshape(int i, int shape[])
+{
+   BddNode *node;
+   
+   if (i < 2)
+      return;
+
+   node = &bddnodes[i];
+   if (MARKEDp(node)  ||  LOWp(node) == -1)
+      return;
+   
+   shape[LEVELp(node)]++;
+   SETMARKp(node);
+   
+   bdd_markshape(LOWp(node), shape);
+   bdd_markshape(HIGHp(node), shape);
+}

@@ -89,6 +89,9 @@ public class DNode {
             return "\""+className+":"+((ClassType)dom).name()+"\"";
         return "\""+className+":"+dom.toString()+"\"";
     }
+    public String toLongString() {
+        return toString()+" at "+expr.position();
+    }
 }
 
 

@@ -19,25 +19,22 @@
 
 package polyglot.ext.jedd.ast;
 
-import polyglot.ast.*;
+import polyglot.ext.jedd.types.*;
+import polyglot.ext.jedd.visit.*;
 import polyglot.ext.jl.ast.*;
-import polyglot.types.Flags;
-import polyglot.types.Package;
-import polyglot.types.Type;
-import polyglot.types.Qualifier;
+import polyglot.types.*;
+import polyglot.ast.*;
 import polyglot.util.*;
+import polyglot.visit.*;
 import java.util.*;
 
-/**
- * NodeFactory for jedd extension.
- */
-public interface JeddNodeFactory extends NodeFactory {
-    public BDDTypeNode BDDTypeNode( Position pos, List domainPairs );
-    public Replace Replace( Position pos, Expr expr, List domainPairs );
-    public FixPhys FixPhys( Position pos, Expr expr );
-    public Join Join( Position pos, Expr lhs, Expr rhs, List ldomains, List rdomains );
-    public Compose Compose( Position pos, Expr lhs, Expr rhs, List ldomains, List rdomains );
-    public BDDLit BDDLit( Position pos, List pieces );
-    public BDDLitPiece BDDLitPiece( Position pos, Expr e, TypeNode domain, TypeNode phys );
-    public BDDTrueFalse BDDTrueFalse( Position pos, boolean value );
+public class Compose_c extends Relprod_c implements Compose, JeddGenerateJava, JeddPhysicalDomains
+{
+    public Compose_c(Position pos, Expr lhs, Expr rhs, List ldomains, List rdomains ) {
+        super( pos, lhs, rhs, ldomains, rdomains );
+    }
+    protected String symbol() { return "<>"; }
+    protected String function() { return "compose"; }
+    protected boolean keepMatchedDomains() { return false; }
 }
+

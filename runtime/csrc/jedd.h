@@ -55,3 +55,5 @@ extern void info();
 extern void reportOrdering( int n, int vars[] );
 
 extern void gbc();
+
+extern void getShape( int bdd, int shape[] );

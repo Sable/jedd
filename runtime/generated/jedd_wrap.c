@@ -719,6 +719,7 @@ extern void dumpdot(int);
 extern void info();
 extern void reportOrdering(int,int []);
 extern void gbc();
+extern void getShape(int,int []);
 
 #include "jedd.h"
 
@@ -1279,6 +1280,28 @@ JNIEXPORT void JNICALL Java_jedd_JeddNativeJNI_gbc(JNIEnv *jenv, jclass jcls) {
             bdd_errno = NULL;
         }
     }
+}
+
+
+JNIEXPORT void JNICALL Java_jedd_JeddNativeJNI_getShape(JNIEnv *jenv, jclass jcls, jint jarg1, jintArray jarg2) {
+    int arg1 ;
+    int *arg2 ;
+    jint *jarr2 ;
+    
+    (void)jenv;
+    (void)jcls;
+    arg1 = (int)jarg1; 
+    if (!SWIG_JavaArrayInInt(jenv, &jarr2, &arg2, jarg2)) return ; 
+    {
+        getShape(arg1,arg2);
+        
+        if( bdd_errno ) {
+            SWIG_exception(SWIG_RuntimeError, bdd_errno);
+            bdd_errno = NULL;
+        }
+    }
+    SWIG_JavaArrayArgoutInt(jenv, jarr2, arg2, jarg2); 
+    free(arg2); 
 }
 
 

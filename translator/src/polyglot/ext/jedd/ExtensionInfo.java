@@ -67,6 +67,7 @@ public class ExtensionInfo extends polyglot.ext.jl.ExtensionInfo {
         return new JeddTypeSystem_c();
     }
 
+    public static final Pass.ID METHOD_DECL_MAP = new Pass.ID("method-decl-map");
     public static final Pass.ID JEDD_BARRIER = new Pass.ID("jedd-barrier");
     public static final Pass.ID PHYSICAL_DOMAINS = new Pass.ID("physical-domains");
     public static final Pass.ID PRINT_DOMAINS = new Pass.ID("print-domains");
@@ -84,6 +85,9 @@ public class ExtensionInfo extends polyglot.ext.jl.ExtensionInfo {
     }
     public List passes(Job job) {
         List passes = super.passes(job);
+        beforePass(passes, Pass.DISAM_ALL,
+                new VisitorPass(METHOD_DECL_MAP, job,
+                    new MethodDeclMapPass(job, ts, nf) ) );
         beforePass(passes, Pass.PRE_OUTPUT_ALL,
                 new GlobalBarrierPass(JEDD_BARRIER, job ) );
         if( job.parent() != null ) {

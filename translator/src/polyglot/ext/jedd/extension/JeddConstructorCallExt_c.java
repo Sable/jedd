@@ -29,8 +29,24 @@ import polyglot.util.*;
 import polyglot.visit.*;
 import java.util.*;
 
-public class JeddConstructorCallExt_c extends JeddExt_c implements JeddPhysicalDomains
+public class JeddConstructorCallExt_c extends JeddExt_c implements JeddTypeCheck, JeddPhysicalDomains
 {
+    public Node typeCheck(TypeChecker tc) throws SemanticException {
+        JeddTypeSystem ts = (JeddTypeSystem) tc.typeSystem();
+        JeddNodeFactory nf = (JeddNodeFactory) tc.nodeFactory();
+
+        List newArgs = new LinkedList();
+        ConstructorCall n = (ConstructorCall) node().typeCheck(tc);
+        for( Iterator argIt = n.arguments().iterator(); argIt.hasNext(); ) {
+            final Expr arg = (Expr) argIt.next();
+            if( arg.type() instanceof BDDType ) {
+                newArgs.add( nf.FixPhys( arg.position(), arg ).typeCheck(tc) );
+            } else {
+                newArgs.add( arg );
+            }
+        }
+        return n.arguments(newArgs);
+    }
     public Node generateJava( JeddTypeSystem ts, JeddNodeFactory nf ) throws SemanticException {
         ConstructorCall n = (ConstructorCall) node();
 
@@ -80,7 +96,7 @@ found_bdd:
             BDDType type = (BDDType) t;
             for( Iterator domainIt = type.map().keySet().iterator(); domainIt.hasNext(); ) {
                 final Type domain = (Type) domainIt.next();
-                ts.addAssignEdge( DNode.v( arg, domain ),
+                ts.addMustEqualEdge( DNode.v( arg, domain ),
                         DNode.v( formal.localInstance(), domain ) );
             }
         }

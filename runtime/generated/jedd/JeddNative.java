@@ -114,4 +114,8 @@ public class JeddNative {
     JeddNativeJNI.gbc();
   }
 
+  public static void getShape(int bdd, int[] shape) {
+    JeddNativeJNI.getShape(bdd, shape);
+  }
+
 }
