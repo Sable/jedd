@@ -1,5 +1,5 @@
 /* Jedd - A language for implementing relations using BDDs
- * Copyright (C) 2003 Ondrej Lhotak
+ * Copyright (C) 2003, 2004, 2005 Ondrej Lhotak
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -35,7 +35,7 @@ public class Replace_c extends Expr_c implements Replace, JeddGenerateJava, Jedd
     private Expr expr;
     public Expr expr() { return expr; }
     public List domainPairs() { return domainPairs; }
-    public Replace_c(Position pos, Expr expr, List domainPairs ) {
+    public Replace_c(Position pos, Expr expr, List domainPairs) {
         super( pos );
         this.expr = expr;
         this.domainPairs = domainPairs;
@@ -273,6 +273,7 @@ public class Replace_c extends Expr_c implements Replace, JeddGenerateJava, Jedd
         List project = new LinkedList();
         List copyFrom = new LinkedList();
         List copyTo = new LinkedList();
+        List copyFromAttr = new LinkedList();
 
         // For each attribute, if it's mapped to the empty set, project
         // it away and remove from the map.
@@ -316,6 +317,7 @@ outer:
             if( set.isEmpty() ) continue;
             for( Iterator toAttrIt = set.iterator(); toAttrIt.hasNext(); ) {
                 final Type toAttr = (Type) toAttrIt.next();
+                copyFromAttr.add(attr);
                 copyFrom.add( beforeCopiesMap.get( attr ) );
                 copyTo.add( thisMap.get( toAttr ) );
             }
@@ -324,6 +326,7 @@ outer:
         project = turnIntoCalls( project, nf, p );
         from = turnIntoCalls( from, nf, p );
         to = turnIntoCalls( to, nf, p );
+        copyFromAttr = turnIntoCalls( copyFromAttr, nf, p );
         copyFrom = turnIntoCalls( copyFrom, nf, p );
         copyTo = turnIntoCalls( copyTo, nf, p );
 
@@ -392,6 +395,13 @@ outer:
                         new LinkedList(),
                         1,
                         nf.ArrayInit( p, copyFrom )
+                        ),
+                    nf.NewArray(
+                        p,
+                        nf.CanonicalTypeNode( p, ts.attribute() ),
+                        new LinkedList(),
+                        1,
+                        nf.ArrayInit( p, copyFromAttr )
                         ),
                     nf.NewArray(
                         p,

@@ -1,5 +1,5 @@
 /* Jedd - A language for implementing relations using BDDs
- * Copyright (C) 2003, 2004 Ondrej Lhotak
+ * Copyright (C) 2003, 2004, 2005 Ondrej Lhotak
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -149,19 +149,25 @@ public class RelationContainer implements Relation {
 
     public double fsize() {
         int vars = 0;
-        for( int i = 0; i < phys.length; i++ ) vars += phys[i].bits();
+        for(int i = 0; i < attributes.length; i++) {
+            vars += attributes[i].domain().numUsefulBits();
+        }
+
         return Backend.v().fSatCount(bdd, vars);
     }
     public long size() {
         int vars = 0;
-        for( int i = 0; i < phys.length; i++ ) vars += phys[i].bits();
+        for(int i = 0; i < attributes.length; i++) {
+            vars += attributes[i].domain().numUsefulBits();
+        }
+
         return Backend.v().satCount(bdd, vars);
     }
     public int numNodes() {
         return Backend.v().numNodes( bdd );
     }
 
-    public Iterator iterator(Attribute[] wanted) {
+    public Iterator iterator(jedd.Attribute[] wanted) {
         if( attributes.length != wanted.length ) {
             throw new RuntimeException( "Attribute count doesn't match" );
         }
@@ -184,6 +190,10 @@ public class RelationContainer implements Relation {
             this.attribute = attribute;
             this.ret = new Object[attribute.length];
             this.ret2 = new Object[attribute.length];
+            this.usefulBits = new boolean[attribute.length][];
+            for(int i = 0; i < attribute.length; i++) {
+                this.usefulBits[i] = attribute[i].domain().usefulBits();
+            }
             nbits = Backend.v().numBits();
             curcube = new int[nbits];
             cubeIt = Backend.v().cubeIterator(bdd);
@@ -197,6 +207,7 @@ public class RelationContainer implements Relation {
         private PhysicalDomain[] phys;
         private Attribute[] attribute;
         private Iterator cubeIt;
+        private boolean[][] usefulBits;
 
         public boolean hasNext() { return cubes != null; }
         private void newCube() {
@@ -215,18 +226,21 @@ public class RelationContainer implements Relation {
         }
         private void curCubeToObject() {
             for( int i = 0; i < attribute.length; i++ )
-                ret[i] = attribute[i].numberer().get( phys[i].readBits( curcube ) );
+                ret[i] = attribute[i].numberer().get(
+                        attribute[i].domain().readBits(phys[i], curcube ) );
         }
         private void advance() {
             if( cubes == null ) throw new RuntimeException( "advancing past end of iterator" );
 
             for( int j = 0; j < phys.length; j++ ) {
-                for( int i = phys[j].bitAfterLast()-1; i >= phys[j].firstBit(); i-- ) {
-                    if( cubes[i] == 0 ) continue;
-                    if( cubes[i] == 1 ) continue;
-                    if( curcube[i] == 1 ) curcube[i] = 0;
+                for( int i = usefulBits[j].length-1; i >= 0; i-- ) {
+                    int ii = i+phys[j].firstBit();
+                    if( cubes[ii] == 0 ) continue;
+                    if( cubes[ii] == 1 ) continue;
+                    if( !usefulBits[j][i] ) continue;
+                    if( curcube[ii] == 1 ) curcube[ii] = 0;
                     else {
-                        curcube[i] = 1;
+                        curcube[ii] = 1;
                         curCubeToObject();
                         return;
                     }
@@ -365,5 +379,24 @@ public class RelationContainer implements Relation {
         }
         ret.append(">");
         return ret.toString();
+    }
+    public Relation add( jedd.Attribute srca, jedd.PhysicalDomain srcpd, jedd.Attribute dsta, jedd.PhysicalDomain dstpd, long offset ) {
+        if( attributes.length != 1 ) throw new RuntimeException( "Performing add on relation with more than one attribute." );
+        if( attributes[0] != srca ) throw new RuntimeException( "Performing add on attribute "+srca+" but relation has attribute "+attributes[0]);
+        if( phys.length != 1 ) throw new RuntimeException( "Performing add on relation with more than one physical domain." );
+        if( phys[0] != srcpd ) throw new RuntimeException( "Performing add on physical domain "+srcpd+" but relation has physical domain "+phys[0]);
+
+        RelationInstance ri = Jedd.v().add(this, srcpd, dstpd, offset);
+        Attribute[] newAttributes = new Attribute[2];
+        PhysicalDomain[] newPhys = new PhysicalDomain[2];
+        newAttributes[0] = srca;
+        newAttributes[1] = dsta;
+        newPhys[0] = srcpd;
+        newPhys[1] = dstpd;
+        return new RelationContainer( newAttributes, newPhys, "add", ri );
+    }
+    public int width(jedd.PhysicalDomain pd) {
+        return Backend.v().width(bdd, pd.firstBit(), 
+                pd.firstBit()+pd.bits()-1);
     }
 }

@@ -34,7 +34,7 @@ import java.io.*;
 
 public class PhysDom {
     final static boolean INCLUDE_COMMENTS = false;
-    final static boolean DEBUG = true;
+    final static boolean DEBUG = false;
     final static boolean STATS = false;
 
     private static PhysDom instance = new PhysDom();

@@ -31,7 +31,7 @@ public class JavabddBackend extends Backend {
     }
 
     private BDDFactory manager;
-    void init() {
+    synchronized void init() {
         manager = BDDFactory.init("java", 1*1000*1000, 100*1000 );
     }
 
@@ -39,7 +39,7 @@ public class JavabddBackend extends Backend {
     int numBits() {
         return totalBits;
     }
-    void addBits( int bits ) {
+    synchronized void addBits( int bits ) {
         manager.extVarNum(bits);
         totalBits += bits;
     }
@@ -54,22 +54,22 @@ public class JavabddBackend extends Backend {
     }
 
     // return value of following functions *is* refed
-    RelationInstance falseBDD() {
+    synchronized RelationInstance falseBDD() {
         RelationInstance ret = bdd( manager.zero() );
         addRef( ret );
         return ret;
     }
-    RelationInstance trueBDD() {
+    synchronized RelationInstance trueBDD() {
         RelationInstance ret = bdd( manager.one() );
         addRef( ret );
         return ret;
     }
-    protected RelationInstance ithVar( int i ) {
+    synchronized protected RelationInstance ithVar( int i ) {
         RelationInstance ret = bdd( manager.ithVar(i) );
         addRef( ret );
         return ret;
     }
-    protected RelationInstance nithVar( int i ) {
+    synchronized protected RelationInstance nithVar( int i ) {
         RelationInstance ret = bdd( manager.nithVar(i) );
         addRef( ret );
         return ret;
@@ -152,7 +152,7 @@ public class JavabddBackend extends Backend {
     }
 
 
-    void setOrder( int level2var[] ) {
+    synchronized void setOrder( int level2var[] ) {
         manager.setVarOrder( level2var );
     }
 
@@ -197,7 +197,7 @@ public class JavabddBackend extends Backend {
         }
         return relpc( ret );
     }
-    Replacer makeReplacer( int from[], int to[] ) {
+    synchronized Replacer makeReplacer( int from[], int to[] ) {
         BDDPairing pair = manager.makePair();
         pair.set( from, to );
         return pair( pair );
@@ -213,5 +213,11 @@ public class JavabddBackend extends Backend {
     }
     private Replacer pair( BDDPairing in ) {
         return new JavabddReplacer( in );
+    }
+    public Adder makeAdder(int[] from, int[] to) {
+        throw new RuntimeException("NYI");
+    }
+    public RelationInstance add(RelationInstance ri, Adder adder, long offset) {
+        throw new RuntimeException("NYI");
     }
 }

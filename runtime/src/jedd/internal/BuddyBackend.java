@@ -30,7 +30,7 @@ public class BuddyBackend extends Backend {
         return new BuddyInstance( in );
     }
 
-    void init() {
+    synchronized void init() {
         System.loadLibrary("jeddbuddy");
         Buddy.bdd_init( 1*1000*1000, 100*1000 );
         Buddy.setuperrorhandler();
@@ -43,29 +43,29 @@ public class BuddyBackend extends Backend {
     int numBits() {
         return totalBits;
     }
-    void addBits( int bits ) {
+    synchronized void addBits( int bits ) {
         Buddy.bdd_extvarnum(bits);
         totalBits += bits;
     }
 
-    void addRef( RelationInstance bdd ) {
+    synchronized void addRef( RelationInstance bdd ) {
         Buddy.bdd_addref( bdd(bdd) );
     }
-    void delRef( RelationInstance bdd ) {
+    synchronized void delRef( RelationInstance bdd ) {
         Buddy.bdd_delref( bdd(bdd) );
     }
 
     // return value of following functions *is* refed
-    RelationInstance falseBDD() {
+    synchronized RelationInstance falseBDD() {
         return bdd( Buddy.bdd_addref( Buddy.bdd_false() ) );
     }
-    RelationInstance trueBDD() {
+    synchronized RelationInstance trueBDD() {
         return bdd( Buddy.bdd_addref( Buddy.bdd_true() ) );
     }
-    protected RelationInstance ithVar( int i ) {
+    synchronized protected RelationInstance ithVar( int i ) {
         return bdd( Buddy.bdd_addref( Buddy.bdd_ithvar(i) ) );
     }
-    protected RelationInstance nithVar( int i ) {
+    synchronized protected RelationInstance nithVar( int i ) {
         return bdd( Buddy.bdd_addref( Buddy.bdd_nithvar(i) ) );
     }
     RelationInstance literal( int bits[] ) {
@@ -93,7 +93,7 @@ public class BuddyBackend extends Backend {
 
 
     // return value of following functions is *not* refed
-    RelationInstance replace( RelationInstance r, Replacer pair ) {
+    synchronized RelationInstance replace( RelationInstance r, Replacer pair ) {
         return bdd( Buddy.bdd_replace( bdd(r), pair(pair) ) );
     }
 
@@ -130,26 +130,39 @@ public class BuddyBackend extends Backend {
         ret.rels = rels;
         return ret;
     }
+    static class BuddyAdder implements Adder {
+        public int from[];
+        public int to[];
+    }
+    Adder makeAdder( int[] from, int[] to ) {
+        BuddyAdder ret = new BuddyAdder();
+        ret.from = from;
+        ret.to = to;
+        return ret;
+    }
 
-    RelationInstance relprod( RelationInstance r1, RelationInstance r2, Projector proj ) {
+    synchronized RelationInstance relprod( RelationInstance r1, RelationInstance r2, Projector proj ) {
         RelationInstance ret = bdd( Buddy.bdd_appex(
                     bdd(r1), bdd(r2), Buddy.bddop_and, bdd(relpc(proj)) ) );
         return ret;
     }
-    RelationInstance project( RelationInstance r, Projector proj ) {
+    synchronized RelationInstance project( RelationInstance r, Projector proj ) {
         RelationInstance ret = bdd( Buddy.bdd_exist( bdd(r), bdd(relpc(proj)) ) );
         return ret;
     }
-    RelationInstance or( RelationInstance r1, RelationInstance r2 ) {
+    synchronized RelationInstance or( RelationInstance r1, RelationInstance r2 ) {
         return bdd( Buddy.bdd_or( bdd(r1), bdd(r2) ) );
     }
-    RelationInstance and( RelationInstance r1, RelationInstance r2 ) {
+    synchronized RelationInstance and( RelationInstance r1, RelationInstance r2 ) {
         return bdd( Buddy.bdd_and( bdd(r1), bdd(r2) ) );
     }
-    RelationInstance biimp( RelationInstance r1, RelationInstance r2 ) {
+    synchronized RelationInstance xor( RelationInstance r1, RelationInstance r2 ) {
+        return bdd( Buddy.bdd_xor( bdd(r1), bdd(r2) ) );
+    }
+    synchronized RelationInstance biimp( RelationInstance r1, RelationInstance r2 ) {
         return bdd( Buddy.bdd_biimp( bdd(r1), bdd(r2) ) );
     }
-    RelationInstance minus( RelationInstance r1, RelationInstance r2 ) {
+    synchronized RelationInstance minus( RelationInstance r1, RelationInstance r2 ) {
         return bdd( Buddy.bdd_apply( bdd(r1), bdd(r2), Buddy.bddop_diff ) );
     }
 
@@ -158,16 +171,16 @@ public class BuddyBackend extends Backend {
     }
 
 
-    void setOrder( int level2var[] ) {
+    synchronized void setOrder( int level2var[] ) {
         Buddy.bdd_setvarorder( level2var );
     }
 
-    Iterator cubeIterator( final RelationInstance r ) {
+    synchronized Iterator cubeIterator( final RelationInstance r ) {
         return new Iterator() {
             int[] cubes = new int[totalBits];
             boolean done = (0 == Buddy.firstCube(bdd(r), cubes.length, cubes));
             public boolean hasNext() { return !done; }
-            public Object next() {
+            synchronized public Object next() {
                 int[] ret = new int[totalBits];
                 System.arraycopy( cubes, 0, ret, 0, totalBits );
                 done = (0 == Buddy.nextCube(bdd(r), cubes.length, cubes));
@@ -185,35 +198,35 @@ public class BuddyBackend extends Backend {
     }
     */
 
-    int numNodes( RelationInstance r ) {
+    synchronized int numNodes( RelationInstance r ) {
         return Buddy.bdd_nodecount(bdd(r));
     }
-    int numPaths( RelationInstance r ) {
+    synchronized int numPaths( RelationInstance r ) {
         return (int) Buddy.bdd_pathcount(bdd(r));
     }
 
-    double fSatCount( RelationInstance r, int vars ) {
+    synchronized double fSatCount( RelationInstance r, int vars ) {
         double s = Buddy.bdd_satcount(bdd(r));
         s /= Math.pow(2,totalBits-vars);
         return s;
     }
 
-    long satCount( RelationInstance r, int vars ) {
+    synchronized long satCount( RelationInstance r, int vars ) {
         return (long) fSatCount(r, vars);
     }
 
-    void gbc() {
+    synchronized void gbc() {
         Buddy.bdd_gbc();
     }
 
-    void getShape( RelationInstance bdd, int shape[] ) {
+    synchronized void getShape( RelationInstance bdd, int shape[] ) {
         Buddy.getShape( bdd(bdd), shape );
     }
 
-    Projector makeProjector( int domains[] ) {
+    synchronized Projector makeProjector( int domains[] ) {
         return relpc( bdd( Buddy.bdd_addref( Buddy.bdd_makeset( domains, domains.length ) ) ) );
     }
-    Replacer makeReplacer( int from[], int to[] ) {
+    synchronized Replacer makeReplacer( int from[], int to[] ) {
         bddPair pair = Buddy.bdd_newpair();
         Buddy.bdd_setpairs( pair, from, to, from.length );
         return pair( pair );
@@ -229,5 +242,73 @@ public class BuddyBackend extends Backend {
     }
     private Replacer pair( bddPair in ) {
         return new BuddyReplacer( in );
+    }
+    RelationInstance add( RelationInstance r, Adder adder, long offset ) {
+        BuddyAdder ba = (BuddyAdder) adder;
+
+        int[] from = ba.from;
+        int[] to = ba.to;
+
+        RelationInstance output = trueBDD();
+        RelationInstance carry = falseBDD();
+
+        for( int i = 0; i < from.length; i++ ) {
+            RelationInstance itf = ithVar(from[i]);
+            RelationInstance itt = ithVar(to[i]);
+            if( (offset & 1L) == 0L ) {
+                // out &= to <=> from ^ c
+                // newc = from & c
+                RelationInstance bdd1 = xor(itf, carry);
+                addRef(bdd1);
+
+                RelationInstance bdd2 = biimp(itt, bdd1);
+                addRef(bdd2);
+                delRef(bdd1);
+
+                RelationInstance bdd3 = and(output, bdd2);
+                addRef(bdd3);
+                delRef(bdd2);
+                delRef(output);
+
+                output = bdd3;
+
+                RelationInstance oldCarry = carry;
+                carry = and(itf, oldCarry);
+                addRef(carry);
+                delRef(oldCarry);
+            } else {
+                // out &= to <=> 1 ^ from ^ c
+                // newc = in | c
+                RelationInstance bdd1 = biimp(itf, carry);
+                addRef(bdd1);
+
+                RelationInstance bdd2 = biimp(itt, bdd1);
+                addRef(bdd2);
+                delRef(bdd1);
+
+                RelationInstance bdd3 = and(output, bdd2);
+                addRef(bdd3);
+                delRef(bdd2);
+                delRef(output);
+
+                output = bdd3;
+
+                RelationInstance oldCarry = carry;
+                carry = or(itf, oldCarry);
+                addRef(carry);
+                delRef(oldCarry);
+            }
+            delRef(itf);
+            delRef(itt);
+            offset >>>= 1;
+        }
+
+        RelationInstance ret = and(r, output);
+        delRef(carry);
+        delRef(output);
+        return ret;
+    }
+    synchronized protected int width(RelationInstance bdd, int bit1, int bit2) {
+        return Buddy.bdd_markwidth(bdd(bdd), bit1, bit2);
     }
 }

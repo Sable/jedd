@@ -31,7 +31,7 @@ public class SableBackend extends Backend {
     }
 
     private JBddManager manager;
-    void init() {
+    synchronized void init() {
         manager = new JBddManager();
     }
 
@@ -39,7 +39,7 @@ public class SableBackend extends Backend {
     int numBits() {
         return totalBits;
     }
-    void addBits( int bits ) {
+    synchronized void addBits( int bits ) {
         while( bits-- > 0 ) {
             manager.newVariable( ""+(totalBits++) );
         }
@@ -51,19 +51,19 @@ public class SableBackend extends Backend {
     }
 
     // return value of following functions *is* refed
-    RelationInstance falseBDD() {
+    synchronized RelationInstance falseBDD() {
         return bdd( manager.ZERO() );
     }
-    RelationInstance trueBDD() {
+    synchronized RelationInstance trueBDD() {
         return bdd( manager.ONE() );
     }
-    protected RelationInstance ithVar( int i ) {
+    synchronized protected RelationInstance ithVar( int i ) {
         return bdd( manager.posBddOf(manager.getIthVariable(i)) );
     }
-    protected RelationInstance nithVar( int i ) {
+    synchronized protected RelationInstance nithVar( int i ) {
         return bdd( manager.negBddOf(manager.getIthVariable(i)) );
     }
-    RelationInstance literal( int bits[] ) {
+    synchronized RelationInstance literal( int bits[] ) {
         int i = 0;
         RelationInstance ret = trueBDD();
         RelationInstance tmp;
@@ -88,14 +88,14 @@ public class SableBackend extends Backend {
 
 
     // return value of following functions is *not* refed
-    RelationInstance replace( RelationInstance r, Replacer pair ) {
+    synchronized RelationInstance replace( RelationInstance r, Replacer pair ) {
         return bdd( bdd(r).replace(pair(pair)) );
     }
 
-    RelationInstance copy( RelationInstance r, Copier copier ) {
+    synchronized RelationInstance copy( RelationInstance r, Copier copier ) {
         return and( r, relpc( copier ) );
     }
-    Copier makeCopier( int from[], int to[] ) {
+    synchronized Copier makeCopier( int from[], int to[] ) {
         int i;
         RelationInstance ret = trueBDD();
         for( i=0; i < from.length; i++ ) {
@@ -115,77 +115,77 @@ public class SableBackend extends Backend {
         return relpc(ret);
     }
 
-    RelationInstance relprod( RelationInstance r1, RelationInstance r2, Projector proj ) {
+    synchronized RelationInstance relprod( RelationInstance r1, RelationInstance r2, Projector proj ) {
         // TODO: implement combined and-exist in SableJBDD
         return bdd( bdd(r1).and(bdd(r2)).exist(bdd(relpc(proj))) );
     }
-    RelationInstance project( RelationInstance r, Projector proj ) {
+    synchronized RelationInstance project( RelationInstance r, Projector proj ) {
         return bdd( bdd(r).exist(bdd(relpc(proj))) );
     }
-    RelationInstance or( RelationInstance r1, RelationInstance r2 ) {
+    synchronized RelationInstance or( RelationInstance r1, RelationInstance r2 ) {
         return bdd( bdd(r1).or( bdd(r2) ) );
     }
-    RelationInstance and( RelationInstance r1, RelationInstance r2 ) {
+    synchronized RelationInstance and( RelationInstance r1, RelationInstance r2 ) {
         return bdd( bdd(r1).and( bdd(r2) ) );
     }
-    RelationInstance biimp( RelationInstance r1, RelationInstance r2 ) {
+    synchronized RelationInstance biimp( RelationInstance r1, RelationInstance r2 ) {
         return bdd( bdd(r1).biimply( bdd(r2) ) );
     }
-    RelationInstance minus( RelationInstance r1, RelationInstance r2 ) {
+    synchronized RelationInstance minus( RelationInstance r1, RelationInstance r2 ) {
         return bdd( bdd(r1).diff( bdd(r2) ) );
     }
 
-    boolean equals( RelationInstance r1, RelationInstance r2 ) {
+    synchronized boolean equals( RelationInstance r1, RelationInstance r2 ) {
         return bdd(r1).equals( bdd(r2) );
     }
 
 
-    void setOrder( int level2var[] ) {
+    synchronized void setOrder( int level2var[] ) {
         // TODO: implement in SableJBDD
     }
 
-    Iterator cubeIterator( RelationInstance r ) {
+    synchronized Iterator cubeIterator( RelationInstance r ) {
         // TODO: implement in SableJBDD
         throw new RuntimeException("NYI");
     }
-    void allCubes( RelationInstance r, int cubes[] ) {
+    synchronized void allCubes( RelationInstance r, int cubes[] ) {
         // TODO: implement in SableJBDD
     }
 
-    int numNodes( RelationInstance r ) {
+    synchronized int numNodes( RelationInstance r ) {
         return bdd(r).size();
     }
-    int numPaths( RelationInstance r ) {
+    synchronized int numPaths( RelationInstance r ) {
         // TODO: implement in SableJBDD
         return 0;
     }
 
-    long satCount( RelationInstance r, int vars ) {
+    synchronized long satCount( RelationInstance r, int vars ) {
         // TODO: implement in SableJBDD
         return 0;
     }
 
-    double fSatCount( RelationInstance r, int vars ) {
+    synchronized double fSatCount( RelationInstance r, int vars ) {
         // TODO: implement in SableJBDD
         return 0;
     }
 
-    void gbc() {
+    synchronized void gbc() {
         // TODO: implement in SableJBDD
     }
 
-    void getShape( RelationInstance bdd, int shape[] ) {
+    synchronized void getShape( RelationInstance bdd, int shape[] ) {
         // TODO: implement in SableJBDD
     }
 
-    Projector makeProjector( int domains[] ) {
+    synchronized Projector makeProjector( int domains[] ) {
         RelationInstance ret = trueBDD();
         for( int i = 0; i < domains.length; i++ ) {
             ret = and( ret, ithVar( domains[i] ) );
         }
         return relpc( ret );
     }
-    Replacer makeReplacer( int from[], int to[] ) {
+    synchronized Replacer makeReplacer( int from[], int to[] ) {
         Map map = new HashMap();
         for( int i = 0; i < from.length; i++ ) {
             map.put( manager.getIthVariable( from[i] ),
@@ -204,5 +204,11 @@ public class SableBackend extends Backend {
     }
     private Replacer pair( Map in ) {
         return new SableReplacer( in );
+    }
+    synchronized public Adder makeAdder(int[] from, int[] to) {
+        throw new RuntimeException("NYI");
+    }
+    synchronized public RelationInstance add(RelationInstance ri, Adder adder, long offset) {
+        throw new RuntimeException("NYI");
     }
 }

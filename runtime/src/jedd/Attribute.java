@@ -19,11 +19,6 @@
 
 package jedd;
 
-public abstract class Attribute {
-    public String name() {
-        return this.getClass().getName();
-    }
-    public String toString() { return name(); }
+public abstract class Attribute extends jedd.internal.Attribute {
     public abstract Domain domain();
-    public final Numberer numberer() { return domain().numberer(); }
 }

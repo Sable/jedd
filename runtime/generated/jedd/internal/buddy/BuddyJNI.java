@@ -20,6 +20,7 @@ class BuddyJNI {
   public final static native void set_bdd_errno(String jarg1);
   public final static native String get_bdd_errno();
   public final static native void setuperrorhandler();
+  public final static native int bdd_markwidth(int jarg1, int jarg2, int jarg3);
   public final static native int get_bddop_and();
   public final static native int get_bddop_xor();
   public final static native int get_bddop_or();

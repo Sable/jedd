@@ -1,5 +1,5 @@
 /* Jedd - A language for implementing relations using BDDs
- * Copyright (C) 2003 Ondrej Lhotak
+ * Copyright (C) 2003, 2004, 2005 Ondrej Lhotak
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -23,6 +23,7 @@ import jedd.*;
 import jedd.order.*;
 
 public class Jedd {
+    private static boolean VERBOSE = false;
     private static Jedd instance = new Jedd();
     private Jedd() {
     }
@@ -33,46 +34,39 @@ public class Jedd {
         Backend.init( type );
     }
     public RelationInstance copy( RelationContainer r,
-        PhysicalDomain[] from, PhysicalDomain[] to ) {
-        RelationInstance ret = copyImpl( r.bdd, from, to );
-        Backend.v().addRef( ret );
+        PhysicalDomain[] from, Attribute[] fromAttr, PhysicalDomain[] to ) {
+        RelationInstance ret = copyImpl( r.bdd, from, fromAttr, to );
         return ret;
     }
     public RelationInstance copy( RelationInstance r,
-            PhysicalDomain[] from, PhysicalDomain[] to ) {
-        RelationInstance ret = copyImpl( r, from, to );
-        Backend.v().addRef( ret );
+            PhysicalDomain[] from, Attribute[] fromAttr, PhysicalDomain[] to ) {
+        RelationInstance ret = copyImpl( r, from, fromAttr, to );
         Backend.v().delRef( r );
         return ret;
     }
     public RelationInstance replace( RelationContainer r,
         PhysicalDomain[] from, PhysicalDomain[] to ) {
         RelationInstance ret = replaceImpl( r.bdd, from, to );
-        Backend.v().addRef( ret );
         return ret;
     }
     public RelationInstance replace( RelationInstance r,
             PhysicalDomain[] from, PhysicalDomain[] to ) {
         RelationInstance ret = replaceImpl( r, from, to );
-        Backend.v().addRef( ret );
         Backend.v().delRef( r );
         return ret;
     }
     public RelationInstance project( RelationContainer r, PhysicalDomain[] toRemove ) {
         RelationInstance ret = projectImpl( r.bdd, toRemove );
-        Backend.v().addRef( ret );
         return ret;
     }
     public RelationInstance project( RelationInstance r, PhysicalDomain[] toRemove ) {
         RelationInstance ret = projectImpl( r, toRemove );
-        Backend.v().addRef( ret );
         Backend.v().delRef( r );
         return ret;
     }
     public RelationInstance compose( RelationInstance r1, RelationInstance r2,
             PhysicalDomain[] d ) {
         RelationInstance ret = composeImpl( r1, r2, d );
-        Backend.v().addRef( ret );
         Backend.v().delRef( r1 );
         Backend.v().delRef( r2 );
         return ret;
@@ -80,14 +74,12 @@ public class Jedd {
     public RelationInstance compose( RelationInstance r1, RelationContainer r2,
             PhysicalDomain[] d ) {
         RelationInstance ret = composeImpl( r1, r2.bdd, d );
-        Backend.v().addRef( ret );
         Backend.v().delRef( r1 );
         return ret;
     }
     public RelationInstance join( RelationInstance r1, RelationInstance r2,
             PhysicalDomain[] d ) {
         RelationInstance ret = joinImpl( r1, r2 );
-        Backend.v().addRef( ret );
         Backend.v().delRef( r1 );
         Backend.v().delRef( r2 );
         return ret;
@@ -95,7 +87,6 @@ public class Jedd {
     public RelationInstance join( RelationInstance r1, RelationContainer r2,
             PhysicalDomain[] d ) {
         RelationInstance ret = joinImpl( r1, r2.bdd );
-        Backend.v().addRef( ret );
         Backend.v().delRef( r1 );
         return ret;
     }
@@ -157,11 +148,12 @@ public class Jedd {
         return ret;
     }
 
-    public RelationInstance literal( Object[] exprs, Attribute[] domains, PhysicalDomain[] phys ) {
+    public RelationInstance literal( Object[] exprs, Attribute[] attrs, PhysicalDomain[] phys ) {
         int[] bits = new int[PhysicalDomain.nextBit];
         Arrays.fill(bits,2);
         for( int i = 0; i < exprs.length; i++ ) {
-            phys[i].setBits(bits, domains[i].numberer().get( exprs[i] ) );
+            attrs[i].domain().setBits(
+                    phys[i], bits, attrs[i].numberer().get(exprs[i]));
         }
         return Backend.v().literal( bits );
     }
@@ -185,7 +177,12 @@ public class Jedd {
             final Integer i = (Integer) iIt.next();
             for( Iterator pdIt = physicalDomains.iterator(); pdIt.hasNext(); ) {
                 final PhysicalDomain pd = (PhysicalDomain) pdIt.next();
-                if( pd.hasBit(i.intValue()) ) pd.setPhysPos(j);
+                if( pd.hasBit(i.intValue()) ) {
+                    pd.setPhysPos(j);
+                    if(VERBOSE) {
+                        System.out.println( "Bit "+(i.intValue()-pd.firstBit())+" of "+pd );
+                    }
+                }
             }
             buddyOrder[j++] = i.intValue();
         }
@@ -266,17 +263,47 @@ public class Jedd {
         }
         return ret;
     }
+    int[][] convertDomains( PhysicalDomain[] d1, Attribute[] a1, PhysicalDomain[] d2 ) {
+        int n = 0;
+        if( d1.length != d2.length ) throw new RuntimeException();
+        if( d1.length != a1.length ) throw new RuntimeException();
+        for( int i = 0; i < d1.length; i++ ) {
+            n += a1[i].domain().numUsefulBits();
+        }
+        int[][] ret = new int[2][n];
+
+        int nextbit = 0;
+        for( int i = 0; i < d1.length; i++ ) {
+            boolean[] usefulBits = a1[i].domain().usefulBits();
+            for( int j = 0; j < usefulBits.length; j++ ) {
+                if(usefulBits[j]) {
+                    ret[0][nextbit] = d1[i].firstBit()+j;
+                    ret[1][nextbit] = d2[i].firstBit()+j;
+                    nextbit++;
+                }
+            }
+        }
+        return ret;
+    }
+    private List toList( PhysicalDomain from, PhysicalDomain to ) {
+        return toList( new PhysicalDomain[] {from}, new PhysicalDomain[] {to} );
+    }
+    private List toList( PhysicalDomain[] from, Attribute[] fromAttr, PhysicalDomain[] to ) {
+        return Arrays.asList( new List[] {
+            Arrays.asList(from), Arrays.asList(fromAttr), Arrays.asList(to) } );
+    }
     private List toList( PhysicalDomain[] from, PhysicalDomain[] to ) {
         return Arrays.asList( new List[] {
             Arrays.asList(from), Arrays.asList(to) } );
     }
     private RelationInstance copyImpl( RelationInstance r,
-            PhysicalDomain[] from, PhysicalDomain[] to ) {
+            PhysicalDomain[] from, Attribute[] fromAttr, PhysicalDomain[] to ) {
         RelationInstance ret;
 
         if( Profiler.enabled() ) Profiler.v().start( "copy", r );
         ret = Backend.v().copy( r,
-                (Backend.Copier) copyCache.get( toList( from, to ) ) );
+                (Backend.Copier) copyCache.get( toList( from, fromAttr, to ) ) );
+        Backend.v().addRef( ret );
         if( Profiler.enabled() ) Profiler.v().finish( "copy", ret );
 
         return ret;
@@ -310,9 +337,11 @@ public class Jedd {
             List l = (List) key;
             PhysicalDomain[] from = new PhysicalDomain[0];
             from = (PhysicalDomain[]) ((List) l.get(0)).toArray(from);
+            Attribute[] fromAttr = new Attribute[0];
+            fromAttr = (Attribute[]) ((List) l.get(1)).toArray(fromAttr);
             PhysicalDomain[] to = new PhysicalDomain[0];
-            to = (PhysicalDomain[]) ((List) l.get(1)).toArray(to);
-            int[][] converted = convertDomains(from, to);
+            to = (PhysicalDomain[]) ((List) l.get(2)).toArray(to);
+            int[][] converted = convertDomains(from, fromAttr, to);
             return Backend.v().makeCopier( converted[0], converted[1] );
         }
     };
@@ -325,6 +354,19 @@ public class Jedd {
         }
     };
 
+    private Cache addCache = new Cache() {
+        public Object make( Object key ) {
+            List l = (List) key;
+            PhysicalDomain[] from = new PhysicalDomain[0];
+            from = (PhysicalDomain[]) ((List) l.get(0)).toArray(from);
+            PhysicalDomain[] to = new PhysicalDomain[0];
+            to = (PhysicalDomain[]) ((List) l.get(1)).toArray(to);
+            int[][] converted = convertDomains(from, to);
+            return Backend.v().makeAdder( converted[0], converted[1] );
+        }
+    };
+
+
     private RelationInstance replaceImpl( RelationInstance r,
             PhysicalDomain[] from, PhysicalDomain[] to ) {
         RelationInstance ret;
@@ -332,6 +374,7 @@ public class Jedd {
         if( Profiler.enabled() ) Profiler.v().start( "replace", r );
         ret = Backend.v().replace( r, 
                 (Backend.Replacer) replCache.get( toList( from, to ) ) );
+        Backend.v().addRef( ret );
         if( Profiler.enabled() ) Profiler.v().finish( "replace", ret );
 
         return ret;
@@ -340,6 +383,7 @@ public class Jedd {
         if( Profiler.enabled() ) Profiler.v().start( "project", r );
         RelationInstance ret = Backend.v().project( r, 
                 (Backend.Projector) projectCache.get( Arrays.asList(toRemove) ) );
+        Backend.v().addRef( ret );
         if( Profiler.enabled() ) Profiler.v().finish( "project", ret );
 
         return ret;
@@ -351,6 +395,7 @@ public class Jedd {
         if( Profiler.enabled() ) Profiler.v().start( "compose", r1, r2 );
         ret = Backend.v().relprod( r1, r2,
                 (Backend.Projector) projectCache.get( Arrays.asList(d) ) );
+        Backend.v().addRef( ret );
         if( Profiler.enabled() ) Profiler.v().finish( "compose", ret );
 
         return ret;
@@ -358,6 +403,7 @@ public class Jedd {
     private RelationInstance joinImpl( RelationInstance r1, RelationInstance r2 ) {
         if( Profiler.enabled() ) Profiler.v().start( "join", r1, r2 );
         RelationInstance ret = Backend.v().and( r1, r2 );
+        Backend.v().addRef( ret );
         if( Profiler.enabled() ) Profiler.v().finish( "join", ret );
 
         return ret;
@@ -374,4 +420,21 @@ public class Jedd {
         }
     }
     public final List physicalDomains = new ArrayList();
+    public RelationInstance add( RelationContainer r,
+        PhysicalDomain from, PhysicalDomain to, long offset ) {
+        RelationInstance ret = addImpl( from, to, offset, r.bdd );
+        return ret;
+    }
+    private RelationInstance addImpl(PhysicalDomain from,
+            PhysicalDomain to, long offset, RelationInstance r) {
+        RelationInstance ret;
+
+        if( Profiler.enabled() ) Profiler.v().start( "add", r );
+        ret = Backend.v().add( r,
+                (Backend.Adder) addCache.get( toList( from, to ) ), offset );
+        Backend.v().addRef( ret );
+        if( Profiler.enabled() ) Profiler.v().finish( "add", ret );
+
+        return ret;
+    }
 }

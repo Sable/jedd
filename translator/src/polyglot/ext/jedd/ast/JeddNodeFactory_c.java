@@ -1,5 +1,5 @@
 /* Jedd - A language for implementing relations using BDDs
- * Copyright (C) 2003 Ondrej Lhotak
+ * Copyright (C) 2003, 2004, 2005 Ondrej Lhotak
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -72,10 +72,22 @@ public class JeddNodeFactory_c extends NodeFactory_c implements JeddNodeFactory 
         JeddTypeSystem ts = (JeddTypeSystem) typeSys;
         body = body.addMember(
                 FieldDecl( pos,
-                    Flags.PUBLIC.set( Flags.FINAL ),
+                    Flags.PRIVATE.set( Flags.FINAL ),
                     CanonicalTypeNode(pos, ts.Int()),
                     "bits",
                     bits ) );
+        body = body.addMember(
+                MethodDecl( pos,
+                    Flags.PUBLIC,
+                    CanonicalTypeNode(pos, ts.Int()),
+                    "maxBits",
+                    Collections.EMPTY_LIST,
+                    Collections.EMPTY_LIST,
+                    Block( pos,
+                        Return( pos, AmbExpr( pos, "bits" ) )
+                        )
+                    )
+                );
         body = body.addMember(
                 MethodDecl( pos,
                     Flags.PUBLIC.set( Flags.STATIC ),

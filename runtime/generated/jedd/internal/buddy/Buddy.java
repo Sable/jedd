@@ -50,6 +50,10 @@ public class Buddy {
     BuddyJNI.setuperrorhandler();
   }
 
+  public static int bdd_markwidth(int bdd, int var1, int var2) {
+    return BuddyJNI.bdd_markwidth(bdd, var1, var2);
+  }
+
   public static SWIGTYPE_p_f_int__void bdd_error_hook(SWIGTYPE_p_f_int__void arg0) {
     long cPtr = BuddyJNI.bdd_error_hook(SWIGTYPE_p_f_int__void.getCPtr(arg0));
     return (cPtr == 0) ? null : new SWIGTYPE_p_f_int__void(cPtr, false);

@@ -105,6 +105,49 @@ void bdd_markshape(int i, int shape[])
    bdd_markshape(HIGHp(node), shape);
 }
 
+static int bdd_markwidth_rec(int bdd, int level, int seenTerminals[])
+{
+   BddNode *node;
+   
+   if (bdd < 2) {
+       if(seenTerminals[bdd]) {
+           return 0;
+       } else {
+           seenTerminals[bdd] = 1;
+           return 1;
+       }
+   }
+
+   node = &bddnodes[bdd];
+   if (MARKEDp(node)  ||  LOWp(node) == -1)
+      return 0;
+   
+   if(LEVELp(node) > level) {
+       // this is a node we want to count
+       SETMARKp(node);
+       return 1;
+   } else {
+       SETMARKp(node);
+       return bdd_markwidth_rec(LOWp(node), level, seenTerminals)
+            + bdd_markwidth_rec(HIGHp(node), level, seenTerminals);
+   }
+}
+
+extern int bdd_markwidth(int bdd, int var1, int var2)
+{
+    int level;
+    int seenTerminals[2];
+    int ret;
+    seenTerminals[0] = 0;
+    seenTerminals[1] = 0;
+    level = bdd_var2level(var1);
+    if(bdd_var2level(var2) > level) level = bdd_var2level(var2);
+    ret = bdd_markwidth_rec(bdd, level, seenTerminals);
+    bdd_unmark(bdd);
+    return ret;
+}
+
+
 extern int bdd_varlevel(int x) {
     fprintf( stderr, "missing function bdd_varlevel called\n" );
     *((int*)0) = 5;

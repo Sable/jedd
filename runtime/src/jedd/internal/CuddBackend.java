@@ -31,7 +31,7 @@ public class CuddBackend extends Backend {
         return new CuddInstance( in );
     }
 
-    void init() {
+    synchronized void init() {
         System.loadLibrary("jeddcudd");
         manager = Cudd.Cudd_Init(0,0,Cudd.CUDD_UNIQUE_SLOTS*4,Cudd.CUDD_CACHE_SLOTS,0);
     }
@@ -39,17 +39,17 @@ public class CuddBackend extends Backend {
     int numBits() {
         return totalBits;
     }
-    void addBits( int bits ) {
+    synchronized void addBits( int bits ) {
         totalBits += bits;
         while(bits-- > 0) Cudd.Cudd_bddNewVar(manager);
     }
 
     private int refs = 0;
-    void addRef( RelationInstance bdd ) {
+    synchronized void addRef( RelationInstance bdd ) {
         refs++;
         Cudd.Cudd_Ref(bdd(bdd));
     }
-    void delRef( RelationInstance bdd ) {
+    synchronized void delRef( RelationInstance bdd ) {
         refs--;
         //System.out.println( "refs = "+refs+":"+Cudd.Cudd_CheckZeroRef(manager) );
         //Cudd.Cudd_RecursiveDeref(manager, bdd(bdd));
@@ -57,28 +57,28 @@ public class CuddBackend extends Backend {
     }
 
     // return value of following functions *is* refed
-    RelationInstance falseBDD() {
+    synchronized RelationInstance falseBDD() {
         RelationInstance ret = bdd( Cudd.Cudd_ReadLogicZero(manager) );
         addRef( ret );
         return ret;
     }
-    RelationInstance trueBDD() {
+    synchronized RelationInstance trueBDD() {
         RelationInstance ret = bdd( Cudd.Cudd_ReadOne(manager) );
         addRef( ret );
         return ret;
     }
-    RelationInstance literal( int bits[] ) {
+    synchronized RelationInstance literal( int bits[] ) {
         RelationInstance ret = bdd(Cudd.Cudd_CubeArrayToBdd(manager, bits));
         addRef(ret);
         return ret;
     }
 
-    protected RelationInstance ithVar( int i ) {
+    synchronized protected RelationInstance ithVar( int i ) {
         RelationInstance ret = bdd( Cudd.Cudd_bddIthVar(manager,i) );
         addRef( ret );
         return ret;
     }
-    protected RelationInstance nithVar( int i ) {
+    synchronized protected RelationInstance nithVar( int i ) {
         RelationInstance ithvar = ithVar(i);
         RelationInstance ret = bdd( Cudd.Cudd_bddNot(bdd(ithvar)) );
         delRef( ithvar );
@@ -87,12 +87,12 @@ public class CuddBackend extends Backend {
     }
 
     // return value of following functions is *not* refed
-    Replacer makeReplacer( int from[], int to[] ) {
+    synchronized Replacer makeReplacer( int from[], int to[] ) {
         bddPair pair = Cudd.newPair(from.length);
         Cudd.setPairs(manager, pair, from, to);
         return pair( pair );
     }
-    RelationInstance replace( RelationInstance r, Replacer pair ) {
+    synchronized RelationInstance replace( RelationInstance r, Replacer pair ) {
         return bdd( Cudd.swapVariables( manager, bdd(r), pair(pair) ) );
     }
     RelationInstance copy( RelationInstance r, Copier copier ) {
@@ -118,30 +118,30 @@ public class CuddBackend extends Backend {
         return relpc(ret);
     }
 
-    Projector makeProjector( int domains[] ) {
+    synchronized Projector makeProjector( int domains[] ) {
         RelationInstance cube = bdd( Cudd.Cudd_IndicesToCube( manager, domains, domains.length ) );
         addRef(cube);
         return relpc( cube );
     }
-    RelationInstance relprod( RelationInstance r1, RelationInstance r2, Projector proj ) {
+    synchronized RelationInstance relprod( RelationInstance r1, RelationInstance r2, Projector proj ) {
         return bdd( Cudd.Cudd_bddAndAbstract(manager,
                     bdd(r1), bdd(r2), bdd(relpc(proj)) ) );
 
     }
-    RelationInstance project( RelationInstance r, Projector proj ) {
+    synchronized RelationInstance project( RelationInstance r, Projector proj ) {
         return bdd( Cudd.Cudd_bddExistAbstract(manager,
                     bdd(r), bdd(relpc(proj)) ) );
     }
-    RelationInstance or( RelationInstance r1, RelationInstance r2 ) {
+    synchronized RelationInstance or( RelationInstance r1, RelationInstance r2 ) {
         return bdd( Cudd.Cudd_bddOr( manager, bdd(r1), bdd(r2) ) );
     }
-    RelationInstance and( RelationInstance r1, RelationInstance r2 ) {
+    synchronized RelationInstance and( RelationInstance r1, RelationInstance r2 ) {
         return bdd( Cudd.Cudd_bddAnd( manager, bdd(r1), bdd(r2) ) );
     }
-    RelationInstance biimp( RelationInstance r1, RelationInstance r2 ) {
+    synchronized RelationInstance biimp( RelationInstance r1, RelationInstance r2 ) {
         return bdd( Cudd.Cudd_bddXnor( manager, bdd(r1), bdd(r2) ) );
     }
-    RelationInstance minus( RelationInstance r1, RelationInstance r2 ) {
+    synchronized RelationInstance minus( RelationInstance r1, RelationInstance r2 ) {
         RelationInstance notr2 = bdd( Cudd.Cudd_bddNot( bdd(r2) ) );
         addRef( notr2 );
         RelationInstance ret = bdd(
@@ -150,21 +150,21 @@ public class CuddBackend extends Backend {
         return ret;
     }
 
-    boolean equals( RelationInstance r1, RelationInstance r2 ) {
+    synchronized boolean equals( RelationInstance r1, RelationInstance r2 ) {
         return Cudd.equals( bdd(r1), bdd(r2) ) != 0;
     }
 
 
-    void setOrder( int level2var[] ) {
+    synchronized void setOrder( int level2var[] ) {
         Cudd.Cudd_ShuffleHeap( manager, level2var );
     }
 
-    Iterator cubeIterator( final RelationInstance r ) {
+    synchronized Iterator cubeIterator( final RelationInstance r ) {
         return new Iterator() {
             int[] cubes = new int[totalBits];
             SWIGTYPE_p_DdGen iterator = Cudd.firstCube(manager, bdd(r), cubes.length, cubes);
-            public boolean hasNext() { return iterator != null && Cudd.isNull(iterator) == 0; }
-            public Object next() {
+            synchronized public boolean hasNext() { return iterator != null && Cudd.isNull(iterator) == 0; }
+            synchronized public Object next() {
                 int[] ret = new int[totalBits];
                 System.arraycopy( cubes, 0, ret, 0, totalBits );
                 boolean done = (0 == Cudd.nextCube(iterator, cubes.length, cubes));
@@ -174,7 +174,7 @@ public class CuddBackend extends Backend {
             public void remove() {
                 throw new UnsupportedOperationException();
             }
-            public void finalize() {
+            synchronized public void finalize() {
                 if( iterator != null && Cudd.isNull(iterator) == 0 ) Cudd.freeIterator(iterator);
             }
         };
@@ -186,26 +186,26 @@ public class CuddBackend extends Backend {
     }
     */
 
-    int numNodes( RelationInstance r ) {
+    synchronized int numNodes( RelationInstance r ) {
         return Cudd.Cudd_DagSize(bdd(r));
     }
-    int numPaths( RelationInstance r ) {
+    synchronized int numPaths( RelationInstance r ) {
         return (int) Cudd.Cudd_CountPathsToNonZero(bdd(r));
     }
 
-    double fSatCount( RelationInstance r, int vars ) {
+    synchronized double fSatCount( RelationInstance r, int vars ) {
         double s = Cudd.Cudd_CountMinterm( manager, bdd(r), vars );
         return s;
     }
 
-    long satCount( RelationInstance r, int vars ) {
+    synchronized long satCount( RelationInstance r, int vars ) {
         return (long) fSatCount(r, vars);
     }
 
-    void gbc() {
+    synchronized void gbc() {
     }
 
-    void getShape( RelationInstance bdd, int shape[] ) {
+    synchronized void getShape( RelationInstance bdd, int shape[] ) {
     }
 
     private static class CuddReplacer implements Replacer {
@@ -219,5 +219,11 @@ public class CuddBackend extends Backend {
     }
     private Replacer pair( bddPair in ) {
         return new CuddReplacer( in );
+    }
+    public Adder makeAdder(int[] from, int[] to) {
+        throw new RuntimeException("NYI");
+    }
+    public RelationInstance add(RelationInstance ri, Adder adder, long offset) {
+        throw new RuntimeException("NYI");
     }
 }

@@ -46,9 +46,10 @@ public abstract class Backend {
 
     // return value of following functions is *not* refed
     abstract RelationInstance replace( RelationInstance r, Replacer repl );
-    abstract RelationInstance copy( RelationInstance r, Copier copyer );
+    abstract RelationInstance copy( RelationInstance r, Copier copier );
     abstract RelationInstance relprod( RelationInstance r1, RelationInstance r2, Projector proj );
     abstract RelationInstance project( RelationInstance r, Projector proj );
+    abstract RelationInstance add( RelationInstance r, Adder adder, long offset );
 
     abstract RelationInstance or( RelationInstance r1, RelationInstance r2 );
     abstract RelationInstance and( RelationInstance r1, RelationInstance r2 );
@@ -75,6 +76,7 @@ public abstract class Backend {
     abstract Projector makeProjector( int domains[] );
     abstract Replacer makeReplacer( int from[], int to[] );
     abstract Copier makeCopier( int from[], int to[] );
+    abstract Adder makeAdder( int from[], int to[] );
 
     protected interface Replacer {
     }
@@ -83,6 +85,9 @@ public abstract class Backend {
     }
 
     protected interface Projector {
+    }
+
+    protected interface Adder {
     }
 
     protected class RelationProjectorCopier implements Projector, Copier {
@@ -99,5 +104,8 @@ public abstract class Backend {
     }
     protected RelationProjectorCopier relpc( RelationInstance in ) {
         return new RelationProjectorCopier( in );
+    }
+    protected int width(RelationInstance bdd, int bit1, int bit2) {
+        throw new RuntimeException("NYI");
     }
 }

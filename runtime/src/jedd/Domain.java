@@ -1,5 +1,5 @@
 /* Jedd - A language for implementing relations using BDDs
- * Copyright (C) 2003 Ondrej Lhotak
+ * Copyright (C) 2003, 2004, 2005 Ondrej Lhotak
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -19,11 +19,7 @@
 
 package jedd;
 
-public abstract class Domain {
+public abstract class Domain extends jedd.internal.Domain {
     public abstract Numberer numberer();
-
-    public String name() {
-        return this.getClass().getName();
-    }
-    public String toString() { return name(); }
+    public abstract int maxBits();
 }

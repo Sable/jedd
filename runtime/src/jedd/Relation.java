@@ -54,4 +54,8 @@ public interface Relation {
     public String toString();
     /** Shift the bits in the relation using the provided shifter. */
     public Relation applyShifter( Jedd.Shifter s );
+    /** Undocumented */
+    public Relation add( Attribute srca, PhysicalDomain srcpd, Attribute dsta, PhysicalDomain dstpd, long offset );
+    /** Undocumented */
+    public int width( PhysicalDomain pd );
 }
