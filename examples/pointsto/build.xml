@@ -23,7 +23,7 @@
                 <fileset dir="src" includes="**/*.jedd"/>
             </apply>
 
-            <javac destdir="classes" classpath="classes:${jedd.runtime.jar}">
+            <javac destdir="classes" classpath="classes:${jedd.runtime.jar}" debug="true">
                 <src path="src"/>
                 <src path="generated"/>
             </javac>

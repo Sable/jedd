@@ -1,5 +1,5 @@
 ## Location of Polyglot classes jar file
-polyglot.jar=${user.home}/polyglot-1.2.0.jar
+polyglot.jar=${user.home}/polyglot-1.3.jar
 
 ## Location of Jedd runtime classes jar file
 jedd.runtime.jar=${user.home}/jedd-runtime.jar
@@ -8,7 +8,7 @@ jedd.runtime.jar=${user.home}/jedd-runtime.jar
 jedd.translator.jar=${user.home}/jedd-translator.jar
 
 ## Command to invoke SAT solver
-sat.solver.cmd=${user.home}/zchaff.2003.10.9.linux
+sat.solver.cmd=${user.home}/zchaff
 
 ## Command to invoke SAT core extractor
 sat.core.cmd=${user.home}/zcore

@@ -18,8 +18,8 @@ public class Prop {
     <obj, atp> objTypes;
     <dtp:V2, atp:V1> subType;
 
-    private static Integer getInt(StringTokenizer st) {
-        Integer ret = Integer.decode(st.nextToken());
+    private static Long getInt(StringTokenizer st) {
+        Long ret = Long.decode(st.nextToken());
         return ret;
     }
     public static final void main( String[] args ) throws Exception {
