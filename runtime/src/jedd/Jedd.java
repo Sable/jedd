@@ -151,7 +151,8 @@ public class Jedd {
         return ret;
     }
     public int minus(int r1, Relation r2) {
-        int ret = JeddNative.minus(r1,r2.bdd);
+        int ret;
+        ret = JeddNative.minus(r1,r2.bdd);
         JeddNative.delRef(r1);
         JeddNative.addRef(ret);
         return ret;

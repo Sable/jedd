@@ -153,6 +153,8 @@
             <classpath>
                 <pathelement location="translator/classes"/>
                 <pathelement location="${polyglot.loc}"/>
+                <pathelement location="${soot.loc}"/>
+                <pathelement location="${jasmin.loc}"/>
             </classpath>
         </javac>
     </target>

@@ -76,6 +76,7 @@ public class JeddExt_c extends Ext_c implements JeddExt {
                     new LinkedList(),
                     1,
                     nf.ArrayInit( p, phys ) ) );
+        args.add( nf.StringLit( p, node.toString()+" at "+p.toString() ) );
         if( init != null ) args.add( init );
 
         return nf.New( p, nf.CanonicalTypeNode( p, ts.relation() ), args ).type(type);

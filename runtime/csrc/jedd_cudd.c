@@ -54,6 +54,7 @@ extern void addRef( int bdd ) {
 }
 
 extern void delRef( int bdd ) {
+    if( bdd == -1 ) return;
 #ifdef REF_DEBUG
     refs--;
 #endif

@@ -29,25 +29,29 @@ public class Relation {
     int bdd;
     Attribute[] domains;
     PhysicalDomain[] phys;
+    String desc;
     public int bdd() {
         JeddNative.addRef(bdd);
         return bdd;
     }
 
-    public Relation( Attribute[] domains, PhysicalDomain[] phys ) {
+    public Relation( Attribute[] domains, PhysicalDomain[] phys, String desc ) {
         this.domains = domains;
         this.phys = phys;
+        this.desc = desc;
         bdd = JeddNative.falseBDD();
     }
-    public Relation( Attribute[] domains, PhysicalDomain[] phys, Relation r ) {
+    public Relation( Attribute[] domains, PhysicalDomain[] phys, String desc, Relation r ) {
         this.domains = domains;
         this.phys = phys;
+        this.desc = desc;
         bdd = r.bdd;
         JeddNative.addRef(bdd);
     }
-    public Relation( Attribute[] domains, PhysicalDomain[] phys, int r ) {
+    public Relation( Attribute[] domains, PhysicalDomain[] phys, String desc, int r ) {
         this.domains = domains;
         this.phys = phys;
+        this.desc = desc;
         bdd = r;
         //JeddNative.addRef(bdd);
         //JeddNative.delRef(r);
@@ -64,6 +68,9 @@ public class Relation {
         JeddNative.delRef(bdd);
         bdd = r.bdd();
         return this;
+    }
+    public void kill() {
+        eq(-1);
     }
 
     public Relation eqUnion( int rhs ) {
@@ -89,7 +96,8 @@ public class Relation {
 
     public Relation eqIntersect( int rhs ) {
         if( Jedd.profiler != null ) Jedd.profiler.start( "eqIntersect", bdd, rhs );
-        int newBdd = JeddNative.and( bdd, rhs );
+        int newBdd;
+        newBdd = JeddNative.and( bdd, rhs );
         JeddNative.addRef(newBdd);
         JeddNative.delRef(bdd);
         JeddNative.delRef(rhs);
@@ -100,7 +108,8 @@ public class Relation {
 
     public Relation eqIntersect( Relation r ) {
         if( Jedd.profiler != null ) Jedd.profiler.start( "eqIntersect", bdd, r.bdd );
-        int newBdd = JeddNative.and( bdd, r.bdd );
+        int newBdd;
+        newBdd = JeddNative.and( bdd, r.bdd );
         JeddNative.addRef(newBdd);
         JeddNative.delRef(bdd);
         bdd = newBdd;
@@ -330,6 +339,7 @@ public class Relation {
         Relation domainBDD = new Relation(
                 new Attribute[] { domains[domain] },
                 new PhysicalDomain[] { phys[domain] },
+                "toString",
                 Jedd.v().project( bdd, otherDomains ) );
 
         // Iterate over all the values of domain
