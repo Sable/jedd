@@ -18,7 +18,7 @@ print >>pin, "set ylabel 'Nodes'"
 print >>pin, """set title "`sqlite -column profile.db \"select type, shrt from events join stacks on events.stackid = stacks.id where events.id = %s\"`" """ % form["event"].value
 
 def series(column, name, offset):
-    return """ "<sqlite -column profile.db \\"select level, nodes from   shapes join events on shapes.eventid = events.%s  where  events.id = %s\\"" using ($1+0.%s):2 title "%s" with impulses %s, "<sqlite -column profile.db \\"select level, nodes from   shapes join events on shapes.eventid = events.%s  where  events.id = %s\\"" using ($1+0.%s):2 title "%s" with points %s """ % ( column, form["event"].value, offset, name, offset, column, form["event"].value, offset, name, offset )
+    return """ "<(echo -1000 -1000; sqlite -column profile.db \\"select level, nodes from   shapes join events on shapes.eventid = events.%s  where  events.id = %s\\")" using ($1+0.%s):2 title "%s" with impulses %s, "<(echo -1000 -1000; sqlite -column profile.db \\"select level, nodes from   shapes join events on shapes.eventid = events.%s  where  events.id = %s\\")" using ($1+0.%s):2 title "%s" with points %s """ % ( column, form["event"].value, offset, name, offset, column, form["event"].value, offset, name, offset )
 plotcmd = "plot %s, %s, %s" % (
     series("inputA", "Input A", "1"),
     series("inputB", "Input B", "2"),
