@@ -117,17 +117,21 @@
         <exec dir="runtime/generated" executable="${swig.loc}/bin/swig">
             <arg line="-I../csrc -I${swig.loc}/lib/swig1.3 -I${swig.loc}/lib/swig1.3/java -java -package jedd jedd.i"/>
         </exec>
+        <mkdir dir="runtime/generated/jedd"/>
+        <move todir="runtime/generated/jedd">
+            <fileset dir="runtime/generated" includes="*.java"/>
+        </move>
     </target>
     <target name="swig-dep" depends="settings">
         <dependset>
             <srcfileset dir="runtime/csrc" includes="*.c,*.h,*.i"/>
             <targetfileset dir="runtime/generated"
-                includes="*.java,*.c"/>
+                includes="**/*.java,*.c"/>
         </dependset>
         <condition property="swig-uptodate">
             <and>
-                <available file="runtime/generated/JeddNative.java"/>
-                <available file="runtime/generated/JeddNativeJNI.java"/>
+                <available file="runtime/generated/jedd/JeddNative.java"/>
+                <available file="runtime/generated/jedd/JeddNativeJNI.java"/>
                 <available file="runtime/generated/jedd_wrap.c"/>
             </and>
         </condition>
