@@ -1,5 +1,5 @@
 /* Jedd - A language for implementing relations using BDDs
- * Copyright (C) 2003 Ondrej Lhotak
+ * Copyright (C) 2003, 2004 Ondrej Lhotak
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -595,7 +595,16 @@ public class PhysDom {
             Clause clause = new Clause();
             if( INCLUDE_COMMENTS ) clause.setComment(
                     "[PHYS>=1] At least one phys for "+dnode);
+            if( allPhys(dnode).isEmpty() ) {
+                StdErrorQueue seq = new StdErrorQueue( System.err, 0, "" );
+                seq.displayError(
+                        new ErrorInfo(ErrorInfo.SEMANTIC_ERROR,
+                        "No physical domain for "+dnode.dom,
+                        dnode.expr.position()));
+            }
+
             for( Iterator physIt = allPhys(dnode).iterator(); physIt.hasNext(); ) {
+
                 final Type phys = (Type) physIt.next();
                 clause.add( Literal.v( dnode, phys ) );
             }
