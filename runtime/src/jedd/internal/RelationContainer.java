@@ -23,6 +23,8 @@ import java.util.*;
 import jedd.*;
 
 public class RelationContainer implements Relation {
+    public static long count = 0;
+    public static long delRefTime = 0;
     RelationInstance bdd;
     private Attribute[] attributes;
     private PhysicalDomain[] phys;
@@ -38,6 +40,7 @@ public class RelationContainer implements Relation {
         this.phys = phys;
         this.desc = desc;
         bdd = Backend.v().falseBDD();
+        count++;
     }
     public RelationContainer( Attribute[] attributes, PhysicalDomain[] phys, String desc, RelationContainer r ) {
         this.attributes = attributes;
@@ -45,6 +48,7 @@ public class RelationContainer implements Relation {
         this.desc = desc;
         bdd = r.bdd;
         Backend.v().addRef(bdd);
+        count++;
     }
     public RelationContainer( Attribute[] attributes, PhysicalDomain[] phys, String desc, RelationInstance r ) {
         this.attributes = attributes;
@@ -53,6 +57,7 @@ public class RelationContainer implements Relation {
         bdd = r;
         //Backend.v().addRef(bdd);
         //Backend.v().delRef(r);
+        count++;
     }
 
     public RelationContainer eq( RelationInstance rhs ) {
@@ -137,7 +142,9 @@ public class RelationContainer implements Relation {
     }
 
     public void finalize() {
+        delRefTime -= new Date().getTime();
         Backend.v().delRef(bdd);
+        delRefTime += new Date().getTime();
     }
 
     public long size() {

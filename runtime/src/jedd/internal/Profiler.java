@@ -54,12 +54,12 @@ public class Profiler
         e.time = new Date().getTime() - e.startTime.getTime();
         e.type = eventName;
         e.stackTrace = stackTrace();
-        //if( e.time > 0 ) events.add( e );
-        events.add( e );
+        if( e.time > 0 ) events.add( e );
+        //events.add( e );
         e.output = new BDD(bdd);
     }
     public void printInfo( PrintStream out ) {
-        out.println( "begin transaction;" );
+        long totalTime = 0;
         out.println( "drop table events;" );
         out.println( "create table events ( id integer primary key, type string, stackid int, time int, inputA int, inputB int, output int ) ;" );
         out.println( "drop table stacks;" );
@@ -68,14 +68,24 @@ public class Profiler
         out.println( "create table shapes ( eventid int, level int, nodes int ) ;" );
         out.println( "drop table sizes;" );
         out.println( "create table sizes ( eventid int, nodes int ) ;" );
+        out.println( "drop table physdoms;" );
+        out.println( "create table physdoms ( name string, pos int ) ;" );
+        out.println( "begin transaction;" );
         for( Iterator eIt = events.iterator(); eIt.hasNext(); ) {
             final Event e = (Event) eIt.next();
             out.println( e.toString() );
+            totalTime += e.time;
         }
+        for( Iterator pdIt = Jedd.v().physicalDomains.iterator(); pdIt.hasNext(); ) {
+            final PhysicalDomain pd = (PhysicalDomain) pdIt.next();
+            out.println( "insert into physdoms values('"+pd.name()+"', "+pd.avgPhysPos()+" );" );
+        }
+        out.println( "insert into physdoms values('', "+PhysicalDomain.nextBit+" );" );
+        out.println( "end transaction;" );
         out.println( "create index sizesindex on sizes ( eventid );" );
         out.println( "create index shapesindex on shapes ( eventid );" );
-        out.println( "end transaction;" );
         out.close();
+        System.out.println( "Total BDD time: "+totalTime+" ms" );
     }
     private String stackTrace() {
         Throwable t = new Throwable();
