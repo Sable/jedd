@@ -36,7 +36,6 @@
             sourcepath="runtime/src"
             destdir="doc/api"
             windowtitle="Jedd Runtime API"
-            verbose="true"
         >
             <fileset dir="runtime/src" includes="jedd/*.java"/>
         </javadoc>

@@ -47,7 +47,7 @@ public class Main {
         largs.addFirst( "jedd" );
         largs.addFirst( "-ext" );
         largs.addFirst( "-noserial" );
-        polyglot.main.Main.main( (String[]) largs.toArray( args ) );
+        polyglot.main.Main.main( (String[]) largs.toArray( new String[0] ) );
     }
 
     public static void usage() {
