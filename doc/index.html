@@ -233,6 +233,14 @@ editor to specify the locations of all the tools. Then, just run
 <tt>ant</tt>, and Jedd should be built in the <tt>lib</tt> subdirectory.
 </p>
 
+<p>
+<b>(Optional)</b> Jedd also includes a Soot-based live variable analysis
+that optimizes Jedd code to free the BDD nodes of relations that become
+dead. To build this optimizer, you will need the latest version of Soot
+from Soot Subversion repository. The optimizer is built using the Ant
+target <tt>compile-deadvaroptimizer</tt>.
+</p>
+
 </blockquote>
 
 <br>

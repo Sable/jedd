@@ -165,8 +165,20 @@
             <classpath>
                 <pathelement location="translator/classes"/>
                 <pathelement location="${polyglot.loc}"/>
+            </classpath>
+        </javac>
+    </target>
+
+    <target name="compile-deadvaroptimizer" depends="settings">
+        <mkdir dir="deadvaroptimizer/classes"/>
+        <javac
+            destdir="deadvaroptimizer/classes"
+            debug="true"
+        >
+            <src path="deadvaroptimizer/src"/>
+            <classpath>
+                <pathelement location="deadvaroptimizer/classes"/>
                 <pathelement location="${soot.loc}"/>
-                <pathelement location="${jasmin.loc}"/>
             </classpath>
         </javac>
     </target>
@@ -279,8 +291,10 @@
         <delete quiet="true">
             <fileset dir="runtime/classes" includes="**/*.class" />
             <fileset dir="translator/classes" includes="**/*.class" />
+            <fileset dir="deadvaroptimizer/classes" includes="**/*.class" />
             <fileset dir="runtime/lib" includes="**/*.jar" />
             <fileset dir="translator/lib" includes="**/*.jar" />
+            <fileset dir="deadvaroptimizer/lib" includes="**/*.jar" />
         </delete>
     </target>
 
