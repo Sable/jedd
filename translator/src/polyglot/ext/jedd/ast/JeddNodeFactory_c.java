@@ -152,7 +152,7 @@ public class JeddNodeFactory_c extends NodeFactory_c implements JeddNodeFactory 
                     Collections.EMPTY_LIST,
                     Collections.EMPTY_LIST,
                     Block( pos,
-                        Return( pos, Call( pos, This(pos), "bits" ) )
+                        Return( pos, IntLit( pos, IntLit.INT, 0 ) )
                         )
                     )
                 );
