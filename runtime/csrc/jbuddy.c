@@ -57,5 +57,6 @@ static void errorhandler(int errorCode) {
 const char* bdd_errno = NULL;
 extern void setuperrorhandler() {
     bdd_error_hook(errorhandler);
+    bdd_gbc_hook(NULL);
 }
 
