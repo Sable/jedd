@@ -43,7 +43,7 @@
 
     <target name="compile-c" depends="swig,compile-cudd,compile-buddy"/>
 
-    <target name="compile-cudd" depends="settings,swig">
+    <target name="compile-cudd" depends="settings,swig,cudd-dep" unless="cudd-uptodate">
         <cc
             name="gcc"
             debug="true"
@@ -71,8 +71,21 @@
             <includepath path="${cudd.loc}/include"/> 
         </cc>
     </target>
+    <target name="cudd-dep" depends="settings">
+        <dependset>
+            <srcfileset dir="runtime/generated" includes="jedd_wrap.c"/>
+            <srcfileset dir="runtime/csrc" includes="jedd_cudd.c"/>
+            <srcfileset dir="${cudd.loc}/cudd" includes="libcudd.a"/>
+            <srcfileset dir="${cudd.loc}/mtr" includes="libmtr.a"/>
+            <srcfileset dir="${cudd.loc}/st" includes="libst.a"/>
+            <srcfileset dir="${cudd.loc}/util" includes="libutil.a"/>
+            <srcfileset dir="${cudd.loc}/epd" includes="libepd.a"/>
+            <targetfileset dir="runtime/lib" includes="libjeddcudd.so"/>
+        </dependset>
+        <available property="cudd-uptodate" file="runtime/lib/libjeddcudd.so"/>
+    </target>
 
-    <target name="compile-buddy" depends="settings,swig">
+    <target name="compile-buddy" depends="settings,swig,buddy-dep" unless="buddy-uptodate">
         <cc
             name="gcc"
             debug="true"
@@ -89,6 +102,15 @@
             <includepath path="runtime/csrc"/>
             <includepath path="${buddy.loc}/src"/> 
         </cc>
+    </target>
+    <target name="buddy-dep" depends="settings">
+        <dependset>
+            <srcfileset dir="runtime/generated" includes="jedd_wrap.c"/>
+            <srcfileset dir="runtime/csrc" includes="jedd_buddy.c"/>
+            <srcfileset dir="${buddy.loc}/src" includes="libbdd.a"/>
+            <targetfileset dir="runtime/lib" includes="libjeddbuddy.so"/>
+        </dependset>
+        <available property="buddy-uptodate" file="runtime/lib/libjeddbuddy.so"/>
     </target>
 
     <target name="swig" depends="settings,swig-dep" unless="swig-uptodate">
