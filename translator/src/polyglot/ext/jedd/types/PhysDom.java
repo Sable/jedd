@@ -180,6 +180,7 @@ public class PhysDom {
     Set solution = new HashSet();
     public void runSat() {
         int numvars = (setMap.size()+litMap.size())/2;
+        if( numvars == 0 ) return;
         try {
             File tmpFile = File.createTempFile("domainassign",".cnf");
             PrintWriter file = new PrintWriter(
@@ -298,8 +299,6 @@ public class PhysDom {
                 if( phys != null ) allPhys.add(phys);
             }
         }
-        log( "there are "+DNode.nodes().size()+" nodes" );
-        log( "there are "+allPhys.size()+" physical domains" );
     }
 
     public void createDnodeConstraints() {
@@ -377,11 +376,6 @@ public class PhysDom {
             clause.add( NegLiteral.v( node2, phys ) );
             cnf.add( clause );
         }
-    }
-
-    private void log(String s) {
-        System.out.println("*** "+s);
-        System.out.flush();
     }
 
     public Type phys(DNode d) {

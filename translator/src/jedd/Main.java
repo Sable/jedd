@@ -41,6 +41,7 @@ public class Main {
         if( largs.size() == 0 ) usage();
         largs.addFirst( "jedd" );
         largs.addFirst( "-ext" );
+        largs.addFirst( "-noserial" );
         polyglot.main.Main.main( (String[]) largs.toArray( args ) );
     }
 

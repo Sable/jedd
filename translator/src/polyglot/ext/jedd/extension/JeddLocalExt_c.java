@@ -47,10 +47,10 @@ public class JeddLocalExt_c extends JeddExt_c implements JeddTypeCheck
         JeddTypeSystem ts = (JeddTypeSystem) tc.typeSystem();
         JeddNodeFactory nf = (JeddNodeFactory) tc.nodeFactory();
 
-        Local n = (Local) node();
+        Local n = (Local) node().typeCheck(tc);
         VarInstance vi = n.localInstance();
         Type t = vi.type();
-        if( !( t instanceof BDDType ) ) return n.typeCheck(tc);
+        if( !( t instanceof BDDType ) ) return n;
         BDDType bt = (BDDType) t;
         n = (Local) n.type( ts.cloneDomains( bt ) );
         for( Iterator domainIt = bt.map().keySet().iterator(); domainIt.hasNext(); ) {

@@ -35,10 +35,10 @@ public class JeddFieldExt_c extends JeddExt_c implements JeddTypeCheck
         JeddTypeSystem ts = (JeddTypeSystem) tc.typeSystem();
         JeddNodeFactory nf = (JeddNodeFactory) tc.nodeFactory();
 
-        Field n = (Field) node();
+        Field n = (Field) node().typeCheck(tc);
         VarInstance vi = n.fieldInstance();
         Type t = vi.type();
-        if( !( t instanceof BDDType ) ) return n.typeCheck(tc);
+        if( !( t instanceof BDDType ) ) return n;
         BDDType bt = (BDDType) t;
         n = (Field) n.type( ts.cloneDomains( bt ) );
         return n;
