@@ -295,6 +295,9 @@
             <fileset dir="runtime/lib" includes="**/*.jar" />
             <fileset dir="translator/lib" includes="**/*.jar" />
             <fileset dir="deadvaroptimizer/lib" includes="**/*.jar" />
+            <fileset dir="runtime/lib" includes="**/*.so" />
+            <fileset dir="translator/lib" includes="**/*.so" />
+            <fileset dir="deadvaroptimizer/lib" includes="**/*.so" />
         </delete>
     </target>
 
