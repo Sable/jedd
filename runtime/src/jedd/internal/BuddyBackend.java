@@ -98,11 +98,24 @@ public class BuddyBackend extends Backend {
     }
 
     RelationInstance copy( RelationInstance r, Copier copier ) {
-        return and( r, relpc( copier ) );
+        BuddyCopier bc = (BuddyCopier) copier;
+        RelationInstance ret = r;
+        addRef(ret);
+        for( int i=0; i<bc.rels.length; i++ ) {
+            RelationInstance newRet = and(ret, bc.rels[i]);
+            addRef(newRet);
+            delRef(ret);
+            ret = newRet;
+        }
+        delRef(ret);
+        return ret;
+    }
+    static class BuddyCopier implements Copier {
+        public RelationInstance[] rels;
     }
     Copier makeCopier( int from[], int to[] ) {
         int i;
-        RelationInstance ret = trueBDD();
+        RelationInstance[] rels = new RelationInstance[from.length];
         for( i=0; i < from.length; i++ ) {
             RelationInstance b1, b2;
             RelationInstance ivf = ithVar(from[i]);
@@ -111,13 +124,11 @@ public class BuddyBackend extends Backend {
             addRef( b1 );
             delRef( ivf );
             delRef( ivt );
-            b2 = and( b1, ret );
-            addRef( b2 );
-            delRef( b1 );
-            delRef( ret );
-            ret = b2;
+            rels[i] = b1;
         }
-        return relpc(ret);
+        BuddyCopier ret = new BuddyCopier();
+        ret.rels = rels;
+        return ret;
     }
 
     RelationInstance relprod( RelationInstance r1, RelationInstance r2, Projector proj ) {
@@ -181,10 +192,14 @@ public class BuddyBackend extends Backend {
         return (int) Buddy.bdd_pathcount(bdd(r));
     }
 
-    long satCount( RelationInstance r, int vars ) {
+    double fSatCount( RelationInstance r, int vars ) {
         double s = Buddy.bdd_satcount(bdd(r));
         s /= Math.pow(2,totalBits-vars);
-        return (long) s;
+        return s;
+    }
+
+    long satCount( RelationInstance r, int vars ) {
+        return (long) fSatCount(r, vars);
     }
 
     void gbc() {

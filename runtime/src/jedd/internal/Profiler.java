@@ -23,48 +23,14 @@ import java.io.*;
 
 public class Profiler
 { 
+    private static boolean VERBOSE = false;
     private static Profiler instance;
     public static Profiler v() { return instance; }
     public static boolean enabled() {
         return instance != null;
     }
-    public static void enable() {
-        instance = new Profiler();
-    }
-
-    LinkedList events = new LinkedList();
-    LinkedList stack = new LinkedList();
-    Map stackMap = new HashMap();
-    static int nextStackTrace = 1;
-
-    public void start( String eventName, RelationInstance bdd ) {
-        RelationInstance fls = Backend.v().falseBDD();
-        Backend.v().delRef( fls );
-        start( eventName, bdd, fls );
-    }
-    public void start( String eventName, RelationInstance bdd1, RelationInstance bdd2 ) {
-        Event e = new Event();
-        e.inputA = new BDD(bdd1);
-        e.inputB = new BDD(bdd2);
-        e.startTime = new Date();
-        stack.addLast( e );
-    }
-    public void finish( String eventName, RelationInstance bdd ) {
-        Event e = (Event) stack.removeLast();
-        e.time = new Date().getTime() - e.startTime.getTime();
-        e.type = eventName;
-        e.stackTrace = stackTrace();
-        if( e.time > 0 ) events.add( e );
-        //events.add( e );
-        e.output = new BDD(bdd);
-        if(e.time < 10) {
-            e.inputA.shape = null;
-            e.inputB.shape = null;
-            e.output.shape = null;
-        }
-    }
-    public void printInfo( PrintStream out ) {
-        long totalTime = 0;
+    public static void enable(PrintStream out) {
+        instance = new Profiler(out);
         out.println( "drop table events;" );
         out.println( "create table events ( id integer primary key, type string, stackid int, time int, inputA int, inputB int, output int ) ;" );
         out.println( "drop table stacks;" );
@@ -76,11 +42,50 @@ public class Profiler
         out.println( "drop table physdoms;" );
         out.println( "create table physdoms ( name string, minpos int, maxpos int ) ;" );
         out.println( "begin transaction;" );
-        for( Iterator eIt = events.iterator(); eIt.hasNext(); ) {
-            final Event e = (Event) eIt.next();
-            out.println( e.toString() );
-            totalTime += e.time;
+    }
+
+    private Profiler(PrintStream out) {
+        this.out = out;
+    }
+    private PrintStream out;
+    //LinkedList events = new LinkedList();
+    LinkedList stack = new LinkedList();
+    Map stackMap = new HashMap();
+    static int nextStackTrace = 1;
+
+    public void start( String eventName, RelationInstance bdd ) {
+        RelationInstance fls = Backend.v().falseBDD();
+        Backend.v().delRef( fls );
+        start( eventName, bdd, fls );
+    }
+    public void start( String eventName, RelationInstance bdd1, RelationInstance bdd2 ) {
+        if(VERBOSE) {
+            System.out.println(eventName+" "+Backend.v().numNodes(bdd1)+" "+Backend.v().numNodes(bdd2));
         }
+        Event e = new Event();
+        e.inputA = new BDD(bdd1);
+        e.inputB = new BDD(bdd2);
+        e.startTime = new Date();
+        stack.addLast( e );
+    }
+    public void finish( String eventName, RelationInstance bdd ) {
+        if(VERBOSE) {
+            System.out.println(eventName+" "+Backend.v().numNodes(bdd));
+        }
+        Event e = (Event) stack.removeLast();
+        e.time = new Date().getTime() - e.startTime.getTime();
+        e.type = eventName;
+        e.stackTrace = stackTrace();
+        //events.add( e );
+        e.output = new BDD(bdd);
+        if(e.time < 10) {
+            e.inputA.shape = null;
+            e.inputB.shape = null;
+            e.output.shape = null;
+        }
+        if( e.time > 0 ) out.println(e.toString());
+    }
+    public void printInfo() {
         for( Iterator pdIt = Jedd.v().physicalDomains.iterator(); pdIt.hasNext(); ) {
             final PhysicalDomain pd = (PhysicalDomain) pdIt.next();
             out.println( "insert into physdoms values('"+pd.name()+"', "+pd.minPhysPos+", "+pd.maxPhysPos+" );" );
@@ -90,7 +95,6 @@ public class Profiler
         out.println( "create index sizesindex on sizes ( eventid );" );
         out.println( "create index shapesindex on shapes ( eventid );" );
         out.close();
-        System.out.println( "Total BDD time: "+totalTime+" ms" );
     }
     private String stackTrace() {
         Throwable t = new Throwable();

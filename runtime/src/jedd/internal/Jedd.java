@@ -171,6 +171,10 @@ public class Jedd {
     }
 
     public void setOrder( Order order ) {
+        for( Iterator pdIt = physicalDomains.iterator(); pdIt.hasNext(); ) {
+            final PhysicalDomain pd = (PhysicalDomain) pdIt.next();
+            pd.clearPhysPos();
+        }
         List newOrder = order.listBits();
         int[] buddyOrder = new int[newOrder.size()];
         if( buddyOrder.length != Backend.v().numBits() ) {

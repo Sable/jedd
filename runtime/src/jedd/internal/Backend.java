@@ -66,6 +66,7 @@ public abstract class Backend {
     abstract int numPaths( RelationInstance r );
 
     abstract long satCount( RelationInstance r, int vars );
+    abstract double fSatCount( RelationInstance r, int vars );
 
     abstract void gbc();
 

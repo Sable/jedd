@@ -168,9 +168,13 @@ public class JavabddBackend extends Backend {
     }
 
     long satCount( RelationInstance r, int vars ) {
+        return (long) fSatCount(r, vars);
+    }
+
+    double fSatCount( RelationInstance r, int vars ) {
         double s = bdd(r).satCount();
         s /= Math.pow(2,totalBits-vars);
-        return (long) s;
+        return s;
     }
 
     void gbc() {

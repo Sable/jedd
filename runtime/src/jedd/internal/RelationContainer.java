@@ -147,6 +147,11 @@ public class RelationContainer implements Relation {
         delRefTime += new Date().getTime();
     }
 
+    public double fsize() {
+        int vars = 0;
+        for( int i = 0; i < phys.length; i++ ) vars += phys[i].bits();
+        return Backend.v().fSatCount(bdd, vars);
+    }
     public long size() {
         int vars = 0;
         for( int i = 0; i < phys.length; i++ ) vars += phys[i].bits();

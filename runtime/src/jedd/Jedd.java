@@ -34,13 +34,13 @@ public class Jedd {
     /** Starts up the Jedd profiler which records the time taken by 
      * each operation. 
      */
-    public void enableProfiling() {
-        Profiler.enable();
+    public void enableProfiling( PrintStream stream ) {
+        Profiler.enable(stream);
     }
     /** Outputs the profiling data recorded by the profiler to an SQL file.
      */
-    public void outputProfile( PrintStream stream ) throws IOException {
-        if( Profiler.enabled() ) Profiler.v().printInfo( stream );
+    public void outputProfile() {
+        if( Profiler.enabled() ) Profiler.v().printInfo();
     }
     /** Forces the underlying BDD backend to perform a garbage collection. */
     public void gbc() {

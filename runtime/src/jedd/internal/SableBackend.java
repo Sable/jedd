@@ -165,6 +165,11 @@ public class SableBackend extends Backend {
         return 0;
     }
 
+    double fSatCount( RelationInstance r, int vars ) {
+        // TODO: implement in SableJBDD
+        return 0;
+    }
+
     void gbc() {
         // TODO: implement in SableJBDD
     }

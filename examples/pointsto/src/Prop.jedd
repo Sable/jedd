@@ -25,14 +25,14 @@ public class Prop {
     }
     public static final void main( String[] args ) throws Exception {
         Jedd.v().setBackend( args[0] );
-        Jedd.v().enableProfiling();
-        new Prop().main();
         try {
-            Jedd.v().outputProfile( new PrintStream( new GZIPOutputStream(
+            Jedd.v().enableProfiling( new PrintStream( new GZIPOutputStream(
                     new FileOutputStream( new File( "profile.sql.gz")))));
         } catch( IOException e ) {
             throw new RuntimeException( "couldn't write profile: "+e );
         }
+        new Prop().main();
+        Jedd.v().outputProfile();
     }
     public final void main() throws Exception {
         //Jedd.v().setOrder( new Seq(FD.v(), new Interleave(V1.v(), V2.v()), H1.v(), H2.v()));

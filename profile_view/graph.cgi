@@ -6,6 +6,7 @@ import sqlite
 import string
 
 def series(column, name, offset):
+    #return """ "<(echo -1000 -1000; sqlite -column profile.db \\"select level, nodes from   events join shapes on shapes.eventid = events.%s  where  events.id = %s\\")" using ($1+0.%s):1 title "%s" with impulses %s """ % ( column, form["event"].value, offset, name, offset )
     return """ "<(echo -1000 -1000; sqlite -column profile.db \\"select level, nodes from   events join shapes on shapes.eventid = events.%s  where  events.id = %s\\")" using ($1+0.%s):2 title "%s" with impulses %s, "<(echo -1000 -1000; sqlite -column profile.db \\"select level, nodes from   events join shapes on shapes.eventid = events.%s  where  events.id = %s\\")" using ($1+0.%s):2 title "%s" with points %s """ % ( column, form["event"].value, offset, name, offset, column, form["event"].value, offset, name, offset )
 #    return """ "<(echo -1000 -1000; sqlite -column profile.db \\"select level, nodes from   events join shapes on shapes.eventid = events.%s  where  events.id = %s\\")" using ($1+0.%s):2 title "%s" with impulses %s """ % ( column, form["event"].value, offset, name, offset )
 
@@ -24,6 +25,8 @@ print >>pin, "set xrange [-0.5:`sqlite -column profile.db \"select max(maxpos) f
 print >>pin, "set key below noautotitles "
 print >>pin, "set xlabel 'Level'"
 print >>pin, "set ylabel 'Nodes'"
+if "log" in form:
+  print >>pin, "set logscale y"
 print >>pin, """set title "`sqlite -column profile.db \"select type, shrt from events join stacks on events.stackid = stacks.id where events.id = %s\"`" """ % form["event"].value
 
 plotcmd = "plot %s, %s, %s" % (

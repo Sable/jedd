@@ -24,6 +24,8 @@ import java.util.*;
 public interface Relation {
     /** Returns the number of tuples in the relation. */
     public long size();
+    /** Returns the number of tuples in the relation. */
+    public double fsize();
     /** Returns the number of BDD nodes used to represent the relation. */
     public int numNodes();
     /** Returns an iterator over the tuples in the relation. Each tuple
