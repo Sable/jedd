@@ -245,6 +245,33 @@ public class Jedd {
         }
         return ret;
     }
+    int[][] convertDomains( PhysicalDomain[] d1, PhysicalDomain[] d2 ) {
+        int n = 0;
+        if( d1.length != d2.length ) throw new RuntimeException();
+        for( int i = 0; i < d1.length; i++ ) {
+            int bits1 = d1[i].bits();
+            int bits2 = d2[i].bits();
+            if( bits1 < bits2 ) n += bits1;
+            else n += bits2;
+        }
+        int[][] ret = new int[2][n];
+
+        int nextbit = 0;
+        for( int i = 0; i < d1.length; i++ ) {
+            int bit1 = d1[i].firstBit();
+            int bit2 = d2[i].firstBit();
+            int bits1 = d1[i].bits();
+            int bits2 = d2[i].bits();
+            int bits = bits1;
+            if( bits1 > bits2 ) bits = bits2;
+            for( int j = 0; j < bits; j++ ) {
+                ret[0][nextbit] = bit1++;
+                ret[1][nextbit] = bit2++;
+                nextbit++;
+            }
+        }
+        return ret;
+    }
     private List toList( PhysicalDomain[] from, PhysicalDomain[] to ) {
         return Arrays.asList( new List[] {
             Arrays.asList(from), Arrays.asList(to) } );
@@ -279,8 +306,8 @@ public class Jedd {
             from = (PhysicalDomain[]) ((List) l.get(0)).toArray(from);
             PhysicalDomain[] to = new PhysicalDomain[0];
             to = (PhysicalDomain[]) ((List) l.get(1)).toArray(to);
-            return Backend.v().makeReplacer(
-                    convertDomains(from), convertDomains(to) );
+            int[][] converted = convertDomains(from, to);
+            return Backend.v().makeReplacer( converted[0], converted[1] );
         }
     };
 
@@ -291,8 +318,8 @@ public class Jedd {
             from = (PhysicalDomain[]) ((List) l.get(0)).toArray(from);
             PhysicalDomain[] to = new PhysicalDomain[0];
             to = (PhysicalDomain[]) ((List) l.get(1)).toArray(to);
-            return Backend.v().makeCopier(
-                    convertDomains(from), convertDomains(to) );
+            int[][] converted = convertDomains(from, to);
+            return Backend.v().makeCopier( converted[0], converted[1] );
         }
     };
 
