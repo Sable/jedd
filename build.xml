@@ -176,7 +176,6 @@
             <includepath path="runtime/csrc"/>
             <includepath path="${buddy.loc}/src"/> 
         </cc>
-        <antcall target="winlink-buddy"/>
     </target>
     <target name="compile-buddy-on-windows" if="iswindows">
         <apply executable="gcc" verbose="true" failonerror="true" dir="runtime/generated/buddylib">
