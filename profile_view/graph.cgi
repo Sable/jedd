@@ -41,13 +41,15 @@ if "order" in form:
     order = form["order"].value;
 
 cursor.execute("""
-    select name, minpos, maxpos from physdoms
+    select name, minpos, maxpos, minpos+maxpos as sum from physdoms order by sum
 """)
+vertpos = 0
 for row in cursor.fetchall():
+    if row.minpos > row.maxpos: continue
     shortname = string.split(row.name,".")[-1]
-    vertpos = row.minpos %5;
-    print >>pin, """set label "%s" at first %s, graph %s center""" % ( shortname, (row.minpos+row.maxpos)/2, .99-vertpos*.025 )
-    print >>pin, """set arrow heads size graph .01,90 from first %s, graph %s to first %s, graph %s""" % ( row.minpos, .975-vertpos*.025, row.maxpos, .975-vertpos*.025 )
+    print >>pin, """set label "%s" at first %s, graph %s center""" % ( shortname, row.sum/2.0, .99-vertpos*.025)
+    print >>pin, """set arrow from first %s, graph %s to first %s, graph %s heads size graph .005,90 linetype -1""" % ( row.minpos, .975-vertpos*.025, row.maxpos, .975-vertpos*.025 )
+    vertpos = (vertpos + 1 ) %5;
 conn.close()
 
 print >>pin, plotcmd
