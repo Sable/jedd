@@ -9,6 +9,9 @@
 
     <target name="settings">
         <property file="ant.settings"/>
+        <condition property="iswindows">
+            <os family="windows"/>
+        </condition>
         <fail
             message="Please copy ant.settings.template to ant.settings, and set the variables in it."
             unless="polyglot.loc"
@@ -56,36 +59,63 @@
     <target name="compile-c" depends="swig,compile-cudd,compile-buddy"/>
 
     <target name="compile-cudd" depends="settings,swig,cudd-dep" unless="cudd-uptodate">
+        <condition property="ccargs" value="-mno-cygwin">
+            <isset property="iswindows"/>
+        </condition>
         <cc
             name="gcc"
             debug="true"
-            objdir="runtime/generated"
+            objdir="runtime/generated/cuddlib"
             outfile="runtime/lib/jeddcudd"
             link="shared"
             runtime="dynamic"
         >
+            <compilerarg value="-O3"/>
             <fileset dir="runtime/generated" includes="jcudd_wrap.c"/>
             <fileset dir="runtime/csrc" includes="jcudd.c"/>
-            <libset dir="${cudd.loc}/cudd" libs="cudd"/>
-            <libset dir="${cudd.loc}/mtr" libs="mtr"/>
-            <libset dir="${cudd.loc}/st" libs="st"/>
-            <libset dir="${cudd.loc}/util" libs="util"/>
-            <libset dir="${cudd.loc}/epd" libs="epd"/>
+            <fileset dir="${cudd.loc}/cudd" includes="cudd*.c"/>
+            <fileset dir="${cudd.loc}/mtr" includes="mtr*.c"/>
+            <fileset dir="${cudd.loc}/st" includes="*.c"/>
+            <fileset dir="${cudd.loc}/util">
+                <include name="cpu_time.c"/>
+                <include name="datalimit.c"/>
+                <include name="safe_mem.c"/>
+            </fileset>
+            <fileset dir="${cudd.loc}/epd" includes="*.c"/>
             <includepath path="${java.loc}/include"/>
             <includepath path="${java.loc}/include/linux"/>
+            <includepath path="${java.loc}/include/win32"/>
             <includepath path="runtime/csrc"/>
             <includepath path="${cudd.loc}/include"/> 
         </cc>
+        <antcall target="winlink-cudd"/>
+    </target>
+    <target name="winlink-cudd" if="iswindows">
+        <echo message="linking cudd for windows"/>
+        <apply executable="dllwrap">
+            <arg value="-mno-cygwin"/>
+            <arg value="-mwindows"/>
+            <arg value="--target=i386-mingw32"/>
+            <arg value="--add-stdcall-alias"/>
+            <arg value="--driver-name"/>
+            <arg value="gcc"/>
+            <arg value="-o"/>
+            <arg value="runtime/lib/jeddcudd.dll"/>
+            <fileset dir="runtime/generated/cuddlib" file="*.o"/>
+        </apply>
     </target>
     <target name="cudd-dep" depends="settings">
         <dependset>
             <srcfileset dir="runtime/generated" includes="jcudd_wrap.c"/>
             <srcfileset dir="runtime/csrc" includes="jcudd.c"/>
-            <srcfileset dir="${cudd.loc}/cudd" includes="libcudd.a"/>
-            <srcfileset dir="${cudd.loc}/mtr" includes="libmtr.a"/>
-            <srcfileset dir="${cudd.loc}/st" includes="libst.a"/>
-            <srcfileset dir="${cudd.loc}/util" includes="libutil.a"/>
-            <srcfileset dir="${cudd.loc}/epd" includes="libepd.a"/>
+            <srcfileset dir="${cudd.loc}/cudd" includes="cudd*.c"/>
+            <srcfileset dir="${cudd.loc}/mtr" includes="mtr*.c"/>
+            <srcfileset dir="${cudd.loc}/st" includes="*.c"/>
+            <srcfileset dir="${cudd.loc}/util">
+                <include name="cpu_time.c"/>
+                <include name="datalimit.c"/>
+                <include name="safe_mem.c"/>
+            </srcfileset>
             <targetfileset dir="runtime/lib" includes="libjeddcudd.so"/>
         </dependset>
         <available property="cudd-uptodate" file="runtime/lib/libjeddcudd.so"/>
@@ -95,7 +125,7 @@
         <cc
             name="gcc"
             debug="true"
-            objdir="runtime/generated"
+            objdir="runtime/generated/buddylib"
             outfile="runtime/lib/jeddbuddy"
             link="shared"
             runtime="dynamic"
@@ -103,18 +133,34 @@
             <compilerarg value="-O3"/>
             <fileset dir="runtime/generated" includes="jbuddy_wrap.c"/>
             <fileset dir="runtime/csrc" includes="jbuddy.c"/>
-            <libset dir="${buddy.loc}/src" libs="bdd"/>
+            <fileset dir="${buddy.loc}/src" includes="*.c"/>
             <includepath path="${java.loc}/include"/>
             <includepath path="${java.loc}/include/linux"/>
+            <includepath path="${java.loc}/include/win32"/>
             <includepath path="runtime/csrc"/>
             <includepath path="${buddy.loc}/src"/> 
         </cc>
+        <antcall target="winlink-buddy"/>
+    </target>
+    <target name="winlink-buddy" if="iswindows">
+        <echo message="linking buddy for windows"/>
+        <apply executable="dllwrap">
+            <arg value="-mno-cygwin"/>
+            <arg value="-mwindows"/>
+            <arg value="--target=i386-mingw32"/>
+            <arg value="--add-stdcall-alias"/>
+            <arg value="--driver-name"/>
+            <arg value="gcc"/>
+            <arg value="-o"/>
+            <arg value="runtime/lib/jeddbuddy.dll"/>
+            <fileset dir="runtime/generated/buddylib" file="*.o"/>
+        </apply>
     </target>
     <target name="buddy-dep" depends="settings">
         <dependset>
             <srcfileset dir="runtime/generated" includes="jbuddy_wrap.c"/>
             <srcfileset dir="runtime/csrc" includes="jbuddy.c"/>
-            <srcfileset dir="${buddy.loc}/src" includes="libbdd.a"/>
+            <srcfileset dir="${buddy.loc}/src" includes="*.c"/>
             <targetfileset dir="runtime/lib" includes="libjeddbuddy.so"/>
         </dependset>
         <available property="buddy-uptodate" file="runtime/lib/libjeddbuddy.so"/>
