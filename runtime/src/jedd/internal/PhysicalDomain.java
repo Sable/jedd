@@ -33,7 +33,8 @@ public abstract class PhysicalDomain {
         Backend.v().addBits(bits());
         domNum = nextDomNum++;
         Jedd.v().physicalDomains.add(this);
-        totalPhysPos = bits()*(2*firstBit+bits()-1)/2;
+        minPhysPos = firstBit;
+        maxPhysPos = firstBit+bits()-1;
     }
 
     public void setBits( int[] bits, long value ) {
@@ -70,9 +71,14 @@ public abstract class PhysicalDomain {
     
     static int nextDomNum = 0;
     int domNum;
-    int totalPhysPos;
-    public int avgPhysPos() { 
-        if( bits() == 0 ) return -1;
-        return totalPhysPos/bits();
+    int maxPhysPos = 0;
+    int minPhysPos = Integer.MAX_VALUE;
+    public void clearPhysPos() {
+        maxPhysPos = 0;
+        minPhysPos = Integer.MAX_VALUE;
+    }
+    public void setPhysPos(int pos) { 
+        if( pos < minPhysPos ) minPhysPos = pos;
+        if( pos > maxPhysPos ) maxPhysPos = pos;
     }
 }

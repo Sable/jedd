@@ -69,7 +69,7 @@ public class Profiler
         out.println( "drop table sizes;" );
         out.println( "create table sizes ( eventid int, nodes int ) ;" );
         out.println( "drop table physdoms;" );
-        out.println( "create table physdoms ( name string, pos int ) ;" );
+        out.println( "create table physdoms ( name string, minpos int, maxpos int ) ;" );
         out.println( "begin transaction;" );
         for( Iterator eIt = events.iterator(); eIt.hasNext(); ) {
             final Event e = (Event) eIt.next();
@@ -78,9 +78,9 @@ public class Profiler
         }
         for( Iterator pdIt = Jedd.v().physicalDomains.iterator(); pdIt.hasNext(); ) {
             final PhysicalDomain pd = (PhysicalDomain) pdIt.next();
-            out.println( "insert into physdoms values('"+pd.name()+"', "+pd.avgPhysPos()+" );" );
+            out.println( "insert into physdoms values('"+pd.name()+"', "+pd.minPhysPos+", "+pd.maxPhysPos+" );" );
         }
-        out.println( "insert into physdoms values('', "+PhysicalDomain.nextBit+" );" );
+        out.println( "insert into physdoms values('', "+PhysicalDomain.nextBit+", "+PhysicalDomain.nextBit+" );" );
         out.println( "end transaction;" );
         out.println( "create index sizesindex on sizes ( eventid );" );
         out.println( "create index shapesindex on shapes ( eventid );" );

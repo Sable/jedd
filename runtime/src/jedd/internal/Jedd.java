@@ -176,18 +176,18 @@ public class Jedd {
             Object o = order[i];
             if( o instanceof PhysicalDomain ) {
                 PhysicalDomain pd = (PhysicalDomain) o;
-                pd.totalPhysPos = 0;
+                pd.clearPhysPos();
                 int[] vars = pd.getBits();
                 if( msbAtTop ) reverse( vars );
                 for( int k = 0; k < vars.length; k++ ) {
-                    pd.totalPhysPos += newOrder.size();
+                    pd.setPhysPos(newOrder.size());
                     newOrder.add( new Integer( vars[k] ) );
                 }
             } else if( o instanceof Object[] ) {
                 PhysicalDomain[] domains = (PhysicalDomain[]) o;
                 int[][] vars = new int[domains.length][];
                 for( int j = 0; j < domains.length; j++ ) {
-                    domains[j].totalPhysPos = 0;
+                    domains[j].clearPhysPos();
                     vars[j] = domains[j].getBits();
                     if( msbAtTop ) reverse( vars[j] );
                 }
@@ -196,7 +196,7 @@ public class Jedd {
                     change = false;
                     for( int k = 0; k < vars.length; k++ ) {
                         if( j < vars[k].length ) {
-                            domains[k].totalPhysPos += newOrder.size();
+                            domains[k].setPhysPos(newOrder.size());
                             newOrder.add( new Integer( vars[k][j] ) );
                             change = true;
                         }

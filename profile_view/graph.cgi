@@ -20,7 +20,7 @@ print "Content-Type: image/png\r\n"
 os.putenv("GNUTERM", "png")
 (pin, pout) = os.popen2("gnuplot")
 print >>pin, "set term png"
-print >>pin, "set xrange [-0.5:`sqlite -column profile.db \"select max(pos) from physdoms\"`+0.5]"
+print >>pin, "set xrange [-0.5:`sqlite -column profile.db \"select max(maxpos) from physdoms\"`+0.5]"
 print >>pin, "set key below noautotitles "
 print >>pin, "set xlabel 'Level'"
 print >>pin, "set ylabel 'Nodes'"
@@ -41,12 +41,13 @@ if "order" in form:
     order = form["order"].value;
 
 cursor.execute("""
-    select name, pos from physdoms
+    select name, minpos, maxpos from physdoms
 """)
 for row in cursor.fetchall():
     shortname = string.split(row.name,".")[-1]
-    vertpos = row.pos %4;
-    print >>pin, """set label "%s" at first %s, graph %s center""" % ( shortname, row.pos, .99-vertpos*.025 )
+    vertpos = row.minpos %5;
+    print >>pin, """set label "%s" at first %s, graph %s center""" % ( shortname, (row.minpos+row.maxpos)/2, .99-vertpos*.025 )
+    print >>pin, """set arrow heads size graph .01,90 from first %s, graph %s to first %s, graph %s""" % ( row.minpos, .975-vertpos*.025, row.maxpos, .975-vertpos*.025 )
 conn.close()
 
 print >>pin, plotcmd
