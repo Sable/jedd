@@ -86,7 +86,7 @@ public class Replace_c extends FixPhys_c implements Replace, JeddGenerateJava, J
         for( Iterator pairIt = domainPairs.iterator(); pairIt.hasNext(); ) {
             final TypeNode[] pair = (TypeNode[]) pairIt.next();
             if( pair[0] == null ) continue;
-            if( !pair[0].type().isSubtype( ts.domain() ) ) {
+            if( !pair[0].type().isSubtype( ts.attribute() ) ) {
                 throw new SemanticException( "Attempt to replace a non-domain" );
             }
             if( !exprMap.containsKey( pair[0].type() ) ) {
@@ -110,7 +110,7 @@ outer:
                         throw new SemanticException( "Multiple physical domains specified for domain "+pair[0].type() );
                     }
                     newDomain[1] = pair[1].type();
-                } else if( pair[1].type().isSubtype( ts.domain() ) ) {
+                } else if( pair[1].type().isSubtype( ts.attribute() ) ) {
                     if( newDomain[0] != null ) {
                         throw new SemanticException( "Multiple physical domains specified for domain "+pair[0].type() );
                     }
@@ -189,7 +189,7 @@ outer:
                     project.add( nf.Call( p, nf.CanonicalTypeNode( p, phys ), "v" ) );
                     continue outer;
                 }
-                if( repPair[1].type().isSubtype( ts.domain() ) ) {
+                if( repPair[1].type().isSubtype( ts.attribute() ) ) {
                     phys = (Type) map.get( repPair[1].type() );
                 } else {
                     phys = repPair[1].type();

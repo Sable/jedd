@@ -27,25 +27,25 @@ public class Relation {
         Jedd jedd = Jedd.v();
     }
     int bdd;
-    Domain[] domains;
+    Attribute[] domains;
     PhysicalDomain[] phys;
     public int bdd() {
         JeddNative.addRef(bdd);
         return bdd;
     }
 
-    public Relation( Domain[] domains, PhysicalDomain[] phys ) {
+    public Relation( Attribute[] domains, PhysicalDomain[] phys ) {
         this.domains = domains;
         this.phys = phys;
         bdd = JeddNative.falseBDD();
     }
-    public Relation( Domain[] domains, PhysicalDomain[] phys, Relation r ) {
+    public Relation( Attribute[] domains, PhysicalDomain[] phys, Relation r ) {
         this.domains = domains;
         this.phys = phys;
         bdd = r.bdd;
         JeddNative.addRef(bdd);
     }
-    public Relation( Domain[] domains, PhysicalDomain[] phys, int r ) {
+    public Relation( Attribute[] domains, PhysicalDomain[] phys, int r ) {
         this.domains = domains;
         this.phys = phys;
         bdd = r;
@@ -139,9 +139,9 @@ public class Relation {
         return JeddNative.satCount(bdd, vars);
     }
 
-    public Iterator iterator(Domain[] wanted) {
+    public Iterator iterator(Attribute[] wanted) {
         if( domains.length != wanted.length ) {
-            throw new RuntimeException( "Domain count doesn't match" );
+            throw new RuntimeException( "Attribute count doesn't match" );
         }
         PhysicalDomain[] physWanted = new PhysicalDomain[wanted.length];
         for( int i=0; i < wanted.length; i++ ) {
@@ -154,7 +154,7 @@ public class Relation {
     }
     
     class MultiRelationIterator implements Iterator {
-        MultiRelationIterator( int bdd, PhysicalDomain[] phys, Domain[] domain ) {
+        MultiRelationIterator( int bdd, PhysicalDomain[] phys, Attribute[] domain ) {
             this.phys = phys;
             this.domain = domain;
             this.ret = new Object[domain.length];
@@ -174,7 +174,7 @@ public class Relation {
         private Object[] ret;
         private Object[] ret2;
         private PhysicalDomain[] phys;
-        private Domain[] domain;
+        private Attribute[] domain;
 
         public boolean hasNext() { return current < ncubes*nbits; }
         private void newCube() {
@@ -228,7 +228,7 @@ public class Relation {
     }
     
     class RelationIterator implements Iterator {
-        RelationIterator( int bdd, PhysicalDomain phys, Domain domain ) {
+        RelationIterator( int bdd, PhysicalDomain phys, Attribute domain ) {
             this.phys = phys;
             this.domain = domain;
             ncubes = JeddNative.numPaths( bdd );
@@ -245,7 +245,7 @@ public class Relation {
         private int[] curcube;
         private Object ret;
         private PhysicalDomain phys;
-        private Domain domain;
+        private Attribute domain;
 
         public boolean hasNext() { return current < ncubes*nbits; }
         private void newCube() {
@@ -325,7 +325,7 @@ public class Relation {
         // Project down to domain
         JeddNative.addRef(bdd);
         Relation domainBDD = new Relation(
-                new Domain[] { domains[domain] },
+                new Attribute[] { domains[domain] },
                 new PhysicalDomain[] { phys[domain] },
                 Jedd.v().project( bdd, otherDomains ) );
 
@@ -334,7 +334,7 @@ public class Relation {
             final Object o = (Object) oIt.next();
             int literal = Jedd.v().literal(
                     new Object[] { o },
-                    new Domain[] { domains[domain] },
+                    new Attribute[] { domains[domain] },
                     new PhysicalDomain[] { phys[domain] } );
             JeddNative.addRef(bdd);
             int restrictedBdd = Jedd.v().compose( bdd, literal, new PhysicalDomain[] { phys[domain] } );

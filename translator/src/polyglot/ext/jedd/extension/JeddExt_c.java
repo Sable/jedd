@@ -66,7 +66,7 @@ public class JeddExt_c extends Ext_c implements JeddExt {
         List args = new LinkedList();
         args.add( nf.NewArray(
                     p,
-                    nf.CanonicalTypeNode( p, ts.domain() ),
+                    nf.CanonicalTypeNode( p, ts.attribute() ),
                     new LinkedList(),
                     1,
                     nf.ArrayInit( p, domains ) ) );

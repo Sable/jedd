@@ -144,7 +144,7 @@ public class Jedd {
         return ret;
     }
 
-    public int literal( Object[] exprs, Domain[] domains, PhysicalDomain[] phys ) {
+    public int literal( Object[] exprs, Attribute[] domains, PhysicalDomain[] phys ) {
         int[] bits = new int[PhysicalDomain.nextBit];
         Arrays.fill(bits,2);
         for( int i = 0; i < exprs.length; i++ ) {

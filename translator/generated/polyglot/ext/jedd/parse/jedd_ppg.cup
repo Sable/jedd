@@ -246,7 +246,12 @@ literal ::=
                      RESULT = parser.nf.StringLit(parser.pos(a), a.getValue()); 
                      :}
  |  NULL_LITERAL:a {:  RESULT = parser.nf.NullLit(parser.pos(a));  :}
- |  relation_literal:a {:  RESULT = a;  :}
+ |  NEW LBRACE:p relation_literal_piece:a relation_literal_tail:b RBRACE {:
+                                                                         
+                b.addFirst(a);
+                RESULT = parser.nf.BDDLit( parser.pos(p), b );
+            
+                                                                         :}
  |  BDDTRUE:p {:
               RESULT = parser.nf.BDDTrueFalse( parser.pos(p), true ); 
               :}
@@ -257,7 +262,17 @@ literal ::=
 type ::=
     primitive_type:a {:  RESULT = a;  :}
  |  reference_type:a {:  RESULT = a;  :}
- |  relation_type:a {:  RESULT = a;  :};
+ |  LT:p attribute_phys:a attribute_phys_tail:b GT {:
+                                                  
+            b.addFirst(a);
+            RESULT = parser.nf.BDDTypeNode( parser.pos(p), b );
+        
+                                                   :}
+ |  LT:p GT {:
+           
+            RESULT = parser.nf.BDDTypeNode( parser.pos(p), new LinkedList() );
+        
+            :};
 
 primitive_type ::=
     numeric_type:a {:  RESULT = a;  :}
@@ -1451,19 +1466,6 @@ expression ::=
 constant_expression ::=
     expression:a {:  RESULT = a;  :};
 
-relation_type ::=
-    LT:p attribute_phys:a attribute_phys_tail:b GT {:
-                                                  
-            b.addFirst(a);
-            RESULT = parser.nf.BDDTypeNode( parser.pos(p), b );
-        
-                                                   :}
- |  LT:p GT {:
-           
-            RESULT = parser.nf.BDDTypeNode( parser.pos(p), new LinkedList() );
-        
-            :};
-
 attribute_phys ::=
     attribute:a colon_attribute_opt:b {:
                                       
@@ -1493,8 +1495,8 @@ relation_expr ::=
  |  postfix_expression:a {:  RESULT = a;  :};
 
 relation_expr_or_relprod ::=
-    relprod:a {:  RESULT = a;  :}
- |  relation_expr:a {:  RESULT = a;  :};
+    relation_expr:a {:  RESULT = a;  :}
+ |  relprod:a {:  RESULT = a;  :};
 
 relprod ::=
     relation_expr_or_relprod:a attribute_list:b GT LT relation_expr:c attribute_list:d {:
@@ -1554,14 +1556,6 @@ attribute_tail ::=
                                        b.addFirst( a ); RESULT = b; 
                                        :}
  |  {:  RESULT = new LinkedList();  :};
-
-relation_literal ::=
-    NEW LBRACE:p relation_literal_piece:a relation_literal_tail:b RBRACE {:
-                                                                         
-                b.addFirst(a);
-                RESULT = parser.nf.BDDLit( parser.pos(p), b );
-            
-                                                                         :};
 
 relation_literal_piece ::=
     expression:e ARROW attribute:d colon_attribute_opt:p {:

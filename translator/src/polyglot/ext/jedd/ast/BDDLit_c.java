@@ -72,11 +72,11 @@ public class BDDLit_c extends Lit_c implements BDDLit, JeddGenerateJava
         List pairs = new LinkedList();
         for( Iterator pieceIt = pieces.iterator(); pieceIt.hasNext(); ) {
             final BDDLitPiece piece = (BDDLitPiece) pieceIt.next();
-            ClassType[] newPair = { (ClassType) piece.domain().type(),
+            ClassType[] newPair = { (ClassType) piece.attribute().type(),
                                     piece.phys() == null ? null :
                                         (ClassType) piece.phys().type() };
-            if( !newPair[0].isSubtype( ts.domain() ) ) 
-                throw new SemanticException( ""+newPair[0]+" does not extend jedd.Domain" );
+            if( !newPair[0].isSubtype( ts.attribute() ) ) 
+                throw new SemanticException( ""+newPair[0]+" does not extend jedd.Attribute" );
             if( newPair[1] != null && !newPair[1].isSubtype( ts.physicalDomain() ) ) 
                 throw new SemanticException( ""+newPair[1]+" does not extend jedd.PhysicalDomain" );
             pairs.add( newPair );
@@ -97,10 +97,10 @@ public class BDDLit_c extends Lit_c implements BDDLit, JeddGenerateJava
         List phys = new LinkedList();
         for( Iterator pieceIt = pieces().iterator(); pieceIt.hasNext(); ) {
             final BDDLitPiece piece = (BDDLitPiece) pieceIt.next();
-            Position pp = piece.domain().position();
+            Position pp = piece.attribute().position();
             exprs.add( piece.e() );
-            domains.add( nf.Call( pp, piece.domain(), "v" ) );
-            Type physType = (Type) map.get(piece.domain().type());
+            domains.add( nf.Call( pp, piece.attribute(), "v" ) );
+            Type physType = (Type) map.get(piece.attribute().type());
             phys.add( nf.Call( pp, nf.CanonicalTypeNode( pp, physType ), "v" ) );
         }
 
@@ -119,7 +119,7 @@ public class BDDLit_c extends Lit_c implements BDDLit, JeddGenerateJava
                     ),
                 nf.NewArray(
                     p,
-                    nf.CanonicalTypeNode( p, ts.domain() ),
+                    nf.CanonicalTypeNode( p, ts.attribute() ),
                     new LinkedList(),
                     1,
                     nf.ArrayInit( p, domains )

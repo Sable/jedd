@@ -104,19 +104,19 @@ public abstract class Relprod_c extends Expr_c implements Relprod, JeddGenerateJ
         HashSet seenAlready;
         seenAlready = new HashSet();
         for( Iterator domainIt = ldomains.iterator(); domainIt.hasNext(); ) {
-            final Type domain = (Type) domainIt.next();
-            if( !seenAlready.add(domain) )
+            final TypeNode domain = (TypeNode) domainIt.next();
+            if( !seenAlready.add(domain.type()) )
                 throw new SemanticException( "Duplicate attribute "+domain+" in attributes to be compared." );
-            if( !domain.isSubtype( ts.domain() ) ) 
-                throw new SemanticException( ""+domain+" does not extend jedd.Domain" );
+            if( !domain.type().isSubtype( ts.attribute() ) ) 
+                throw new SemanticException( ""+domain+" does not extend jedd.Attribute" );
         }
         seenAlready = new HashSet();
         for( Iterator domainIt = rdomains.iterator(); domainIt.hasNext(); ) {
-            final Type domain = (Type) domainIt.next();
-            if( !seenAlready.add(domain) )
+            final TypeNode domain = (TypeNode) domainIt.next();
+            if( !seenAlready.add(domain.type()) )
                 throw new SemanticException( "Duplicate attribute "+domain+" in attributes to be compared." );
-            if( !domain.isSubtype( ts.domain() ) ) 
-                throw new SemanticException( ""+domain+" does not extend jedd.Domain" );
+            if( !domain.type().isSubtype( ts.attribute() ) ) 
+                throw new SemanticException( ""+domain+" does not extend jedd.Attribute" );
         }
 
         // make sure all attributes in result are unique.

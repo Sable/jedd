@@ -514,7 +514,6 @@ outer:          for( Iterator newPathIt = ((Set)pathMap.get(node)).iterator(); n
                     Set clause = new Clause("[SPECIFIED] "+dnode+" specified to be "+phys);
                     clause.add( Literal.v( dnode, phys ) );
                     if( cnf.add( clause ) ) {;
-                        System.out.println( ""+dnode+" specified to be "+phys );
                         specifiedAttributes++;
                     }
                 }

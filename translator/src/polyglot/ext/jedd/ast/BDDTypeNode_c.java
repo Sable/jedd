@@ -51,8 +51,8 @@ public class BDDTypeNode_c extends TypeNode_c implements BDDTypeNode, JeddGenera
             final TypeNode[] pair = (TypeNode[]) pairIt.next();
             Type[] typePair = new Type[2];
             typePair[0] = pair[0].type();
-            if( !typePair[0].isSubtype( ts.domain() ) ) 
-                throw new SemanticException( typePair[0]+" is not a subtype of jedd.Domain.", pair[0].position() );
+            if( !typePair[0].isSubtype( ts.attribute() ) ) 
+                throw new SemanticException( typePair[0]+" is not a subtype of jedd.Attribute.", pair[0].position() );
             if( seenDomains.contains( typePair[0] ) ) 
                 throw new SemanticException( typePair[0]+" is duplicated.", pair[0].position() );
             seenDomains.add( typePair[0] );

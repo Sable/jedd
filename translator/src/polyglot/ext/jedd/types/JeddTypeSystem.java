@@ -30,7 +30,7 @@ public interface JeddTypeSystem extends TypeSystem {
     public void addMustEqualEdge( DNode n1, DNode n2 );
     public void physicalDomains() throws SemanticException;
     public ClassType jedd();
-    public ClassType domain();
+    public ClassType attribute();
     public ClassType physicalDomain();
     public ClassType relation();
     public BDDType sameDomains( BDDType t );

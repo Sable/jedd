@@ -238,8 +238,8 @@ found_bdd:
     public ClassType jedd() {
         return jeddType( "jedd.Jedd" );
     }
-    public ClassType domain() {
-        return jeddType( "jedd.Domain" );
+    public ClassType attribute() {
+        return jeddType( "jedd.Attribute" );
     }
     public ClassType physicalDomain() {
         return jeddType( "jedd.PhysicalDomain" );

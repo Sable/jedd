@@ -34,7 +34,7 @@ public class BDDLitPiece_c extends Node_c implements BDDLitPiece
     private TypeNode domain;
     private TypeNode phys;
     public Expr e() { return e; }
-    public TypeNode domain() { return domain; }
+    public TypeNode attribute() { return domain; }
     public TypeNode phys() { return phys; }
     public BDDLitPiece_c(Position pos, Expr e, TypeNode domain, TypeNode phys) {
         super(pos);

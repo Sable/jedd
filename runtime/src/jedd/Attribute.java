@@ -19,7 +19,7 @@
 
 package jedd;
 
-public abstract class Domain {
+public abstract class Attribute {
     public abstract Numberer numberer();
 
     public String name() {

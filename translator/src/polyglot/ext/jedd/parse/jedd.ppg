@@ -41,11 +41,6 @@ terminal Token BDDTRUE;
 start with goal;
 
 extend type ::=
-        relation_type:a
-            {: RESULT = a; :}
-        ;
-
-relation_type ::=
         LT:p attribute_phys:a attribute_phys_tail:b GT
         {:
             b.addFirst(a);
@@ -105,10 +100,10 @@ extend unary_expression_not_plus_minus ::= relation_expr_or_relprod:a
         ;
 
 relation_expr_or_relprod ::=
-        relprod:a
+        relation_expr:a
         {: RESULT = a; :}
         |
-        relation_expr:a
+        relprod:a
         {: RESULT = a; :}
         ;
 
@@ -180,22 +175,17 @@ attribute_tail ::=
         ;
 
 extend literal ::=
-            relation_literal:a
-            {: RESULT = a; :}
+            NEW LBRACE:p relation_literal_piece:a relation_literal_tail:b RBRACE
+            {: 
+                b.addFirst(a);
+                RESULT = parser.nf.BDDLit( parser.pos(p), b );
+            :}
         |
             BDDTRUE:p
             {: RESULT = parser.nf.BDDTrueFalse( parser.pos(p), true ); :}
         |
             BDDFALSE:p
             {: RESULT = parser.nf.BDDTrueFalse( parser.pos(p), false ); :}
-        ;
-
-relation_literal ::=
-            NEW LBRACE:p relation_literal_piece:a relation_literal_tail:b RBRACE
-            {: 
-                b.addFirst(a);
-                RESULT = parser.nf.BDDLit( parser.pos(p), b );
-            :}
         ;
 
 relation_literal_piece ::=
