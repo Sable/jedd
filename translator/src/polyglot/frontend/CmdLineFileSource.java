@@ -17,40 +17,20 @@
  * Boston, MA 02111-1307, USA.
  */
 
-package polyglot.ext.jedd;
+package polyglot.frontend;
 
 import polyglot.ast.*;
 import polyglot.types.*;
-import polyglot.frontend.*;
-import polyglot.ext.jedd.visit.*;
-import polyglot.ext.jedd.ast.*;
-import polyglot.ext.jedd.types.*;
 import polyglot.util.*;
+import polyglot.visit.*;
+import polyglot.main.*;
+
 import java.util.*;
+import java.io.*;
 
-/**
- * Extension information for jedd extension.
- */
-public class PrintDomainsPass extends AbstractPass {
-    private JeddTypeSystem ts;
-    private Job job;
-    public PrintDomainsPass( Pass.ID id, Job job, TypeSystem ts ) {
-        super(id);
-        this.job = job;
-        this.ts = (JeddTypeSystem) ts;
-    }
-    static boolean runAlready = false;
-    public boolean run() {
-        if( runAlready ) return true;
-        runAlready = true;
-        try {
-            ts.physicalDomains();
-        } catch( SemanticException e ) {
-            job.compiler().errorQueue().enqueue(ErrorInfo.SEMANTIC_ERROR,
-                                e.getMessage(), e.position());
-            return false;
-        }
-
-        return true;
+public class CmdLineFileSource extends FileSource {
+    public CmdLineFileSource(String name) throws IOException {
+        super(name);
     }
 }
+

@@ -33,6 +33,7 @@ extern int trueBDD();
 
 // return value of following functions is *not* refed
 extern int replace( int r, int n, int from[], int to[] );
+extern int replacepair( int r, int pair );
 extern int relprod( int r1, int r2, int n, int domains[] );
 extern int project( int r, int n, int toRemove[] );
 extern int or( int r1, int r2 );
@@ -57,3 +58,8 @@ extern void reportOrdering( int n, int vars[] );
 extern void gbc();
 
 extern void getShape( int bdd, int shape[] );
+
+extern int makecube( int n, int domains[] );
+extern int relprodcube( int r1, int r2, int cube );
+extern int makepair( int fn, int from[], int tn, int to[] );
+

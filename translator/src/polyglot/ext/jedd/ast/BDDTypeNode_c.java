@@ -20,6 +20,7 @@
 package polyglot.ext.jedd.ast;
 
 import polyglot.ext.jedd.types.*;
+import polyglot.ext.jedd.extension.*;
 import polyglot.ext.jl.ast.*;
 import polyglot.types.*;
 import polyglot.ast.*;
@@ -27,7 +28,7 @@ import polyglot.util.*;
 import polyglot.visit.*;
 import java.util.*;
 
-public class BDDTypeNode_c extends TypeNode_c implements BDDTypeNode, JeddGenerateJava
+public class BDDTypeNode_c extends TypeNode_c implements BDDTypeNode, JeddGenerateJava, JeddTypeCheck
 {
     List domainPairs;
     public BDDTypeNode_c(Position pos, List domainPairs ) {
@@ -42,6 +43,25 @@ public class BDDTypeNode_c extends TypeNode_c implements BDDTypeNode, JeddGenera
         JeddTypeSystem ts = (JeddTypeSystem) ar.typeSystem();
 
         List types = new LinkedList();
+
+        for( Iterator pairIt = domainPairs.iterator(); pairIt.hasNext(); ) {
+
+            final TypeNode[] pair = (TypeNode[]) pairIt.next();
+            Type[] typePair = new Type[2];
+            typePair[0] = pair[0].type();
+
+            if( pair[1] != null ) {
+                typePair[1] = pair[1].type();
+            }
+
+            types.add( typePair );
+        }
+
+        Node ret = type(ts.BDDType( types ) );
+        return ret;
+    }
+    public Node typeCheck(TypeChecker tc) throws SemanticException {
+        JeddTypeSystem ts = (JeddTypeSystem) tc.typeSystem();
 
         Set seenDomains = new HashSet();
         Set seenPhys = new HashSet();
@@ -65,11 +85,9 @@ public class BDDTypeNode_c extends TypeNode_c implements BDDTypeNode, JeddGenera
                     throw new SemanticException( typePair[1]+" is duplicated.", pair[1].position() );
                 seenPhys.add( typePair[1] );
             }
-
-            types.add( typePair );
         }
 
-        return type(ts.BDDType( types ) );
+        return this;
     }
     public Node visitChildren(NodeVisitor v) {
         List newDomains = new LinkedList();

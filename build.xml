@@ -98,6 +98,7 @@
             link="shared"
             runtime="dynamic"
         >
+            <compilerarg value="-O3"/>
             <fileset dir="runtime/generated" includes="jedd_wrap.c"/>
             <fileset dir="runtime/csrc" includes="jedd_buddy.c"/>
             <libset dir="${buddy.loc}/src" libs="bdd"/>

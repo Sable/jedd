@@ -21,6 +21,7 @@ class JeddNativeJNI {
   public final static native int falseBDD();
   public final static native int trueBDD();
   public final static native int replace(int jarg1, int jarg2, int[] jarg3, int[] jarg4);
+  public final static native int replacepair(int jarg1, int jarg2);
   public final static native int relprod(int jarg1, int jarg2, int jarg3, int[] jarg4);
   public final static native int project(int jarg1, int jarg2, int[] jarg3);
   public final static native int or(int jarg1, int jarg2);
@@ -37,4 +38,7 @@ class JeddNativeJNI {
   public final static native void reportOrdering(int jarg1, int[] jarg2);
   public final static native void gbc();
   public final static native void getShape(int jarg1, int[] jarg2);
+  public final static native int makecube(int jarg1, int[] jarg2);
+  public final static native int relprodcube(int jarg1, int jarg2, int jarg3);
+  public final static native int makepair(int jarg1, int[] jarg2, int jarg3, int[] jarg4);
 }

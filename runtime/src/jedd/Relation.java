@@ -67,13 +67,13 @@ public class Relation {
     }
 
     public Relation eqUnion( int rhs ) {
-        if( Jedd.profiler != null ) Jedd.profiler.start( "eqUnion", bdd, rhs );
+        //if( Jedd.profiler != null ) Jedd.profiler.start( "eqUnion", bdd, rhs );
         int newBdd = JeddNative.or( bdd, rhs );
         JeddNative.addRef(newBdd);
         JeddNative.delRef(bdd);
         JeddNative.delRef(rhs);
         bdd = newBdd;
-        if( Jedd.profiler != null ) Jedd.profiler.finish( "eqUnion", bdd );
+        //if( Jedd.profiler != null ) Jedd.profiler.finish( "eqUnion", bdd );
         return this;
     }
 
@@ -137,6 +137,9 @@ public class Relation {
         int vars = 0;
         for( int i = 0; i < phys.length; i++ ) vars += phys[i].bits();
         return JeddNative.satCount(bdd, vars);
+    }
+    public int numNodes() {
+        return JeddNative.numNodes( bdd );
     }
 
     public Iterator iterator(Attribute[] wanted) {

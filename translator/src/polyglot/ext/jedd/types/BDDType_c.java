@@ -35,10 +35,18 @@ public class BDDType_c extends ReferenceType_c implements BDDType {
         ret.append("<");
         for( Iterator pairIt = domainPairs.iterator(); pairIt.hasNext(); ) {
             final Type[] pair = (Type[]) pairIt.next();
-            ret.append( ((ClassType)pair[0]).fullName() );
+            if( pair[0] == null ) 
+                ret.append( "<unknown>" );
+            else if( pair[0] instanceof ClassType ) 
+                ret.append( ((ClassType)pair[0]).fullName() );
+            else
+                ret.append( pair[0].toString() );
             if( pair[1] != null ) {
                 ret.append(":");
-                ret.append( ((ClassType)pair[1]).fullName() );
+                if( pair[1] instanceof ClassType ) 
+                    ret.append( ((ClassType)pair[1]).fullName() );
+                else
+                    ret.append( pair[1].toString() );
             }
             if( pairIt.hasNext() ) ret.append(", ");
         }

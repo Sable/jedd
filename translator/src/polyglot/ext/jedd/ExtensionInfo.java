@@ -73,6 +73,7 @@ public class ExtensionInfo extends polyglot.ext.jl.ExtensionInfo {
     public static final Pass.ID PRINT_DOMAINS = new Pass.ID("print-domains");
     public static final Pass.ID INSERT_REPLACE = new Pass.ID("insert-replace");
     public static final Pass.ID GENERATE_JAVA = new Pass.ID("generate-java");
+    public static final Pass.ID DOMAINS_BARRIER = new Pass.ID("domains-barrier");
 
     private void doRemovePass( List passes, Pass.ID pass ) {
         for( Iterator pIt = passes.iterator(); pIt.hasNext(); ) {
@@ -90,7 +91,9 @@ public class ExtensionInfo extends polyglot.ext.jl.ExtensionInfo {
                     new MethodDeclMapPass(job, ts, nf) ) );
         beforePass(passes, Pass.PRE_OUTPUT_ALL,
                 new GlobalBarrierPass(JEDD_BARRIER, job ) );
-        if( job.parent() != null ) {
+        beforePass(passes, Pass.PRE_OUTPUT_ALL,
+                new GlobalBarrierPass(DOMAINS_BARRIER, job ) );
+        if( !(job.source() instanceof CmdLineFileSource )  ) {
             doRemovePass( passes, Pass.DISAM );
             doRemovePass( passes, Pass.TYPE_CHECK );
             doRemovePass( passes, Pass.EXC_CHECK );
@@ -104,7 +107,7 @@ public class ExtensionInfo extends polyglot.ext.jl.ExtensionInfo {
                     new PrintDomainsPass(PRINT_DOMAINS, job, ts ) );
             return passes;
         }
-        beforePass(passes, Pass.PRE_OUTPUT_ALL,
+        beforePass(passes, DOMAINS_BARRIER,
                 new VisitorPass(PHYSICAL_DOMAINS, job,
                     new PhysicalDomains( job, ts, nf ) ) );
         beforePass(passes, Pass.PRE_OUTPUT_ALL,
@@ -131,71 +134,7 @@ public class ExtensionInfo extends polyglot.ext.jl.ExtensionInfo {
     }
     public SourceLoader sourceLoader() {
         if( source_loader == null ) {
-            source_loader = new SourceLoader(this, getOptions().source_path) {
-                /** Load a source from a specific file. */
-                public FileSource fileSource(String fileName) throws IOException {
-                    File sourceFile = new File(fileName);
-
-                    if (! sourceFile.exists()) {
-                        throw new FileNotFoundException(fileName);
-                    }
-
-                    if (! fileName.endsWith("." + fileExtension())
-                            && !fileName.endsWith(".java")) {
-                        throw new IOException("Source \"" + fileName +
-                                              "\" does not have the extension \"." +
-                                              fileExtension() + "\".");
-                    }
-
-                    if (Report.should_report(Report.frontend, 2))
-                        Report.report(2, "Loading class from " + sourceFile);
-
-                    return new FileSource(fileName);
-                }
-
-                /** Load the source file for the given class name using the source path. */
-                public FileSource classSource(String className) throws IOException {
-                    /* Search the source path. */
-                    FileSource ret = classSourceGuts(
-                                className.replace('.', File.separatorChar) +
-                                "." + fileExtension() );
-                    if( ret != null ) return ret;
-                    ret = classSourceGuts(
-                                className.replace('.', File.separatorChar) +
-                                ".java" );
-                    if( ret != null ) return ret;
-
-                    throw new FileNotFoundException(
-                                className.replace('.', File.separatorChar) +
-                                "." + fileExtension() );
-                }
-                private FileSource classSourceGuts(String fileName) throws IOException {
-                    File current_dir = new File(System.getProperty("user.dir"));
-
-                    for( Iterator directoryIt = getOptions().source_path.iterator(); directoryIt.hasNext(); ) {
-
-                        final File directory = (File) directoryIt.next();
-
-                        File sourceFile;
-
-                        if (directory != null && directory.equals(current_dir)) {
-                            sourceFile = new File(fileName);
-                        }
-                        else {
-                            sourceFile = new File(directory, fileName);
-                        }
-                        
-                        if (sourceFile.exists()) {
-                            if (Report.should_report(Report.frontend, 2))
-                                Report.report(2, "Loading from " + sourceFile);
-
-                            return new FileSource(sourceFile.getPath());
-                        }
-                    }
-
-                    return null;
-                }
-            };
+            source_loader = new JeddSourceLoader(this, getOptions().source_path);
         }
         return source_loader;
     }

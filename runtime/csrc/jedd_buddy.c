@@ -28,7 +28,7 @@ static void errorhandler(int errorCode) {
 }
 
 extern void init() {
-    bdd_init( 1000000, 100000 );
+    bdd_init( 5000000, 500000 );
     bdd_error_hook(errorhandler);
     bdd_disable_reorder();
     bdd_setcacheratio(4);
@@ -101,6 +101,14 @@ extern int literal( int n, int bits[] ) {
 }
 
 // return value of following functions is *not* refed
+extern int makepair( int fn, int from[], int tn, int to[] ) {
+    bddPair* pair = bdd_newpair();
+    bdd_setpairs( pair, from, to, fn );
+    return (int) pair;
+}
+extern int replacepair( int r, int pair ) {
+    return bdd_replace( r, (bddPair*) pair );
+}
 extern int replace( int r, int n, int from[], int to[] ) {
     int i;
     bddPair* pair = bdd_newpair();
@@ -108,6 +116,14 @@ extern int replace( int r, int n, int from[], int to[] ) {
     return bdd_replace( r, pair );
 }
 
+extern int makecube( int n, int domains[] ) {
+    int cube = bdd_makeset( domains, n );
+    addRef(cube);
+    return cube;
+}
+extern int relprodcube( int r1, int r2, int cube ) {
+    return bdd_relprod( r1, r2, cube );
+}
 extern int relprod( int r1, int r2, int n, int domains[] ) {
     int ret;
     int cube = bdd_makeset( domains, n );
@@ -204,7 +220,6 @@ extern void gbc() {
 void bdd_markshape(int i, int shape[]);
 
 extern void getShape( int bdd, int shape[] ) {
-    CHECK(bdd);
     bdd_markshape(bdd, shape);
     bdd_unmark(bdd);
 }

@@ -48,7 +48,8 @@ public class JeddProfiler
         e.time = new Date().getTime() - e.startTime.getTime();
         e.type = eventName;
         e.stackTrace = stackTrace();
-        if( e.time > 0 ) events.add( e );
+        //if( e.time > 0 ) events.add( e );
+        events.add( e );
         e.output = new BDD(bdd);
     }
     public void printInfo( PrintStream out ) {

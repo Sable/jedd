@@ -54,6 +54,10 @@ public class JeddNative {
     return JeddNativeJNI.replace(r, n, from, to);
   }
 
+  public static int replacepair(int r, int pair) {
+    return JeddNativeJNI.replacepair(r, pair);
+  }
+
   public static int relprod(int r1, int r2, int n, int[] domains) {
     return JeddNativeJNI.relprod(r1, r2, n, domains);
   }
@@ -116,6 +120,18 @@ public class JeddNative {
 
   public static void getShape(int bdd, int[] shape) {
     JeddNativeJNI.getShape(bdd, shape);
+  }
+
+  public static int makecube(int n, int[] domains) {
+    return JeddNativeJNI.makecube(n, domains);
+  }
+
+  public static int relprodcube(int r1, int r2, int cube) {
+    return JeddNativeJNI.relprodcube(r1, r2, cube);
+  }
+
+  public static int makepair(int fn, int[] from, int tn, int[] to) {
+    return JeddNativeJNI.makepair(fn, from, tn, to);
   }
 
 }

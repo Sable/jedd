@@ -51,7 +51,9 @@ public class PhysDom {
         public static SetLit v( Set set ) {
             SetLit ret = new SetLit(set);
             SetLit ret2 = (SetLit) setMap.get( ret );
-            if( ret2 == null ) setMap.put( ret2 = ret, ret );
+            if( ret2 == null ) {
+                setMap.put( ret2 = ret, ret );
+            }
             return ret2;
         }
         public boolean equals( Object other ) {
@@ -78,7 +80,9 @@ public class PhysDom {
         public static NegSetLit v( Set set ) {
             NegSetLit ret = new NegSetLit( set );
             NegSetLit ret2 = (NegSetLit) setMap.get( ret );
-            if( ret2 == null ) setMap.put( ret2 = ret, ret );
+            if( ret2 == null ) {
+                setMap.put( ret2 = ret, ret );
+            }
             return ret2;
         }
         public static NegSetLit v( SetLit e ) {
@@ -106,7 +110,9 @@ public class PhysDom {
         public static Literal v( DNode dnode, Type phys ) {
             Literal ret = new Literal( dnode, phys );
             Literal ret2 = (Literal) litMap.get( ret );
-            if( ret2 == null ) litMap.put( ret2 = ret, ret );
+            if( ret2 == null ) {
+                litMap.put( ret2 = ret, ret );
+            }
             return ret2;
         }
         public boolean equals( Object other ) {
@@ -138,7 +144,9 @@ public class PhysDom {
         public static NegLiteral v( DNode dnode, Type phys ) {
             NegLiteral ret = new NegLiteral( dnode, phys );
             NegLiteral ret2 = (NegLiteral) litMap.get( ret );
-            if( ret2 == null ) litMap.put( ret2 = ret, ret );
+            if( ret2 == null ) {
+                litMap.put( ret2 = ret, ret );
+            }
             return ret2;
         }
         public boolean equals( Object other ) {
@@ -217,7 +225,7 @@ public class PhysDom {
             String str;
             String soln = null;
             while ((str = br.readLine()) != null) {
-                System.out.println( str );
+                if( str.length() < 1000 ) System.out.println( str );
                 boolean hasNum = false;
                 boolean hasBad = false;
                 for( int i = 0; i < str.length(); i++ ) {
@@ -617,14 +625,14 @@ outer:          for( Iterator newPathIt = ((Set)pathMap.get(node)).iterator(); n
         for( Iterator exprIt = DNode.exprs().iterator(); exprIt.hasNext(); ) {
             final BDDExpr expr = (BDDExpr) exprIt.next();
             exprs++;
-            if( !( expr.obj() instanceof FixPhys ) ) {
+            if( !( expr.obj() instanceof FixPhys ) || expr.obj() instanceof Replace ) {
                 nonrep++;
             }
         }
         for( Iterator nodeIt = DNode.nodes().iterator(); nodeIt.hasNext(); ) {
             final DNode node = (DNode) nodeIt.next();
             nodes++;
-            if( !( node.expr.obj() instanceof FixPhys ) ) {
+            if( !( node.expr.obj() instanceof FixPhys ) || node.expr.obj() instanceof Replace ) {
                 nonrepnodes++;
             }
         }

@@ -31,6 +31,7 @@ public abstract class PhysicalDomain {
         firstBit = nextBit;
         nextBit += bits();
         JeddNative.addBits(bits());
+        domNum = nextDomNum++;
     }
 
     public void setBits( int[] bits, int value ) {
@@ -63,5 +64,30 @@ public abstract class PhysicalDomain {
         return ret;
     }
 
+    public int cube() {
+        if( cube == 0 ) {
+            int[] cd = Jedd.v().convertDomains( new PhysicalDomain[] { this } );
+            cube = JeddNative.makecube( cd.length, cd );
+        }
+        return cube;
+    }
+
+    public int repl( PhysicalDomain to ) {
+        if( pairs[domNum][to.domNum] == 0 ) {
+            int[] cd = Jedd.v().convertDomains( new PhysicalDomain[] { this } );
+            int[] tcd = Jedd.v().convertDomains( new PhysicalDomain[] { to } );
+            pairs[domNum][to.domNum] = 
+                JeddNative.makepair( cd.length, cd, tcd.length, tcd );
+        }
+        return pairs[domNum][to.domNum];
+    }
+
+    int cube = 0;
+
     static int nextBit = 0;
+    
+    static int nextDomNum = 0;
+    int domNum;
+    
+    static int[][] pairs = new int[32][32];
 }

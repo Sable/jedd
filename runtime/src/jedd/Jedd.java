@@ -218,7 +218,7 @@ public class Jedd {
         return ret;
     }
 
-    private int[] convertDomains( PhysicalDomain[] d ) {
+    int[] convertDomains( PhysicalDomain[] d ) {
         int n = 0;
         for( int i = 0; i < d.length; i++ ) n += d[i].bits();
         int[] ret = new int[n];
@@ -234,12 +234,19 @@ public class Jedd {
     }
     private int replaceImpl( int r,
             PhysicalDomain[] from, PhysicalDomain[] to ) {
+        int ret;
+        if( from.length == 1 ) {
+            if( profiler != null ) profiler.start( "replace", r );
+            ret = JeddNative.replacepair( r, from[0].repl(to[0]) );
+            if( profiler != null ) profiler.finish( "replace", ret );
+            return ret;
+        }
         int[] cfrom = convertDomains(from);
         int[] cto = convertDomains(to);
         if( cfrom.length != cto.length ) throw new RuntimeException();
 
         if( profiler != null ) profiler.start( "replace", r );
-        int ret = JeddNative.replace( r, cfrom.length, cfrom, cto );
+        ret = JeddNative.replace( r, cfrom.length, cfrom, cto );
         if( profiler != null ) profiler.finish( "replace", ret );
 
         return ret;
@@ -255,10 +262,17 @@ public class Jedd {
     }
     private int composeImpl( int r1, int r2,
             PhysicalDomain[] d ) {
+        int ret;
+        if( d.length == 1 ) {
+            if( profiler != null ) profiler.start( "compose", r1, r2 );
+            ret = JeddNative.relprodcube( r1, r2, d[0].cube() );
+            if( profiler != null ) profiler.finish( "compose", ret );
+            return ret;
+        }
         int[] cd = convertDomains(d);
 
         if( profiler != null ) profiler.start( "compose", r1, r2 );
-        int ret = JeddNative.relprod( r1, r2, cd.length, cd );
+        ret = JeddNative.relprod( r1, r2, cd.length, cd );
         if( profiler != null ) profiler.finish( "compose", ret );
 
         return ret;

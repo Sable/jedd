@@ -704,6 +704,7 @@ extern int literal(int,int []);
 extern int falseBDD();
 extern int trueBDD();
 extern int replace(int,int,int [],int []);
+extern int replacepair(int,int);
 extern int relprod(int,int,int,int []);
 extern int project(int,int,int []);
 extern int or(int,int);
@@ -720,6 +721,9 @@ extern void info();
 extern void reportOrdering(int,int []);
 extern void gbc();
 extern void getShape(int,int []);
+extern int makecube(int,int []);
+extern int relprodcube(int,int,int);
+extern int makepair(int,int [],int,int []);
 
 #include "jedd.h"
 
@@ -952,6 +956,29 @@ JNIEXPORT jint JNICALL Java_jedd_JeddNativeJNI_replace(JNIEnv *jenv, jclass jcls
     SWIG_JavaArrayArgoutInt(jenv, jarr4, arg4, jarg4); 
     free(arg3); 
     free(arg4); 
+    return jresult;
+}
+
+
+JNIEXPORT jint JNICALL Java_jedd_JeddNativeJNI_replacepair(JNIEnv *jenv, jclass jcls, jint jarg1, jint jarg2) {
+    jint jresult = 0 ;
+    int arg1 ;
+    int arg2 ;
+    int result;
+    
+    (void)jenv;
+    (void)jcls;
+    arg1 = (int)jarg1; 
+    arg2 = (int)jarg2; 
+    {
+        result = (int)replacepair(arg1,arg2);
+        
+        if( bdd_errno ) {
+            SWIG_exception(SWIG_RuntimeError, bdd_errno);
+            bdd_errno = NULL;
+        }
+    }
+    jresult = (jint)result; 
     return jresult;
 }
 
@@ -1302,6 +1329,90 @@ JNIEXPORT void JNICALL Java_jedd_JeddNativeJNI_getShape(JNIEnv *jenv, jclass jcl
     }
     SWIG_JavaArrayArgoutInt(jenv, jarr2, arg2, jarg2); 
     free(arg2); 
+}
+
+
+JNIEXPORT jint JNICALL Java_jedd_JeddNativeJNI_makecube(JNIEnv *jenv, jclass jcls, jint jarg1, jintArray jarg2) {
+    jint jresult = 0 ;
+    int arg1 ;
+    int *arg2 ;
+    int result;
+    jint *jarr2 ;
+    
+    (void)jenv;
+    (void)jcls;
+    arg1 = (int)jarg1; 
+    if (!SWIG_JavaArrayInInt(jenv, &jarr2, &arg2, jarg2)) return 0; 
+    {
+        result = (int)makecube(arg1,arg2);
+        
+        if( bdd_errno ) {
+            SWIG_exception(SWIG_RuntimeError, bdd_errno);
+            bdd_errno = NULL;
+        }
+    }
+    jresult = (jint)result; 
+    SWIG_JavaArrayArgoutInt(jenv, jarr2, arg2, jarg2); 
+    free(arg2); 
+    return jresult;
+}
+
+
+JNIEXPORT jint JNICALL Java_jedd_JeddNativeJNI_relprodcube(JNIEnv *jenv, jclass jcls, jint jarg1, jint jarg2, jint jarg3) {
+    jint jresult = 0 ;
+    int arg1 ;
+    int arg2 ;
+    int arg3 ;
+    int result;
+    
+    (void)jenv;
+    (void)jcls;
+    arg1 = (int)jarg1; 
+    arg2 = (int)jarg2; 
+    arg3 = (int)jarg3; 
+    {
+        result = (int)relprodcube(arg1,arg2,arg3);
+        
+        if( bdd_errno ) {
+            SWIG_exception(SWIG_RuntimeError, bdd_errno);
+            bdd_errno = NULL;
+        }
+    }
+    jresult = (jint)result; 
+    return jresult;
+}
+
+
+JNIEXPORT jint JNICALL Java_jedd_JeddNativeJNI_makepair(JNIEnv *jenv, jclass jcls, jint jarg1, jintArray jarg2, jint jarg3, jintArray jarg4) {
+    jint jresult = 0 ;
+    int arg1 ;
+    int *arg2 ;
+    int arg3 ;
+    int *arg4 ;
+    int result;
+    jint *jarr2 ;
+    jint *jarr4 ;
+    
+    (void)jenv;
+    (void)jcls;
+    arg1 = (int)jarg1; 
+    if (!SWIG_JavaArrayInInt(jenv, &jarr2, &arg2, jarg2)) return 0; 
+    arg3 = (int)jarg3; 
+    if (!SWIG_JavaArrayInInt(jenv, &jarr4, &arg4, jarg4)) return 0; 
+    {
+        result = (int)makepair(arg1,arg2,arg3,arg4);
+        
+        if( bdd_errno ) {
+            SWIG_exception(SWIG_RuntimeError, bdd_errno);
+            bdd_errno = NULL;
+        }
+    }
+    jresult = (jint)result; 
+    SWIG_JavaArrayArgoutInt(jenv, jarr2, arg2, jarg2); 
+    SWIG_JavaArrayArgoutInt(jenv, jarr4, arg4, jarg4); 
+    free(arg2); 
+    free(arg4); 
+    return jresult;
 }
 
 
