@@ -63,6 +63,7 @@ public class Main {
         System.err.println();
         System.err.println( "Jedd options are listed below:" );
         System.err.println( " -s <sat-solver-cmd>  sets the external SAT solver to be used" );
+        System.err.println( " -sc <sat-core-cmd>  sets the external program for extracting UNSAT cores" );
         System.err.println();
         System.err.println( "Polyglot options are listed in the Polyglot help screen below:" );
         System.err.println();
