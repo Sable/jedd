@@ -21,6 +21,7 @@ package polyglot.ext.jedd.ast;
 
 import polyglot.ext.jedd.extension.*;
 import polyglot.ext.jedd.types.*;
+import polyglot.ext.jedd.visit.*;
 import polyglot.ext.jl.ast.*;
 import polyglot.types.*;
 import polyglot.ast.*;
@@ -127,7 +128,9 @@ outer:
         }
         return type( ts.BDDType( newDomains ) );
     }
-    public Node physicalDomains( JeddTypeSystem ts, JeddNodeFactory nf ) {
+    public Node physicalDomains( PhysicalDomains pd ) {
+        JeddTypeSystem ts = pd.jeddTypeSystem();
+
         BDDType exprType = (BDDType) expr.type();
         Map exprMap = exprType.map();
 

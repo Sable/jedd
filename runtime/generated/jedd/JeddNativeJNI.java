@@ -30,6 +30,7 @@ class JeddNativeJNI {
   public final static native void allCubes(int jarg1, int[] jarg2);
   public final static native int numNodes(int jarg1);
   public final static native int numPaths(int jarg1);
+  public final static native int satCount(int jarg1, int jarg2);
   public final static native void dump(int jarg1, int jarg2, int[] jarg3);
   public final static native void dumpdot(int jarg1);
   public final static native void info();

@@ -75,8 +75,10 @@ public class JeddBinaryExt_c extends JeddExt_c implements JeddTypeCheck
 
         throw new SemanticException( "Operator "+op+" cannot be used with BDD types." );
     }
-    public Node physicalDomains( JeddTypeSystem ts, JeddNodeFactory nf ) throws SemanticException {
-        Binary n = (Binary) super.physicalDomains(ts, nf);
+    public Node physicalDomains( PhysicalDomains pd ) throws SemanticException {
+        JeddTypeSystem ts = pd.jeddTypeSystem();
+
+        Binary n = (Binary) super.physicalDomains(pd);
         if( !( n.left().type() instanceof BDDType ) ) return n;
         if( !( n.right().type() instanceof BDDType ) ) return n;
 

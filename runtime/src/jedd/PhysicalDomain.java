@@ -40,6 +40,7 @@ public abstract class PhysicalDomain {
             bit++;
             value >>= 1;
         }
+        if( value != 0 ) throw new RuntimeException( "Value was too large in domain "+name()+"!" );
     }
     public int readBits( int[] bits ) {
         int ret = 0;

@@ -29,20 +29,13 @@ import polyglot.util.*;
 import polyglot.visit.*;
 import java.util.*;
 
-public class JeddCallExt_c extends JeddExt_c implements JeddPhysicalDomains
+public class JeddConstructorCallExt_c extends JeddExt_c implements JeddPhysicalDomains
 {
     public Node generateJava( JeddTypeSystem ts, JeddNodeFactory nf ) throws SemanticException {
-        Call n = (Call) node();
+        ConstructorCall n = (ConstructorCall) node();
 
         CanonicalTypeNode jeddRelation =  nf.CanonicalTypeNode( n.position(), ts.relation() );
 
-        Receiver target = n.target();
-        if( target instanceof Expr ) {
-            Expr tgt = (Expr) target;
-            if( tgt.type() instanceof BDDType ) {
-                n = n.target( newRelation( ts, nf, (BDDType) tgt.type(), tgt ) );
-            }
-        }
         List newArgs = new LinkedList();
         for( Iterator argIt = n.arguments().iterator(); argIt.hasNext(); ) {
             final Expr arg = (Expr) argIt.next();
@@ -58,8 +51,8 @@ public class JeddCallExt_c extends JeddExt_c implements JeddPhysicalDomains
     public Node physicalDomains( PhysicalDomains pd ) throws SemanticException {
         JeddTypeSystem ts = pd.jeddTypeSystem();
 
-        Call n = (Call) node();
-        MethodInstance mi = n.methodInstance();
+        ConstructorCall n = (ConstructorCall) node();
+        ConstructorInstance mi = n.constructorInstance();
 
 // We want to return if none of the arguments or return type is a BDD type.
 // Now wouldn't it have been easier to just leave goto in the language?
@@ -69,11 +62,10 @@ found_bdd:
                 final Expr arg = (Expr) argIt.next();
                 if( arg.type() instanceof BDDType ) break found_bdd;
             }
-            if( mi.returnType() instanceof BDDType ) break found_bdd;
             return n;
         }
 
-        MethodDecl md = (MethodDecl) ts.instance2Decl().get(mi);
+        ConstructorDecl md = (ConstructorDecl) ts.instance2Decl().get(mi);
         if( md == null ) {
             throw new SemanticException( "Call to "+mi.container()+":"+mi+" but I don't have its code to analyze." );
         }
@@ -90,13 +82,6 @@ found_bdd:
                 final Type domain = (Type) domainIt.next();
                 ts.addAssignEdge( DNode.v( arg, domain ),
                         DNode.v( formal.localInstance(), domain ) );
-            }
-        }
-        if( md.returnType().type() instanceof BDDType ) {
-            BDDType type = (BDDType) md.returnType().type();
-            for( Iterator domainIt = type.map().keySet().iterator(); domainIt.hasNext(); ) {
-                final Type domain = (Type) domainIt.next();
-                ts.addAssignEdge( DNode.v( mi, domain ), DNode.v( n, domain ) );
             }
         }
         return n;

@@ -90,6 +90,10 @@ public class JeddNative {
     return JeddNativeJNI.numPaths(r);
   }
 
+  public static int satCount(int r, int vars) {
+    return JeddNativeJNI.satCount(r, vars);
+  }
+
   public static void dump(int r, int n, int[] bits) {
     JeddNativeJNI.dump(r, n, bits);
   }

@@ -153,6 +153,11 @@ extern int numPaths( int r ) {
     return (int) Cudd_CountPathsToNonZero((DdNode*) r);
 }
 
+extern int satCount( int r, int vars ) {
+    double s = Cudd_CountMinterm( manager, (DdNode*)r, vars );
+    return (int) s;
+}
+
 extern void dump( int r1, int n, int bits[] ) {
     Cudd_PrintDebug( manager, (DdNode*) r1, n, 2 );
 }

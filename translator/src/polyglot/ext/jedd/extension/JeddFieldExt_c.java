@@ -43,7 +43,9 @@ public class JeddFieldExt_c extends JeddExt_c implements JeddTypeCheck
         n = (Field) n.type( ts.cloneDomains( bt ) );
         return n;
     }
-    public Node physicalDomains( JeddTypeSystem ts, JeddNodeFactory nf ) throws SemanticException {
+    public Node physicalDomains( PhysicalDomains pd ) throws SemanticException {
+        JeddTypeSystem ts = pd.jeddTypeSystem();
+
         Field n = (Field) node();
         VarInstance vi = n.fieldInstance();
         Type t = vi.type();

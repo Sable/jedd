@@ -46,6 +46,8 @@ extern void allCubes( int r, int cubes[] );
 extern int numNodes( int r );
 extern int numPaths( int r );
 
+extern int satCount( int r, int vars );
+
 extern void dump( int r, int n, int bits[] );
 extern void dumpdot( int r );
 extern void info();

@@ -29,36 +29,23 @@ import polyglot.util.*;
 import polyglot.visit.*;
 import java.util.*;
 
-public class JeddLocalExt_c extends JeddExt_c implements JeddTypeCheck
+public class JeddReturnExt_c extends JeddExt_c implements JeddPhysicalDomains
 {
     public Node physicalDomains( PhysicalDomains pd ) throws SemanticException {
         JeddTypeSystem ts = pd.jeddTypeSystem();
 
-        Local n = (Local) node();
-        VarInstance vi = n.localInstance();
-        Type t = vi.type();
-        if( !( t instanceof BDDType ) ) return n;
-        BDDType bt = (BDDType) t;
-        for( Iterator domainIt = bt.map().keySet().iterator(); domainIt.hasNext(); ) {
-            final Type domain = (Type) domainIt.next();
-            ts.addMustEqualEdge( DNode.v( n, domain ), DNode.v( vi, domain ) );
-        }
-        return n;
-    }
-    public Node typeCheck(TypeChecker tc) throws SemanticException {
-        JeddTypeSystem ts = (JeddTypeSystem) tc.typeSystem();
-        JeddNodeFactory nf = (JeddNodeFactory) tc.nodeFactory();
+        Return n = (Return) node();
 
-        Local n = (Local) node().typeCheck(tc);
-        VarInstance vi = n.localInstance();
-        Type t = vi.type();
-        if( !( t instanceof BDDType ) ) return n;
-        BDDType bt = (BDDType) t;
-        n = (Local) n.type( ts.cloneDomains( bt ) );
-        for( Iterator domainIt = bt.map().keySet().iterator(); domainIt.hasNext(); ) {
+        if( n.expr() == null ) return n;
+        if( !( n.expr().type() instanceof BDDType ) ) return n;
+
+        MethodInstance mi = (MethodInstance) pd.context().currentCode();
+        BDDType type = (BDDType) n.expr().type();
+        for( Iterator domainIt = type.map().keySet().iterator(); domainIt.hasNext(); ) {
             final Type domain = (Type) domainIt.next();
-            ts.addMustEqualEdge( DNode.v( n, domain ), DNode.v( vi, domain ) );
+            ts.addAssignEdge( DNode.v( n.expr(), domain ), DNode.v( mi, domain ) );
         }
+
         return n;
     }
 }

@@ -17,40 +17,25 @@
  * Boston, MA 02111-1307, USA.
  */
 
-package polyglot.ext.jedd.ast;
+package polyglot.ext.jedd.extension;
 
-import polyglot.ast.*;
 import polyglot.ext.jl.ast.*;
-import polyglot.ext.jedd.extension.*;
+import polyglot.ext.jedd.ast.*;
+import polyglot.ext.jedd.types.*;
+import polyglot.types.*;
+import polyglot.ast.*;
 import polyglot.util.*;
+import polyglot.visit.*;
 import java.util.*;
 
-/**
- * DelFactory for jedd extension.
- */
-public class JeddDelFactory_c extends AbstractDelFactory_c {
-    public JL delBinaryImpl() {
-        return new JeddDel_c();
-    }
-    public JL delAssignImpl() {
-        return new JeddDel_c();
-    }
-    public JL delLocalDeclImpl() {
-        return new JeddDel_c();
-    }
-    public JL delFieldDeclImpl() {
-        return new JeddDel_c();
-    }
-    public JL delLocalImpl() {
-        return new JeddDel_c();
-    }
-    public JL delFieldImpl() {
-        return new JeddDel_c();
-    }
-    public JL delMethodDeclImpl() {
-        return new JeddDel_c();
-    }
-    public JL delConstructorDeclImpl() {
-        return new JeddDel_c();
+public class JeddConstructorDeclExt_c extends JeddExt_c implements JeddTypeCheck
+{
+    public Node typeCheck( TypeChecker tc ) throws SemanticException {
+        JeddTypeSystem ts = (JeddTypeSystem) tc.typeSystem();
+        ConstructorDecl n = (ConstructorDecl) node();
+
+        ts.instance2Decl().put( n.constructorInstance(), n );
+        return n.typeCheck(tc);
     }
 }
+

@@ -22,6 +22,7 @@ package polyglot.ext.jedd.extension;
 import polyglot.ext.jl.ast.*;
 import polyglot.ext.jedd.ast.*;
 import polyglot.ext.jedd.types.*;
+import polyglot.ext.jedd.visit.*;
 import polyglot.types.*;
 import polyglot.ast.*;
 import polyglot.util.*;
@@ -48,7 +49,9 @@ public class JeddFieldDeclExt_c extends JeddExt_c implements JeddTypeCheck
             return n.init( (Expr) nf.FixPhys( n.init().position(), n.init() ).typeCheck( tc ) );
         }
     }
-    public Node physicalDomains( JeddTypeSystem ts, JeddNodeFactory nf ) throws SemanticException {
+    public Node physicalDomains( PhysicalDomains pd ) throws SemanticException {
+        JeddTypeSystem ts = pd.jeddTypeSystem();
+
         FieldDecl n = (FieldDecl) node();
         if( n.init() == null ) return n;
         if( !( n.declType() instanceof BDDType ) ) return n;

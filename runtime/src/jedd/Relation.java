@@ -133,6 +133,12 @@ public class Relation {
         JeddNative.delRef(bdd);
     }
 
+    public int size() {
+        int vars = 0;
+        for( int i = 0; i < phys.length; i++ ) vars += phys[i].bits();
+        return JeddNative.satCount(bdd, vars);
+    }
+
     public Iterator iterator() {
         if( domains.length != 1 ) {
             throw new RuntimeException( "Can only get iterator over single-domain BDD." );

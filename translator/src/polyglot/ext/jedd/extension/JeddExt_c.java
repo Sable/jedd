@@ -31,10 +31,10 @@ import polyglot.util.*;
 import java.util.*;
 
 public class JeddExt_c extends Ext_c implements JeddExt {
-    public Node physicalDomains(JeddTypeSystem ts, JeddNodeFactory nf) throws SemanticException {
+    public Node physicalDomains(PhysicalDomains pd) throws SemanticException {
         Node n = node();
         if( n instanceof JeddPhysicalDomains ) {
-            return ((JeddPhysicalDomains) n).physicalDomains( ts, nf );
+            return ((JeddPhysicalDomains) n).physicalDomains( pd );
         }
         return n;
     }

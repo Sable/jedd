@@ -61,15 +61,19 @@
             Workaround for cctask libs < 3 chars bug
             <libset dir="${cudd.loc}/st" libs="st"/>
             -->
-            <linkerarg value="${cudd.loc}/st/libst.a"/>
 
             <libset dir="${cudd.loc}/util" libs="util"/>
             <libset dir="${cudd.loc}/epd" libs="epd"/>
+            <linkerarg value="-L"/>
+            <linkerarg value="${cudd.loc}/st"/>
+            <linkerarg value="-lst"/>
             <includepath path="${java.loc}/include"/>
             <includepath path="${java.loc}/include/linux"/>
             <includepath path="runtime/csrc"/>
             <includepath path="${cudd.loc}/include"/> 
         </cc>
+        <!-- This cpptasks thing is screwed up. Just link the darn thing. -->
+        <exec dir="runtime/lib" command="gcc -g -shared -o libjeddcudd.so ../generated/jedd_wrap.o ../generated/jedd_cudd.o -L /home/olhotak/cudd-2.3.1/cudd -lcudd -L /home/olhotak/cudd-2.3.1/mtr -lmtr -L /home/olhotak/cudd-2.3.1/util -lutil -L /home/olhotak/cudd-2.3.1/epd -lepd -L /home/olhotak/cudd-2.3.1/st -lst"/>
     </target>
     <target name="cudd-dep" depends="settings">
         <dependset>

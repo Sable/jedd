@@ -35,4 +35,5 @@ public interface JeddTypeSystem extends TypeSystem {
     public ClassType relation();
     public BDDType sameDomains( BDDType t );
     public BDDType cloneDomains( BDDType t );
+    public Map instance2Decl();
 }

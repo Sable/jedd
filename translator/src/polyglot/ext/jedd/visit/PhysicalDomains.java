@@ -38,14 +38,18 @@ public class PhysicalDomains extends ContextVisitor
         n = super.leaveCall(old, n, v);
 
         if (n.ext() instanceof JeddExt) {
-            return ((JeddExt) n.ext()).physicalDomains((JeddTypeSystem) typeSystem(),
-                                              (JeddNodeFactory) nodeFactory());
+            return ((JeddExt) n.ext()).physicalDomains(this);
         } else if (n instanceof JeddPhysicalDomains) {
-            return ((JeddPhysicalDomains) n).physicalDomains((JeddTypeSystem) typeSystem(),
-                                              (JeddNodeFactory) nodeFactory());
+            return ((JeddPhysicalDomains) n).physicalDomains( this );
         }
 
         return n;
+    }
+    public JeddTypeSystem jeddTypeSystem() {
+        return (JeddTypeSystem) typeSystem();
+    }
+    public JeddNodeFactory jeddNodeFactory() {
+        return (JeddNodeFactory) nodeFactory();
     }
 }
 

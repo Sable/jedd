@@ -41,6 +41,12 @@ public class JeddExtFactory_c extends AbstractExtFactory_c {
     public Ext extFieldImpl() {
         return new JeddFieldExt_c();
     }
+    public Ext extMethodDeclImpl() {
+        return new JeddMethodDeclExt_c();
+    }
+    public Ext extConstructorDeclImpl() {
+        return new JeddConstructorDeclExt_c();
+    }
     public Ext extLocalDeclImpl() {
         return new JeddLocalDeclExt_c();
     }
@@ -55,5 +61,8 @@ public class JeddExtFactory_c extends AbstractExtFactory_c {
     }
     public Ext extNewImpl() {
         return new JeddNewExt_c();
+    }
+    public Ext extReturnImpl() {
+        return new JeddReturnExt_c();
     }
 }

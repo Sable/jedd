@@ -713,6 +713,7 @@ extern void setOrder(int,int []);
 extern void allCubes(int,int []);
 extern int numNodes(int);
 extern int numPaths(int);
+extern int satCount(int,int);
 extern void dump(int,int,int []);
 extern void dumpdot(int);
 extern void info();
@@ -1156,6 +1157,29 @@ JNIEXPORT jint JNICALL Java_jedd_JeddNativeJNI_numPaths(JNIEnv *jenv, jclass jcl
     arg1 = (int)jarg1; 
     {
         result = (int)numPaths(arg1);
+        
+        if( bdd_errno ) {
+            SWIG_exception(SWIG_RuntimeError, bdd_errno);
+            bdd_errno = NULL;
+        }
+    }
+    jresult = (jint)result; 
+    return jresult;
+}
+
+
+JNIEXPORT jint JNICALL Java_jedd_JeddNativeJNI_satCount(JNIEnv *jenv, jclass jcls, jint jarg1, jint jarg2) {
+    jint jresult = 0 ;
+    int arg1 ;
+    int arg2 ;
+    int result;
+    
+    (void)jenv;
+    (void)jcls;
+    arg1 = (int)jarg1; 
+    arg2 = (int)jarg2; 
+    {
+        result = (int)satCount(arg1,arg2);
         
         if( bdd_errno ) {
             SWIG_exception(SWIG_RuntimeError, bdd_errno);

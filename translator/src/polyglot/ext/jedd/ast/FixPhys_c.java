@@ -21,6 +21,7 @@ package polyglot.ext.jedd.ast;
 
 import polyglot.ext.jedd.extension.*;
 import polyglot.ext.jedd.types.*;
+import polyglot.ext.jedd.visit.*;
 import polyglot.ext.jl.ast.*;
 import polyglot.types.*;
 import polyglot.ast.*;
@@ -62,7 +63,9 @@ public class FixPhys_c extends Expr_c implements FixPhys, JeddGenerateJava, Jedd
         Expr ret = type( ts.BDDType( newPairs ) );
         return ret;
     }
-    public Node physicalDomains( JeddTypeSystem ts, JeddNodeFactory nf ) throws SemanticException {
+    public Node physicalDomains( PhysicalDomains pd ) throws SemanticException {
+        JeddTypeSystem ts = pd.jeddTypeSystem();
+
         BDDType type = (BDDType) type();
         BDDType exprType = (BDDType) expr().type();
         for( Iterator domainIt = exprType.map().keySet().iterator(); domainIt.hasNext(); ) {

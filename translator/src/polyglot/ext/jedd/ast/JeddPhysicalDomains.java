@@ -22,6 +22,7 @@ package polyglot.ext.jedd.ast;
 import polyglot.ext.jedd.ast.*;
 import polyglot.ext.jedd.extension.*;
 import polyglot.ext.jedd.types.*;
+import polyglot.ext.jedd.visit.*;
 import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.util.*;
@@ -31,6 +32,6 @@ import java.util.*;
 
 public interface JeddPhysicalDomains
 {
-    public Node physicalDomains( JeddTypeSystem ts, JeddNodeFactory nf ) throws SemanticException;
+    public Node physicalDomains( PhysicalDomains pd ) throws SemanticException;
 }
 

@@ -188,7 +188,10 @@ public class JeddTypeSystem_c extends TypeSystem_c implements JeddTypeSystem {
     }
     private ClassType jeddType( String name ) {
         try {
-            return typeForName(name);
+            ClassType ret = typeForName(name);
+            if( ret == null ) 
+                throw new InternalCompilerError( "Couldn't find type "+name );
+            return ret;
         } catch( SemanticException e ) {
             throw new InternalCompilerError( "Couldn't find type "+name );
         }
@@ -221,5 +224,9 @@ public class JeddTypeSystem_c extends TypeSystem_c implements JeddTypeSystem {
             domains.add( new Type[] { domain, (Type) map.get(domain) } );
         }
         return BDDType( domains );
+    }
+    private Map instance2Decl = new HashMap();
+    public Map instance2Decl() {
+        return instance2Decl;
     }
 }

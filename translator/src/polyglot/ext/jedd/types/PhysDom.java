@@ -530,7 +530,8 @@ outer:          for( Iterator newPathIt = ((Set)pathMap.get(node)).iterator(); n
     public static Type getType( Object n ) {
         if( n instanceof Expr ) return ((Expr) n).type();
         if( n instanceof VarInstance ) return ((VarInstance) n).type();
-        throw new InternalCompilerError( n.toString() );
+        if( n instanceof MethodInstance ) return ((MethodInstance) n).returnType();
+        throw new InternalCompilerError( n.toString()+" of class "+n.getClass().toString() );
     }
     public void printDomainsDot() {
         try {

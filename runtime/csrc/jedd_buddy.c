@@ -19,6 +19,7 @@
 
 #include "jedd.h"
 #include "bdd.h"
+#include <math.h>
 
 const char* bdd_errno = NULL;
 static void errorhandler(int errorCode) {
@@ -138,13 +139,6 @@ extern int minus( int r1, int r2 ) {
 }
 
 extern void setOrder( int n, int level2var[] ) {
-      {
-      int i;
-      for( i=0; i < 100; i++ ) {
-          printf( "%u ", level2var[i] );
-      }
-      printf( "That was the ordering\n" );
-      }
     bdd_setvarorder( level2var );
 }
 
@@ -168,6 +162,17 @@ extern int numNodes( int r ) {
 
 extern int numPaths( int r ) {
     return (int) bdd_pathcount(r);
+}
+
+double myexp2( int i ) {
+    double ret = 1;
+    while(i--) ret *=2;
+    return ret;
+}
+extern int satCount( int r, int vars ) {
+    double s = bdd_satcount(r);
+    s /= myexp2(totalBits-vars);
+    return (int) s;
 }
 
 extern void dumpdot( int r ) {
