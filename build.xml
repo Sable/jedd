@@ -175,6 +175,7 @@
             <includepath path="${java.loc}/include/win32"/>
             <includepath path="runtime/csrc"/>
             <includepath path="${buddy.loc}/src"/> 
+            <includepath path="${buddy.loc}"/> 
         </cc>
     </target>
     <target name="compile-buddy-on-windows" if="iswindows">
@@ -193,6 +194,8 @@
             <arg file="runtime/csrc"/>
             <arg value="-I"/>
             <arg file="${buddy.loc}/src"/> 
+            <arg value="-I"/>
+            <arg file="${buddy.loc}"/> 
 
             <fileset dir="runtime/generated" includes="jbuddy_wrap.c"/>
             <fileset dir="runtime/csrc" includes="jbuddy.c"/>
