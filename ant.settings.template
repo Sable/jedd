@@ -25,6 +25,3 @@ javabdd.loc=${user.home}/JavaBDD
 ## Location of Soot classes
 soot.loc=${user.home}/soot/classes
 
-## Location of Jasmin classes
-jasmin.loc=${user.home}/jasminclasses-sable-1.2.jar
-
