@@ -246,33 +246,33 @@ literal ::=
                      RESULT = parser.nf.StringLit(parser.pos(a), a.getValue()); 
                      :}
  |  NULL_LITERAL:a {:  RESULT = parser.nf.NullLit(parser.pos(a));  :}
- |  NEW LBRACE:p relation_literal_piece:a relation_literal_tail:b RBRACE {:
-                                                                         
+ |  NEW LBRACE:p relation_literal_piece:a relation_literal_tail:b RBRACE:e {:
+                                                                           
                 b.addFirst(a);
-                RESULT = parser.nf.BDDLit( parser.pos(p), b );
+                RESULT = parser.nf.BDDLit( parser.pos(p, e), b );
             
-                                                                         :}
+                                                                           :}
  |  BDDTRUE:p {:
-              RESULT = parser.nf.BDDTrueFalse( parser.pos(p), true ); 
+              RESULT = parser.nf.BDDTrueFalse( parser.pos(p, p), true ); 
               :}
  |  BDDFALSE:p {:
-               RESULT = parser.nf.BDDTrueFalse( parser.pos(p), false ); 
+               RESULT = parser.nf.BDDTrueFalse( parser.pos(p, p), false ); 
                :};
 
 type ::=
     primitive_type:a {:  RESULT = a;  :}
  |  reference_type:a {:  RESULT = a;  :}
- |  LT:p attribute_phys:a attribute_phys_tail:b GT {:
-                                                  
+ |  LT:p attribute_phys:a attribute_phys_tail:b GT:e {:
+                                                    
             b.addFirst(a);
-            RESULT = parser.nf.BDDTypeNode( parser.pos(p), b );
+            RESULT = parser.nf.BDDTypeNode( parser.pos(p, e), b );
         
-                                                   :}
- |  LT:p GT {:
-           
-            RESULT = parser.nf.BDDTypeNode( parser.pos(p), new LinkedList() );
+                                                     :}
+ |  LT:p GT:e {:
+             
+            RESULT = parser.nf.BDDTypeNode( parser.pos(p, e), new LinkedList() );
         
-            :};
+              :};
 
 primitive_type ::=
     numeric_type:a {:  RESULT = a;  :}
@@ -445,17 +445,17 @@ class_declaration ::=
                 a, b.getIdentifier(), c, d, e); 
                                                                                    :}
  |  modifiers_opt:a CLASS:n IDENTIFIER:b LPAREN class_type:domain RPAREN super_opt:c interfaces_opt:d class_body:e {:
-                                                                                                                   RESULT = parser.nf.ClassDeclAttribute(parser.pos(n),
+                                                                                                                   RESULT = parser.nf.ClassDeclAttribute(parser.pos(n, e),
                 a, b.getIdentifier(), c, d, e, domain, parser.ts ); 
                                                                                                                    :}
  |  modifiers_opt:a CLASS:n IDENTIFIER:b LPAREN INTEGER_LITERAL:bits RPAREN super_opt:c interfaces_opt:d class_body:e {:
-                                                                                                                      RESULT = parser.nf.ClassDeclDomain(parser.pos(n),
+                                                                                                                      RESULT = parser.nf.ClassDeclDomain(parser.pos(n, e),
                 a, b.getIdentifier(), c, d, e, 
-                parser.nf.IntLit(parser.pos(bits), IntLit.INT,
+                parser.nf.IntLit(parser.pos(bits, e), IntLit.INT,
                     bits.getValue().intValue()), parser.ts ); 
                                                                                                                       :}
  |  modifiers_opt:a CLASS:n IDENTIFIER:b LPAREN RPAREN super_opt:c interfaces_opt:d class_body:e {:
-                                                                                                 RESULT = parser.nf.ClassDeclPhysDom(parser.pos(n),
+                                                                                                 RESULT = parser.nf.ClassDeclPhysDom(parser.pos(n, e),
                 a, b.getIdentifier(), c, d, e, parser.ts ); 
                                                                                                  :};
 
@@ -697,12 +697,12 @@ explicit_constructor_invocation ::=
  |  primary:a DOT SUPER:n LPAREN argument_list_opt:b RPAREN SEMICOLON {:
                                                                       RESULT = parser.nf.SuperCall(parser.pos(n), a, b); 
                                                                       :}
- |  class_instance_creation_expression:a DOT THIS:n LPAREN argument_list_opt:b RPAREN SEMICOLON {:
-                                                                                                RESULT = parser.nf.ThisCall(parser.pos(n), a, b); 
-                                                                                                :}
- |  class_instance_creation_expression:a DOT SUPER:n LPAREN argument_list_opt:b RPAREN SEMICOLON {:
-                                                                                                 RESULT = parser.nf.SuperCall(parser.pos(n), a, b); 
-                                                                                                 :};
+ |  class_instance_creation_expression:a DOT THIS:n LPAREN argument_list_opt:b RPAREN SEMICOLON:e {:
+                                                                                                  RESULT = parser.nf.ThisCall(parser.pos(a, e), a, b); 
+                                                                                                  :}
+ |  class_instance_creation_expression:a DOT SUPER:n LPAREN argument_list_opt:b RPAREN SEMICOLON:e {:
+                                                                                                   RESULT = parser.nf.SuperCall(parser.pos(a, e), a, b); 
+                                                                                                   :};
 
 interface_declaration ::=
     modifiers_opt:a INTERFACE:n IDENTIFIER:b extends_interfaces_opt:c interface_body:d {:
@@ -1153,11 +1153,11 @@ class_instance_creation_expression ::=
                                                                                 RESULT = parser.nf.New(parser.pos(a), a.toExpr(),
 				      b.toType(), c, d); 
                                                                                 :}
- |  class_instance_creation_expression:a DOT NEW simple_name:b LPAREN argument_list_opt:c RPAREN {:
-                                                                                                 RESULT = parser.nf.New(parser.pos(a), a, b.toType(), c); 
-                                                                                                 :}
+ |  class_instance_creation_expression:a DOT NEW simple_name:b LPAREN argument_list_opt:c RPAREN:e {:
+                                                                                                   RESULT = parser.nf.New(parser.pos(a, e), a, b.toType(), c); 
+                                                                                                   :}
  |  class_instance_creation_expression:a DOT NEW simple_name:b LPAREN argument_list_opt:c RPAREN class_body:d {:
-                                                                                                              RESULT = parser.nf.New(parser.pos(a), a, b.toType(), c, d); 
+                                                                                                              RESULT = parser.nf.New(parser.pos(a, d), a, b.toType(), c, d); 
                                                                                                               :};
 
 argument_list_opt ::=
@@ -1231,7 +1231,7 @@ field_access ::=
                 b.getIdentifier()); 
                                         :}
  |  class_instance_creation_expression:a DOT IDENTIFIER:b {:
-                                                          RESULT = parser.nf.Field(parser.pos(b), a, b.getIdentifier()); 
+                                                          RESULT = parser.nf.Field(parser.pos(a, b), a, b.getIdentifier()); 
                                                           :};
 
 method_invocation ::=
@@ -1254,9 +1254,9 @@ method_invocation ::=
                 parser.nf.Super(parser.pos(n), a.toType()),
                 b.getIdentifier(), c); 
                                                                           :}
- |  class_instance_creation_expression:a DOT IDENTIFIER:b LPAREN argument_list_opt:c RPAREN {:
-                                                                                            RESULT = parser.nf.Call(parser.pos(b), a, b.getIdentifier(), c); 
-                                                                                            :};
+ |  class_instance_creation_expression:a DOT IDENTIFIER:b LPAREN argument_list_opt:c RPAREN:e {:
+                                                                                              RESULT = parser.nf.Call(parser.pos(a, e), a, b.getIdentifier(), c); 
+                                                                                              :};
 
 array_access ::=
     name:a LBRACK expression:b RBRACK {:
@@ -1265,9 +1265,9 @@ array_access ::=
  |  primary_no_new_array:a LBRACK expression:b RBRACK {:
                                                       RESULT = parser.nf.ArrayAccess(parser.pos(a), a, b); 
                                                       :}
- |  class_instance_creation_expression:a LBRACK expression:b RBRACK {:
-                                                                    RESULT = parser.nf.ArrayAccess(parser.pos(a), a, b); 
-                                                                    :};
+ |  class_instance_creation_expression:a LBRACK expression:b RBRACK:e {:
+                                                                      RESULT = parser.nf.ArrayAccess(parser.pos(a, e), a, b); 
+                                                                      :};
 
 postfix_expression ::=
     primary:a {:  RESULT = a;  :}
@@ -1518,18 +1518,18 @@ relation_expr_or_relprod ::=
  |  relprod:a {:  RESULT = a;  :};
 
 relprod ::=
-    relation_expr_or_relprod:a attribute_list:b GT LT relation_expr:c attribute_list:d {:
-                                                                                       RESULT = parser.nf.Join( parser.pos(a), a, c, b, d ); 
-                                                                                       :}
- |  relation_expr_or_relprod:a attribute_list:b LT GT relation_expr:c attribute_list:d {:
-                                                                                       RESULT = parser.nf.Compose( parser.pos(a), a, c, b, d ); 
-                                                                                       :};
+    relation_expr_or_relprod:a LBRACE attribute_list:b RBRACE GT LT relation_expr:c LBRACE attribute_list:d RBRACE:e {:
+                                                                                                                     RESULT = parser.nf.Join( parser.pos(a, e), a, c, b, d ); 
+                                                                                                                     :}
+ |  relation_expr_or_relprod:a LBRACE attribute_list:b RBRACE LT GT relation_expr:c LBRACE attribute_list:d RBRACE:e {:
+                                                                                                                     RESULT = parser.nf.Compose( parser.pos(a, e), a, c, b, d ); 
+                                                                                                                     :};
 
 replace ::=
     LPAREN:p replacement:a replacement_tail:b RPAREN relation_expr:c {:
                                                                     
             b.addFirst(a);
-            RESULT = parser.nf.Replace( parser.pos(p), c, b );
+            RESULT = parser.nf.Replace( parser.pos(p, c), c, b );
         
                                                                      :};
 
@@ -1559,10 +1559,8 @@ replacement_tail ::=
          :};
 
 attribute_list ::=
-    LBRACE attribute:a attribute_tail:b RBRACE {:
-                                               b.addFirst( a ); RESULT = b; 
-                                               :}
- |  LBRACE RBRACE {:  RESULT = new LinkedList();  :};
+    attribute:a attribute_tail:b {:  b.addFirst( a ); RESULT = b;  :}
+ |  {:  RESULT = new LinkedList();  :};
 
 attribute_tail ::=
     COMMA attribute:a attribute_tail:b {:
@@ -1572,7 +1570,7 @@ attribute_tail ::=
 
 relation_literal_piece ::=
     expression:e ARROW attribute:d colon_attribute_opt:p {:
-                                                         RESULT = parser.nf.BDDLitPiece( parser.pos(e), e, d, p ); 
+                                                         RESULT = parser.nf.BDDLitPiece( parser.pos(e, p), e, d, p ); 
                                                          :};
 
 relation_literal_tail ::=
