@@ -2,7 +2,7 @@
 java.loc=/usr/localcc/pkgs/j2sdk1.4.2
 
 ## Location of Polyglot classes jar
-polyglot.loc=${user.home}/polyglot-1.1.0.jar
+polyglot.loc=${user.home}/polyglot-1.1.1.jar
 
 ## Location of JFlex classes jar
 jflex.loc=${user.home}/JFlex.jar
@@ -17,7 +17,7 @@ cudd.loc=${user.home}/cudd-2.3.1
 buddy.loc=${user.home}/buddy22
 
 ## Location of SableJBDD distribution
-sablejbdd.loc=${user.home}/sablejbdd-0.01
+sablejbdd.loc=${user.home}/sablejbdd-0.02
 
 ## Location of JavaBDD distribution
 javabdd.loc=${user.home}/JavaBDD
