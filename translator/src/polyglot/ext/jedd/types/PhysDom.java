@@ -681,6 +681,15 @@ public class PhysDom {
         conflictEdgeCount++;
     }
 
+    public static Type updatedPhys(DNode d) {
+        BDDExpr e = d.expr;
+        BDDType t = e.getType();
+        for( Iterator pairIt = t.domainPairs().iterator(); pairIt.hasNext(); ) {
+            final Type[] pair = (Type[]) pairIt.next();
+            if( pair[0] == d.dom ) return pair[1];
+        }
+        throw new RuntimeException();
+    }
     public static Type phys(DNode d) {
         return d.rep().phys;
     }
@@ -1005,7 +1014,7 @@ outer:
                     if( node.domNum > adj.domNum ) continue;
                     file.print( "  "+node.domNum+" -- "+adj.domNum+" [" );
                     if( solution != null ) {
-                        if( phys(node) != phys(adj) ) {
+                        if( updatedPhys(node) != updatedPhys(adj) ) {
                             file.print( "style=dotted, " );
                         }
                         if( solution.contains( ArrowLit.v( node, adj ) ) ) {
