@@ -486,6 +486,7 @@ public class PhysDom {
                     NegLiteral nl2 = null;
                     for( Iterator litIt = cl.iterator(); litIt.hasNext(); ) {
                         final HasNum lit = (HasNum) litIt.next();
+                        if(!(lit instanceof NegLiteral)) continue clause;
                         if( lit.getNum() != i1.intValue() 
                         && lit.getNum() != i2.intValue() ) continue clause;
                         if( nl1 == null ) nl1 = (NegLiteral) lit;
