@@ -25,7 +25,6 @@ non terminal Replace replace;
 non terminal Relprod relprod;
 non terminal TypeNode[] replacement;
 non terminal LinkedList replacement_tail;
-non terminal BDDLit relation_literal;
 non terminal BDDLitPiece relation_literal_piece;
 non terminal LinkedList relation_literal_tail;
 non terminal TypeNode[] attribute_phys;
@@ -40,7 +39,11 @@ terminal Token BDDTRUE;
 
 start with goal;
 
-extend type ::=
+extend type ::= relation_type:a 
+        {: RESULT = a; :}
+;
+
+relation_type ::=
         LT:p attribute_phys:a attribute_phys_tail:b GT:e
         {:
             b.addFirst(a);
@@ -253,4 +256,9 @@ extend method_invocation ::= class_instance_creation_expression:a DOT IDENTIFIER
 
 extend unary_expression_not_plus_minus ::= class_instance_creation_expression:a
         {: RESULT = a; :}
+;
+
+extend cast_expression ::= LPAREN relation_type:a RPAREN 
+        unary_expression_not_plus_minus:b
+        {: RESULT = parser.nf.Cast(parser.pos(a), a, b); :}
 ;

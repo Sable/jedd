@@ -34,17 +34,17 @@ public abstract class PhysicalDomain {
         domNum = nextDomNum++;
     }
 
-    public void setBits( int[] bits, int value ) {
+    public void setBits( int[] bits, long value ) {
         int bit = firstBit;
         for( int i = 0; i < bits(); i++ ) {
-            bits[bit] = value & 1;
+            bits[bit] = (int) (value & 1L);
             bit++;
-            value >>= 1;
+            value >>>= 1;
         }
         if( value != 0 ) throw new RuntimeException( "Value was too large in domain "+name()+"!" );
     }
-    public int readBits( int[] bits ) {
-        int ret = 0;
+    public long readBits( int[] bits ) {
+        long ret = 0;
         int bit = firstBit+bits()-1;
         for( int i = 0; i < bits(); i++ ) {
             ret <<= 1;

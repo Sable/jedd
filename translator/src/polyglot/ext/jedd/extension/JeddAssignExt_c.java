@@ -54,7 +54,7 @@ public class JeddAssignExt_c extends JeddExt_c implements JeddTypeCheck, JeddPhy
         ||  op == Assign.BIT_OR_ASSIGN
         ||  op == Assign.SUB_ASSIGN ) {
             if( lt.map().keySet().equals( rt.map().keySet() )
-            ||  rt.map().keySet().isEmpty() ) {
+            ||  rt.isLitType() ) {
                 return n.type( ts.sameDomains( lt ) );
             }
             throw new SemanticException( "Incompatible types for "+op+

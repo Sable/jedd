@@ -57,7 +57,7 @@ public class BDDTypeNode_c extends TypeNode_c implements BDDTypeNode, JeddGenera
             types.add( typePair );
         }
 
-        Node ret = type(ts.BDDType( types ) );
+        Node ret = type(ts.BDDType( types, false ) );
         return ret;
     }
     public Node typeCheck(TypeChecker tc) throws SemanticException {

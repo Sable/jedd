@@ -370,5 +370,54 @@ public class RelationContainer implements Relation {
         toString("[", b, 0, bdd);
         return b.toString();
     }
+    public jedd.Relation applyShifter( jedd.Jedd.Shifter s ) {
+        Jedd.Shifter shifter = (Jedd.Shifter) s;
 
+        RelationInstance projected = Backend.v().project( bdd, shifter.p );
+        Backend.v().addRef(projected);
+
+        RelationInstance copied = Backend.v().copy( projected, shifter.c );
+        Backend.v().addRef(copied);
+        Backend.v().delRef(projected);
+
+        return new RelationContainer( attributes, phys, "applyShifter", copied );
+    }
+    RelationInstance cast( Attribute[] newAttributes, PhysicalDomain[] newPhys ) {
+        do {
+            if( newAttributes.length != attributes.length ) break;
+            if( newPhys.length != phys.length ) break;
+
+            Set oldSet = new HashSet();
+            Map newMap = new HashMap();
+            
+            for( int i = 0; i < attributes.length; i++ ) {
+                oldSet.add(attributes[i]);
+                newMap.put(newAttributes[i], newPhys[i]);
+            }
+            if( !oldSet.equals(newMap.keySet()) ) break;
+
+            List from = new ArrayList();
+            List to = new ArrayList();
+
+            for( int i = 0; i < attributes.length; i++ ) {
+                PhysicalDomain newD = (PhysicalDomain) newMap.get(attributes[i]);
+                if( newD.equals(phys[i]) ) continue;
+                from.add( phys[i] );
+                to.add(newD);
+            }
+
+            if( from.isEmpty() ) return Jedd.v().read(this);
+            return Jedd.v().replace( this,
+                (PhysicalDomain[]) from.toArray(new PhysicalDomain[from.size()]),
+                (PhysicalDomain[]) to.toArray(new PhysicalDomain[to.size()]));
+        } while(false);
+        StringBuffer errorMsg = new StringBuffer();
+        errorMsg.append("<");
+        for( int i = 0; i < attributes.length; i++ ) {
+            if( i > 0 ) errorMsg.append( ", " );
+            errorMsg.append( attributes[i]+":"+phys[i] );
+        }
+        errorMsg.append(">");
+        throw new ClassCastException( errorMsg.toString() );
+    }
 }

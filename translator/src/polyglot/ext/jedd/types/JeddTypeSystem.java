@@ -25,8 +25,7 @@ import polyglot.types.*;
 import java.util.*;
 
 public interface JeddTypeSystem extends TypeSystem {
-    // TODO: declare any new methods needed
-    public BDDType BDDType( List domainPairs );
+    public BDDType BDDType( List domainPairs, boolean isLitType );
     public void addAssignEdge( DNode n1, DNode n2 );
     public void addMustEqualEdge( DNode n1, DNode n2 );
     public void physicalDomains( JeddNodeFactory nf, Collection jobs ) throws SemanticException;
@@ -35,6 +34,7 @@ public interface JeddTypeSystem extends TypeSystem {
     public ClassType physicalDomain();
     public ClassType domain();
     public ClassType relation();
+    public ClassType jeddRelation();
     public BDDType sameDomains( BDDType t );
     public BDDType cloneDomains( BDDType t );
     public Map instance2Decl();

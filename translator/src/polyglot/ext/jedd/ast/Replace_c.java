@@ -179,7 +179,7 @@ public class Replace_c extends Expr_c implements Replace, JeddGenerateJava, Jedd
             }
         }
         
-        return type( ts.BDDType( newDomains ) );
+        return type( ts.BDDType( newDomains, false ) );
     }
     public Node physicalDomains( PhysicalDomains pd ) {
         JeddTypeSystem ts = pd.jeddTypeSystem();

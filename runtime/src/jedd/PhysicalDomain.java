@@ -20,4 +20,5 @@
 package jedd;
 
 public abstract class PhysicalDomain extends jedd.internal.PhysicalDomain {
+    public interface Copier {}
 }

@@ -88,7 +88,7 @@ public class BDDLit_c extends Lit_c implements BDDLit, JeddGenerateJava
             if( !seenAttrs.add( newPair[0] ) ) throw new SemanticException(
                     "Duplicate attribute "+newPair[0] );
         }
-        BDDLit_c ret = (BDDLit_c) type(ts.BDDType(pairs));
+        BDDLit_c ret = (BDDLit_c) type(ts.BDDType(pairs, false));
         ret.pieces = pieces;
         return ret;
     }

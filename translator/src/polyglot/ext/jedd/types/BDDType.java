@@ -23,6 +23,7 @@ import polyglot.ext.jl.types.*;
 import java.util.*;
 
 public interface BDDType extends ReferenceType {
+    public boolean isLitType();
     public Map map();
     public List domainPairs();
 }

@@ -199,7 +199,6 @@ non terminal Replace replace;
 non terminal Relprod relprod;
 non terminal TypeNode[] replacement;
 non terminal LinkedList replacement_tail;
-non terminal BDDLit relation_literal;
 non terminal BDDLitPiece relation_literal_piece;
 non terminal LinkedList relation_literal_tail;
 non terminal TypeNode[] attribute_phys;
@@ -262,17 +261,7 @@ literal ::=
 type ::=
     primitive_type:a {:  RESULT = a;  :}
  |  reference_type:a {:  RESULT = a;  :}
- |  LT:p attribute_phys:a attribute_phys_tail:b GT:e {:
-                                                    
-            b.addFirst(a);
-            RESULT = parser.nf.BDDTypeNode( parser.pos(p, e), b );
-        
-                                                     :}
- |  LT:p GT:e {:
-             
-            RESULT = parser.nf.BDDTypeNode( parser.pos(p, e), new LinkedList() );
-        
-              :};
+ |  relation_type:a {:  RESULT = a;  :};
 
 primitive_type ::=
     numeric_type:a {:  RESULT = a;  :}
@@ -1329,7 +1318,10 @@ cast_expression ::=
  |  LPAREN name:a dims:b RPAREN unary_expression_not_plus_minus:c {:
                                                                   RESULT = parser.nf.Cast(parser.pos(a),
                 parser.array(a.toType(), b.intValue()), c); 
-                                                                  :};
+                                                                  :}
+ |  LPAREN relation_type:a RPAREN unary_expression_not_plus_minus:b {:
+                                                                    RESULT = parser.nf.Cast(parser.pos(a), a, b); 
+                                                                    :};
 
 multiplicative_expression ::=
     unary_expression:a {:  RESULT = a;  :}
@@ -1484,6 +1476,19 @@ expression ::=
 
 constant_expression ::=
     expression:a {:  RESULT = a;  :};
+
+relation_type ::=
+    LT:p attribute_phys:a attribute_phys_tail:b GT:e {:
+                                                    
+            b.addFirst(a);
+            RESULT = parser.nf.BDDTypeNode( parser.pos(p, e), b );
+        
+                                                     :}
+ |  LT:p GT:e {:
+             
+            RESULT = parser.nf.BDDTypeNode( parser.pos(p, e), new LinkedList() );
+        
+              :};
 
 attribute_phys ::=
     attribute:a colon_attribute_opt:b {:

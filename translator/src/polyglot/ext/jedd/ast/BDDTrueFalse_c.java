@@ -46,7 +46,7 @@ public class BDDTrueFalse_c extends Lit_c implements BDDTrueFalse, JeddGenerateJ
     }
     public Node buildTypes(TypeBuilder tb) {
         JeddTypeSystem ts = (JeddTypeSystem) tb.typeSystem();
-        BDDTrueFalse_c ret = (BDDTrueFalse_c) type(ts.BDDType(new LinkedList()));
+        BDDTrueFalse_c ret = (BDDTrueFalse_c) type(ts.BDDType(new LinkedList(), true));
         ret.value = value;
         return ret;
     }

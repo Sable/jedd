@@ -158,7 +158,7 @@ public abstract class Relprod_c extends Expr_c implements Relprod, JeddGenerateJ
         }
 
 
-        return type( ts.BDDType( resultingType ) );
+        return type( ts.BDDType( resultingType, false ) );
     }
     public Node physicalDomains( PhysicalDomains pd ) {
         JeddTypeSystem ts = pd.jeddTypeSystem();

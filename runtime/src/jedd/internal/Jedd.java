@@ -230,7 +230,21 @@ public class Jedd {
         Backend.v().delRef(r);
         return ret;
     }
-
+    class Shifter implements jedd.Jedd.Shifter {
+        Backend.Projector p;
+        Backend.Copier c;
+    }
+    public Shifter makeShifter( int[] fromBits, int[] toBits ) {
+        Shifter ret = new Shifter();
+        if( fromBits.length != toBits.length ) throw new RuntimeException();
+        ret.p = Backend.v().makeProjector( toBits );
+        ret.c = Backend.v().makeCopier( fromBits, toBits );
+        return ret;
+    }
+    public RelationInstance cast( jedd.Relation r, Attribute[] attrs,
+            PhysicalDomain[] phys ) {
+        return ((RelationContainer) r).cast(attrs, phys);
+    }
     int[] convertDomains( PhysicalDomain[] d ) {
         int n = 0;
         for( int i = 0; i < d.length; i++ ) n += d[i].bits();

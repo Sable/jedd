@@ -28,10 +28,8 @@ import polyglot.util.*;
 import java.util.*;
 
 public class JeddTypeSystem_c extends TypeSystem_c implements JeddTypeSystem {
-    // TODO: implement new methods in JeddTypeSystem.
-    // TODO: override methods as needed from TypeSystem_c.
-    public BDDType BDDType( List domainPairs ) {
-        return new BDDType_c( this, domainPairs );
+    public BDDType BDDType( List domainPairs, boolean isLitType ) {
+        return new BDDType_c( this, domainPairs, isLitType );
     }
     public void checkOverride(MethodInstance mi, MethodInstance mj) throws SemanticException {
         super.checkOverride(mi, mj);
@@ -252,22 +250,26 @@ found_bdd:
     public ClassType relation() {
         return jeddType( "jedd.internal.RelationContainer" );
     }
+    public ClassType jeddRelation() {
+        return jeddType( "jedd.Relation" );
+    }
     public BDDType sameDomains( BDDType t ) {
         List domains = new LinkedList();
         for( Iterator domainIt = t.map().keySet().iterator(); domainIt.hasNext(); ) {
             final Type domain = (Type) domainIt.next();
             domains.add( new Type[] { domain, null } );
         }
-        return BDDType( domains );
+        return BDDType( domains, t.isLitType() );
     }
     public BDDType cloneDomains( BDDType t ) {
+        if( t.isLitType() ) throw new InternalCompilerError("Attempting to clone literal type.");
         List domains = new LinkedList();
         Map map = t.map();
         for( Iterator domainIt = map.keySet().iterator(); domainIt.hasNext(); ) {
             final Type domain = (Type) domainIt.next();
             domains.add( new Type[] { domain, (Type) map.get(domain) } );
         }
-        return BDDType( domains );
+        return BDDType( domains, false );
     }
     private Map instance2Decl = new HashMap();
     public Map instance2Decl() {
@@ -289,6 +291,14 @@ found_bdd:
         }
         throw new SemanticException( "Need field "+name+
                 " of class "+type+" which has no field with that name." );
+    }
+
+    public boolean isCastValid( Type fromType, Type toType ) {
+        assert_(fromType);
+        assert_(toType);
+        if( isSubtype(fromType, jeddRelation()) && toType instanceof BDDType )
+            return true;
+        return super.isCastValid(fromType, toType);
     }
 
     protected NullType createNull() {

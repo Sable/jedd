@@ -64,4 +64,9 @@ public class Jedd {
     public void setBackend( String type ) {
         jedd.internal.Jedd.v().setBackend( type );
     }
+    /** Creates a Shifter that can be applied to shift bits within a BDD. */
+    public Shifter makeShifter( int[] fromBits, int[] toBits ) {
+        return jedd.internal.Jedd.v().makeShifter(fromBits, toBits);
+    }
+    public interface Shifter {}
 }

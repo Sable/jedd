@@ -50,4 +50,6 @@ public interface Relation {
     public Iterator iterator();
     /** Returns a string representation listing all the tuples in the relation. */
     public String toString();
+    /** Shift the bits in the relation using the provided shifter. */
+    public Relation applyShifter( Jedd.Shifter s );
 }

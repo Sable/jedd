@@ -24,11 +24,16 @@ import polyglot.util.*;
 import java.util.*;
 
 public class BDDType_c extends ReferenceType_c implements BDDType {
+    private boolean isLitType;
+    public boolean isLitType() { return isLitType; }
     private List domainPairs = new LinkedList();
     public List domainPairs() { return domainPairs; }
-    BDDType_c( TypeSystem ts, List domainPairs ) {
+    BDDType_c( TypeSystem ts, List domainPairs, boolean isLitType ) {
         super(ts);
+        this.isLitType = isLitType;
         this.domainPairs = domainPairs;
+        if( isLitType && !domainPairs.isEmpty() ) 
+            throw new InternalCompilerError("Attempting to create literal BDD type with attributes.");
         HashSet seen = new HashSet();
         for( Iterator domainsIt = domainPairs.iterator(); domainsIt.hasNext(); ) {
             final Type[] domains = (Type[]) domainsIt.next();
@@ -66,7 +71,9 @@ public class BDDType_c extends ReferenceType_c implements BDDType {
         return toString();
     }
     public boolean isCastValidImpl(Type toType) {
-        return isImplicitCastValidImpl(toType);
+        if( isImplicitCastValidImpl(toType) ) return true;
+        if( toType instanceof BDDType && map().keySet().isEmpty() ) return true;
+        return false;
     }
     public boolean isImplicitCastValidImpl(Type toType) {
         if( toType instanceof NullType ) return false;
@@ -74,7 +81,7 @@ public class BDDType_c extends ReferenceType_c implements BDDType {
         if( !( toType instanceof BDDType ) ) return false;
         BDDType to = (BDDType) toType;
         if( map().keySet().equals( to.map().keySet() ) ) return true;
-        if( map().keySet().isEmpty() ) return true;
+        if( isLitType() ) return true;
         if( to.map().keySet().isEmpty() ) return true;
         return false;
     }
@@ -92,19 +99,13 @@ public class BDDType_c extends ReferenceType_c implements BDDType {
     public List interfaces() { return new LinkedList(); }
     public List fields() { return new LinkedList(); }
     public List methods() { return new LinkedList(); }
+    private JeddTypeSystem jeddts() { return (JeddTypeSystem) ts; }
     public Type superType() { 
-        return jeddRelation();
+        return jeddts().jeddRelation();
     }
     public boolean descendsFromImpl(Type ancestor) {
-        return ts.equals(ancestor, jeddRelation() ) || ts.equals(ancestor, ts.Object());
+        return ts.equals(ancestor, jeddts().jeddRelation() ) || ts.equals(ancestor, ts.Object());
     }
     public FieldInstance fieldNamed( String name ) { return null; }
-    private Type jeddRelation() {
-        try {
-            return ts.typeForName( "jedd.Relation" );
-        } catch( SemanticException e ) {
-            throw new InternalCompilerError( "Couldn't find jedd.Relation "+e );
-        }
-    }
 }
 

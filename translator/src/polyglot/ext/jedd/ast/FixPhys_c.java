@@ -101,7 +101,7 @@ public class FixPhys_c extends Expr_c implements FixPhys, JeddGenerateJava, Jedd
             Type[] newPair = new Type[] { pair[0], null };
             newPairs.add( newPair );
         }
-        Expr ret = type( ts.BDDType( newPairs ) );
+        Expr ret = type( ts.BDDType( newPairs, exprType.isLitType() ) );
         return ret;
     }
     public Node physicalDomains( PhysicalDomains pd ) throws SemanticException {

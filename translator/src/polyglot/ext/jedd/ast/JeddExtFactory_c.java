@@ -71,6 +71,9 @@ public class JeddExtFactory_c extends AbstractExtFactory_c {
     public Ext extReturnImpl() {
         return new JeddReturnExt_c();
     }
+    public Ext extCastImpl() {
+        return new JeddCastExt_c();
+    }
     public Ext extForImpl() {
         return new ForExt_c();
     }
