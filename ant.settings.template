@@ -2,7 +2,7 @@
 java.loc=/usr/localcc/pkgs/j2sdk1.4.2
 
 ## Location of Polyglot classes jar
-polyglot.loc=${user.home}/polyglot-1.1.1.jar
+polyglot.loc=${user.home}/polyglot-1.2.0.jar
 
 ## Location of JFlex classes jar
 jflex.loc=${user.home}/JFlex.jar
