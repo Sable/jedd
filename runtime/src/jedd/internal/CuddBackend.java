@@ -170,9 +170,9 @@ public class CuddBackend extends Backend {
         return (int) Cudd.Cudd_CountPathsToNonZero(bdd(r));
     }
 
-    int satCount( RelationInstance r, int vars ) {
+    long satCount( RelationInstance r, int vars ) {
         double s = Cudd.Cudd_CountMinterm( manager, bdd(r), vars );
-        return (int) s;
+        return (long) s;
     }
 
     void gbc() {

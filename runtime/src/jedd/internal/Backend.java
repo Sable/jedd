@@ -64,7 +64,7 @@ public abstract class Backend {
     abstract int numNodes( RelationInstance r );
     abstract int numPaths( RelationInstance r );
 
-    abstract int satCount( RelationInstance r, int vars );
+    abstract long satCount( RelationInstance r, int vars );
 
     abstract void gbc();
 

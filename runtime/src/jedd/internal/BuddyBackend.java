@@ -162,10 +162,10 @@ public class BuddyBackend extends Backend {
         return (int) Buddy.bdd_pathcount(bdd(r));
     }
 
-    int satCount( RelationInstance r, int vars ) {
+    long satCount( RelationInstance r, int vars ) {
         double s = Buddy.bdd_satcount(bdd(r));
         s /= Math.pow(2,totalBits-vars);
-        return (int) s;
+        return (long) s;
     }
 
     void gbc() {

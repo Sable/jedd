@@ -23,7 +23,7 @@ import java.util.*;
 
 public interface Relation {
     public void kill();
-    public int size();
+    public long size();
     public int numNodes();
     public Iterator iterator(Attribute[] wanted);
     public Iterator iterator();

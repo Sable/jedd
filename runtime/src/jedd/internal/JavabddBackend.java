@@ -167,10 +167,10 @@ public class JavabddBackend extends Backend {
         return (int) bdd(r).pathCount();
     }
 
-    int satCount( RelationInstance r, int vars ) {
+    long satCount( RelationInstance r, int vars ) {
         double s = bdd(r).satCount();
         s /= Math.pow(2,totalBits-vars);
-        return (int) s;
+        return (long) s;
     }
 
     void gbc() {

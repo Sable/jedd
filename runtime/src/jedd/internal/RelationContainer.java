@@ -140,7 +140,7 @@ public class RelationContainer implements Relation {
         Backend.v().delRef(bdd);
     }
 
-    public int size() {
+    public long size() {
         int vars = 0;
         for( int i = 0; i < phys.length; i++ ) vars += phys[i].bits();
         return Backend.v().satCount(bdd, vars);

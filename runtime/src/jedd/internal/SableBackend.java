@@ -156,7 +156,7 @@ public class SableBackend extends Backend {
         return 0;
     }
 
-    int satCount( RelationInstance r, int vars ) {
+    long satCount( RelationInstance r, int vars ) {
         // TODO: implement in SableJBDD
         return 0;
     }
