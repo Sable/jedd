@@ -151,5 +151,11 @@ public class BDDLit_c extends Lit_c implements BDDLit, JeddGenerateJava
         v.visitCFGList(toVisit, this);
         return succs;
     }
+    public Object constantValue() { 
+        // It may be constant, but we don't really want the Polyglot
+        // constant folder to know that, since it won't know how to
+        // fold it anyway.
+        return null;
+    }
 }
 

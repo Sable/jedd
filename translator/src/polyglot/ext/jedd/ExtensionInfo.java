@@ -45,6 +45,9 @@ public class ExtensionInfo extends polyglot.ext.jl.ExtensionInfo {
         Topics t = new Topics();
     }
 
+    public String[] defaultFileExtensions() {
+        return new String[] { "jedd", "java" };
+    }
     public String defaultFileExtension() {
         return "jedd";
     }

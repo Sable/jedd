@@ -58,5 +58,11 @@ public class BDDTrueFalse_c extends Lit_c implements BDDTrueFalse, JeddGenerateJ
         return nf.Call( n.position(), getJedd, n.value() ? "trueBDD" : "falseBDD" )
             .type( n.type() );
     }
+    public Object constantValue() { 
+        // It may be constant, but we don't really want the Polyglot
+        // constant folder to know that, since it won't know how to
+        // fold it anyway.
+        return null;
+    }
 }
 
