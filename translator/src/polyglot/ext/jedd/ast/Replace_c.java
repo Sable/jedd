@@ -171,10 +171,14 @@ public class Replace_c extends Expr_c implements Replace, JeddGenerateJava, Jedd
                     Type[] newDomain = new Type[2];
                     newDomain[0] = exprPair[0];
                     newDomains.add( newDomain );
+                    if( !seenAlready.add( newDomain[0] ) ) {
+                        throw new SemanticException( "Resulting type has"+
+                                " duplicate attribute "+newDomain[0] );
+                    }
                 }
             }
         }
-
+        
         return type( ts.BDDType( newDomains ) );
     }
     public Node physicalDomains( PhysicalDomains pd ) {

@@ -29,6 +29,20 @@ public class BDDType_c extends ReferenceType_c implements BDDType {
     BDDType_c( TypeSystem ts, List domainPairs ) {
         super(ts);
         this.domainPairs = domainPairs;
+        HashSet seen = new HashSet();
+        for( Iterator domainsIt = domainPairs.iterator(); domainsIt.hasNext(); ) {
+            final Type[] domains = (Type[]) domainsIt.next();
+            if( domains[0] != null ) {
+                if( !seen.add(domains[0]) ) {
+                    throw new RuntimeException( "bad type: "+domainPairs );
+                }
+            }
+            if( domains[1] != null ) {
+                if( !seen.add(domains[1]) ) {
+                    throw new RuntimeException( "bad type: "+domainPairs );
+                }
+            }
+        }
     }
     public String toString() {
         StringBuffer ret = new StringBuffer();
