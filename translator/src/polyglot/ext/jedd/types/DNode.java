@@ -29,6 +29,7 @@ public class DNode {
     BDDExpr expr;
     Type dom;
     int domNum;
+    Type phys;
     static int nextDomNum = 0;
     public static DNode v( VarInstance expr, Type dom ) {
         return v( BDDExpr.v(expr), dom );
@@ -68,6 +69,9 @@ public class DNode {
     private DNode( BDDExpr expr, Type dom ) {
         this.expr = expr;
         this.dom = dom;
+        BDDType t = expr.getType();
+        Map map = t.map();
+        this.phys = (Type) map.get(dom);
     }
     public int hashCode() {
         return expr.hashCode()+dom.hashCode();
@@ -90,6 +94,36 @@ public class DNode {
     }
     public String toLongString() {
         return toString()+" at "+expr.position();
+    }
+
+    private DNode rep = this;
+    public DNode rep() {
+        if( rep == this ) return this;
+        rep = rep.rep();
+        return rep;
+    }
+
+    public void merge( DNode other ) {
+        if( rep != this ) {
+            rep.merge(other);
+        } else {
+            DNode otherRep = other.rep();
+
+            // prefer the node that's not a FixPhys for the rep
+            if( !expr.isFixPhys() && otherRep.expr.isFixPhys() ) {
+                otherRep.merge(this);
+                return;
+            }
+
+            rep = otherRep;
+
+            if( phys != null ) {
+                if( rep.phys != null && rep.phys != phys ) {
+                    throw new RuntimeException( "trying to merge node "+this+" with phys "+phys+" with node "+rep+" with phys "+rep.phys );
+                }
+                rep.phys = phys;
+            }
+        }
     }
 }
 

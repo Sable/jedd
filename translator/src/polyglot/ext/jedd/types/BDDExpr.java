@@ -85,6 +85,9 @@ public abstract class BDDExpr {
         public Position position() {
             return ex.position();
         }
+        public boolean isFixPhys() {
+            return ex instanceof FixPhys;
+        }
     }
     private static BDDExpr v( BDDExpr ret ) {
         BDDExpr ret2 = (BDDExpr) instances.get( ret );
@@ -107,6 +110,7 @@ public abstract class BDDExpr {
         return o.obj() == obj();
     }
     public abstract void throwSemanticException( String s ) throws SemanticException;
+    public boolean isFixPhys() { return false; }
 }
 
 

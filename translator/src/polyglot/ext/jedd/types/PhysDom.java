@@ -34,6 +34,8 @@ import java.io.*;
 
 public class PhysDom {
     final static boolean INCLUDE_COMMENTS = false;
+    final static boolean DEBUG = false;
+    final static boolean STATS = false;
 
     private static PhysDom instance = new PhysDom();
     public static PhysDom v() { return instance; }
@@ -121,7 +123,7 @@ public class PhysDom {
         DNode dnode;
         Type phys;
         private Literal( DNode dnode, Type phys ) {
-            this.dnode = dnode; this.phys = phys;
+            this.dnode = dnode.rep(); this.phys = phys;
         }
         public static Literal v( DNode dnode, Type phys ) {
             Literal ret = new Literal( dnode, phys );
@@ -161,7 +163,7 @@ public class PhysDom {
             this( Literal.v( dnode, phys ) );
         }
         public static NegLiteral v( DNode dnode, Type phys ) {
-            NegLiteral ret = new NegLiteral( dnode, phys );
+            NegLiteral ret = new NegLiteral( dnode.rep(), phys );
             NegLiteral ret2 = (NegLiteral) litMap.get( ret );
             if( ret2 == null ) {
                 litMap.put( ret2 = ret, ret );
@@ -181,6 +183,12 @@ public class PhysDom {
         public String toString() {
             return Integer.toString(getNum());
         }
+    }
+
+    public static class Path extends HashSet {
+        public Path( Type phys ) { this.phys = phys; }
+        public Path( Path p ) { super(p); this.phys = p.phys; }
+        public final Type phys;
     }
 
     Set cnf = new HashSet();
@@ -221,22 +229,34 @@ public class PhysDom {
         //printDomainsDot();
         //printDomainsRsf();
 
+        if(DEBUG) System.out.println( "creating literals" );
         createLiterals();
 
+        if(DEBUG) System.out.println( "adding equality edges" );
+        addMustEqualEdges();
+
+        if(DEBUG) System.out.println( "computing adjacency lists" );
+        computeAdjacencies();
+
+        if(DEBUG) System.out.println( "creating dnode constraints" );
         createDnodeConstraints();
+        if(DEBUG) System.out.println( "setting programmer-specified assignments" );
         setupSpecifiedAssignment();
 
+        if(DEBUG) System.out.println( "adding assign edges" );
         addAssignEdges();
 
-        addMustEqualEdges();
+        if(DEBUG) System.out.println( "adding conflict edges" );
         addConflictEdges();
 
         //tryWithBDDsJustForKicks();
+        if(DEBUG) System.out.println( "running sat solver" );
         runSat();
 
+        if(DEBUG) System.out.println( "recording sat solver results" );
         recordPhys(jobs);
 
-        printDomainsDot();
+        //printDomainsDot();
         //printDomainsRsf();
 
         printStats();
@@ -261,7 +281,7 @@ public class PhysDom {
             String str;
             String soln = null;
             while ((str = br.readLine()) != null) {
-                if( str.length() < 1000 ) System.out.println( str );
+                if(STATS) if( str.length() < 1000 ) System.out.println( str );
                 boolean hasNum = false;
                 boolean hasBad = false;
                 for( int i = 0; i < str.length(); i++ ) {
@@ -359,10 +379,37 @@ public class PhysDom {
                         else nl2 = (NegLiteral) lit;
                     }
                     if( !cl.isConflict() ) continue line;
-                    System.err.println( "Conflict between\n"+
-                            nl1.lit.dnode.toLongString()+"\nand\n"+
-                            nl2.lit.dnode.toLongString()+"\nover physical domain "+
-                            nl1.lit.phys );
+                    DNode conflictingNode1 = nl1.lit.dnode;
+                    DNode conflictingNode2 = nl2.lit.dnode;
+                    for( Iterator exprIt = DNode.exprs().iterator(); exprIt.hasNext(); ) {
+                        final BDDExpr expr = (BDDExpr) exprIt.next();
+                        DNode node1 = null;
+                        DNode node2 = null;
+                        BDDType t = expr.getType();
+                        Map map = t.map();
+                        for( Iterator attrIt = map.keySet().iterator(); attrIt.hasNext(); ) {
+                            final Type attr = (Type) attrIt.next();
+                            DNode orig = DNode.v(expr, attr);
+                            if( orig.rep() == conflictingNode1 ) node1 = orig;
+                            if( orig.rep() == conflictingNode2 ) node2 = orig;
+                        }
+                        if( node1 != null && node2 != null ) {
+                            StdErrorQueue seq = new StdErrorQueue( System.err, 0, "" );
+                            seq.displayError(
+                                    new ErrorInfo(ErrorInfo.SEMANTIC_ERROR,
+                                    "Conflict between attributes "+node1.dom
+                                    +" and "+node2.dom+
+                                    (  expr.isFixPhys() 
+                                     ? " of replaced version of" 
+                                     : " of"),
+                                    expr.position() ) );
+                            System.err.println( "over physical domain "
+                                    +nl1.lit.phys );
+
+                            continue clause;
+                        }
+                    }
+                    throw new RuntimeException();
                 }
             }
         } catch( IOException e ) {
@@ -430,6 +477,7 @@ public class PhysDom {
         // Each dnode must be assigned to at least one phys
         for( Iterator dnodeIt = DNode.nodes().iterator(); dnodeIt.hasNext(); ) {
             final DNode dnode = (DNode) dnodeIt.next();
+            if( dnode.rep() != dnode ) continue;
             Clause clause = new Clause();
             if( INCLUDE_COMMENTS ) clause.setComment(
                     "[PHYS>=1] At least one phys for "+dnode);
@@ -443,6 +491,7 @@ public class PhysDom {
         // Each dnode must be assigned to at most one phys
         for( Iterator dnodeIt = DNode.nodes().iterator(); dnodeIt.hasNext(); ) {
             final DNode dnode = (DNode) dnodeIt.next();
+            if( dnode.rep() != dnode ) continue;
             for( Iterator physIt = allPhys.iterator(); physIt.hasNext(); ) {
                 final Type phys = (Type) physIt.next();
                 for( Iterator phys2It = allPhys.iterator(); phys2It.hasNext(); ) {
@@ -462,10 +511,13 @@ public class PhysDom {
     public void addMustEqualEdges() {
         for( Iterator edgeIt = mustEqualEdges.iterator(); edgeIt.hasNext(); ) {
             final DNode[] edge = (DNode[]) edgeIt.next();
-            addMustEqualEdge( edge[0], edge[1] );
+            edge[0].merge( edge[1] );
         }
     }
+    /*
     private void addMustEqualEdge( DNode node1, DNode node2 ) {
+        if( node1 == node2 ) return;
+
         // (xa ==> ya) /\ (ya ==> xa) = (ya \/ ~xa) /\ (xa \/ ~ya)
         for( Iterator physIt = allPhys.iterator(); physIt.hasNext(); ) {
             final Type phys = (Type) physIt.next();
@@ -483,6 +535,7 @@ public class PhysDom {
             cnf.add( clause );
         }
     }
+    */
 
     public void addConflictEdges() {
         for( Iterator exprIt = DNode.exprs().iterator(); exprIt.hasNext(); ) {
@@ -515,33 +568,32 @@ public class PhysDom {
     }
 
     public Type phys(DNode d) {
-        BDDExpr expr = d.expr;
-        BDDType t = expr.getType();
-        Map map = t.map();
-        return (Type) map.get(d.dom);
+        return d.rep().phys;
     }
 
-    public Type phys(Set s) {
-        for( Iterator nodeIt = s.iterator(); nodeIt.hasNext(); ) {
-            final DNode node = (DNode) nodeIt.next();
-            Type ret = phys(node);
-            if(ret != null) return ret;
-        }
-        return null;
+    public Type phys(Path s) {
+        return s.phys;
     }
 
-    public Collection adjacent(DNode d) {
-        Set ret = new HashSet();
+    private void computeAdjacencies() {
+        adjacentCache = new HashMap();
         for( Iterator edgeIt = assignEdges.iterator(); edgeIt.hasNext(); ) {
             final DNode[] edge = (DNode[]) edgeIt.next();
-            if( edge[0] == d ) ret.add(edge[1]);
-            if( edge[1] == d ) ret.add(edge[0]);
+            addAdjacency(edge[0].rep(), edge[1].rep());
+            addAdjacency(edge[1].rep(), edge[0].rep());
         }
-        for( Iterator edgeIt = mustEqualEdges.iterator(); edgeIt.hasNext(); ) {
-            final DNode[] edge = (DNode[]) edgeIt.next();
-            if( edge[0] == d ) ret.add(edge[1]);
-            if( edge[1] == d ) ret.add(edge[0]);
+    }
+    private void addAdjacency(DNode src, DNode dst) {
+        Set dsts = (Set) adjacentCache.get(src);
+        if( dsts == null ) {
+            adjacentCache.put(src, dsts = new HashSet());
         }
+        dsts.add(dst);
+    }
+    private Map adjacentCache;
+    public Collection adjacent(DNode d) {
+        Collection ret = (Collection) adjacentCache.get(d.rep());
+        if( ret == null ) return Collections.EMPTY_LIST;
         return ret;
     }
     
@@ -552,12 +604,14 @@ public class PhysDom {
         // initialize all nodes that have a phys with a path of length 1
         for( Iterator nodeIt = DNode.nodes().iterator(); nodeIt.hasNext(); ) {
             final DNode node = (DNode) nodeIt.next();
+            if( node.rep() != node ) continue;
+
             Set paths = new HashSet();
             pathMap.put( node, paths );
             if( phys(node) == null ) continue;
-            Set path = new HashSet();
+            Path path = new Path(phys(node));
             path.add(node);
-            paths.add( path );
+            paths.add(path);
             worklist.addLast(node);
         }
 
@@ -566,14 +620,18 @@ public class PhysDom {
             DNode node = (DNode) worklist.removeFirst();
             for( Iterator onodeIt = adjacent(node).iterator(); onodeIt.hasNext(); ) {
                 final DNode onode = (DNode) onodeIt.next();
+                if( onode.rep() != onode ) throw new RuntimeException();
+
                 if( phys(onode) != null ) continue;
                 boolean changed = false;
 outer:
-                for( Iterator newPathIt = ((Set)pathMap.get(node)).iterator(); newPathIt.hasNext(); ) {              final Set newPath = (Set) newPathIt.next();
-                    Set newPath2 = new HashSet(newPath);
+                for( Iterator newPathIt = ((Set)pathMap.get(node)).iterator(); newPathIt.hasNext(); ) {              final Path newPath = (Path) newPathIt.next();
+                    if( newPath.contains(onode) ) continue;
+                    Path newPath2 = new Path(newPath);
                     newPath2.add( onode );
                     for( Iterator oldPathIt = ((Set)pathMap.get(onode)).iterator(); oldPathIt.hasNext(); ) {
                         final Set oldPath = (Set) oldPathIt.next();
+                        if( oldPath.size() > newPath2.size() ) continue;
                         if( newPath2.containsAll(oldPath) ) continue outer;
                     }
                     ((Set) pathMap.get(onode)).add( newPath2 );
@@ -586,6 +644,8 @@ outer:
         // now encode paths as constraints
         for( Iterator nodeIt = pathMap.keySet().iterator(); nodeIt.hasNext(); ) {
             final DNode node = (DNode) nodeIt.next();
+            if( node.rep() != node ) throw new RuntimeException();
+
             Set paths = (Set) pathMap.get(node);
 
             {
@@ -604,15 +664,16 @@ outer:
 
             {
                 for( Iterator pathIt = paths.iterator(); pathIt.hasNext(); ) {
-                    final Set path = (Set) pathIt.next();
+                    final Path path = (Path) pathIt.next();
                     // all the nodes in the path must have correct phys
                     Type phys = phys(path);
+                    NegSetLit pathLit = NegSetLit.v(path);
                     for( Iterator nodeOnPathIt = path.iterator(); nodeOnPathIt.hasNext(); ) {
                         final DNode nodeOnPath = (DNode) nodeOnPathIt.next();
                         // a ==> b /\ c /\ d = (b \/ ~a) /\ (c \/ ~a) /\ (d \/ ~a)
                         Clause clause = new Clause();
                         if(INCLUDE_COMMENTS) clause.setComment("[NODEONPATH] Node "+nodeOnPath+" to node "+node);
-                        clause.add( NegSetLit.v(path) );
+                        clause.add( pathLit );
                         clause.add( Literal.v( nodeOnPath, phys ) );
                         cnf.add(clause);
                     }
@@ -630,7 +691,7 @@ outer:
             for( Iterator domainIt = map.keySet().iterator(); domainIt.hasNext(); ) {
                 final Type domain = (Type) domainIt.next();
                 Type phys = (Type) map.get(domain);
-                DNode dnode = DNode.v(expr,domain);
+                DNode dnode = DNode.v(expr,domain).rep();
                 if( phys != null ) {
                     Clause clause = new Clause();
                     if(INCLUDE_COMMENTS) clause.setComment("[SPECIFIED] "+dnode+" specified to be "+phys);
@@ -832,14 +893,14 @@ outer:
                 nonrepnodes++;
             }
         }
-        System.out.println( "Must equal edges: "+mustEqualEdges.size() );
-        System.out.println( "Assignment edges: "+assignEdges.size() );
-        System.out.println( "Conflict edges: "+conflictEdgeCount/2 );
-        System.out.println( "Expressions: "+exprs );
-        System.out.println( "Non-replaces: "+nonrep );
-        System.out.println( "Attributes: "+nodes );
-        System.out.println( "Non-rep attributes: "+nonrepnodes );
-        System.out.println( "Specified attributes: "+specifiedAttributes );
-        System.out.println( "Physical domains: "+allPhys.size() );
+        if(STATS) System.out.println( "Must equal edges: "+mustEqualEdges.size() );
+        if(STATS) System.out.println( "Assignment edges: "+assignEdges.size() );
+        if(STATS) System.out.println( "Conflict edges: "+conflictEdgeCount/2 );
+        if(STATS) System.out.println( "Expressions: "+exprs );
+        if(STATS) System.out.println( "Non-replaces: "+nonrep );
+        if(STATS) System.out.println( "Attributes: "+nodes );
+        if(STATS) System.out.println( "Non-rep attributes: "+nonrepnodes );
+        if(STATS) System.out.println( "Specified attributes: "+specifiedAttributes );
+        if(STATS) System.out.println( "Physical domains: "+allPhys.size() );
     }
 }
