@@ -289,8 +289,8 @@ public class Jedd {
             List l = (List) key;
             PhysicalDomain[] from = new PhysicalDomain[0];
             from = (PhysicalDomain[]) ((List) l.get(0)).toArray(from);
-            PhysicalDomain[] to = (PhysicalDomain[])
-                ((List) l.get(1)).toArray(from);
+            PhysicalDomain[] to = new PhysicalDomain[0];
+            to = (PhysicalDomain[]) ((List) l.get(1)).toArray(to);
             return Backend.v().makeCopier(
                     convertDomains(from), convertDomains(to) );
         }
