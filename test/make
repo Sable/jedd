@@ -1,3 +1,0 @@
-#!/bin/sh
-rm classes/*
-cd jedd && java -cp $CLASSPATH:$HOME/polyglot/classes:$HOME/jedd/classes  polyglot/main/Main -noserial -d ../classes -ext jedd  `find -name '*.jedd'`

@@ -1,7 +1,0 @@
-import jedd.*;
-
-class H1 extends PhysicalDomain {
-    public int bits() { return 20; }
-    public static PhysicalDomain v() { return instance; }
-    private static PhysicalDomain instance = new H1();
-}

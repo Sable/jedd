@@ -1,7 +1,0 @@
-import jedd.*;
-
-class fld extends Domain {
-    public Numberer numberer() { return null; }
-    public static Domain v() { return instance; }
-    private static Domain instance = new fld();
-}
