@@ -1,0 +1,166 @@
+import java.io.*;
+import java.util.*;
+import jedd.*;
+import java.util.zip.*;
+import attributes.*;
+import domains.*;
+import physical_domains.*;
+
+public class Prop {
+    <src:V1, dst:V2> edgeSet;
+    <var:V1, obj:H1> allocs;
+    <var:V1, obj:H1> pointsTo;
+    <src:V1, fld:FD, dst:V2> loads;
+    <src:V1, fld:FD, dst:V2> stores;
+    <var, obj> typeFilter = 1B;
+    <var, obj> solution;
+    <var, dtp> varTypes;
+    <obj, atp> objTypes;
+    <dtp:V2, atp:V1> subType;
+
+    private static Integer getInt(StringTokenizer st) {
+        Integer ret = Integer.decode(st.nextToken());
+        return ret;
+    }
+    public static final void main( String[] args ) throws Exception {
+        Jedd.v().setBackend( args[0] );
+        Jedd.v().enableProfiling();
+        new Prop().main();
+        try {
+            Jedd.v().outputProfile( new PrintStream( new GZIPOutputStream(
+                    new FileOutputStream( new File( "profile.sql.gz")))));
+        } catch( IOException e ) {
+            throw new RuntimeException( "couldn't write profile: "+e );
+        }
+    }
+    public final void main() throws Exception {
+        PhysicalDomain[] interleaved = { V1.v(), V2.v(), FD.v(), H1.v(), H2.v() };
+        PhysicalDomain[] v1v2 = { V1.v(), V2.v() };
+        Object[] order = { FD.v(), V1.v(), V2.v(), H1.v(), H2.v() };
+        //Object[] order = { FD.v(), v1v2, H1.v(), H2.v() };
+        //Object[] order = { H2.v(), H1.v(), v1v2, FD.v() };
+        //Object[] order = { interleaved };
+        Jedd.v().setOrder( order, true );
+
+        parseInput();
+
+        Jedd.v().gbc();
+
+        System.out.println("starting propagation");
+        propagate();
+    }
+
+    private void parseInput() throws Exception {
+        BufferedReader br = new BufferedReader( new InputStreamReader( System.in ) );
+        String line;
+        String mode = null;
+        while(true) {
+            line = br.readLine();
+            if( line == null ) break;
+            if( line.indexOf( ":" ) >= 0 ) {
+                mode = line;
+                System.out.println("reading "+mode);
+                continue;
+            }
+            StringTokenizer st = new StringTokenizer(line);
+            if( mode.indexOf( "Allocations" ) >= 0 ) {
+                Object o1 = getInt(st);
+                Object o2 = getInt(st);
+                allocs = allocs | new { o1=>obj, o2=>var };
+            } else if( mode.indexOf( "Assignments" ) >= 0 ) {
+                edgeSet |= new { getInt(st)=>src, getInt(st)=>dst };
+            } else if( mode.indexOf( "Loads" ) >= 0 ) {
+                loads |= new { getInt(st)=>src, getInt(st)=>fld, getInt(st)=>dst };
+            } else if( mode.indexOf( "Stores" ) >= 0 ) {
+                stores |= new { getInt(st)=>src, getInt(st)=>dst, getInt(st)=>fld };
+            } else if( mode.indexOf( "Solution" ) >= 0 ) {
+                solution |= new { getInt(st)=>var, getInt(st)=>obj };
+            } else if( mode.indexOf( "Declared Types" ) >= 0 ) {
+                subType |= new { getInt(st)=>dtp, getInt(st)=>atp };
+            } else if( mode.indexOf( "Allocation Types" ) >= 0 ) {
+                objTypes |= new { getInt(st)=>obj, getInt(st)=>atp };
+            } else if( mode.indexOf( "Variable Types" ) >= 0 ) {
+                varTypes |= new { getInt(st)=>var, getInt(st)=>dtp };
+            }
+        }
+        if( subType != 0B ) {
+            typeFilter = ( subType {atp} <> objTypes {atp} ) {dtp} <> varTypes {dtp};
+        }
+        varTypes = 0B;
+        objTypes = 0B;
+        subType = 0B;
+        System.out.println( "Nodes in points-to BDD: "+pointsTo.numNodes() );
+        System.out.println( "Nodes in loads BDD: "+loads.numNodes() );
+        System.out.println( "Nodes in stores BDD: "+stores.numNodes() );
+        System.out.println( "Nodes in edge-set BDD: "+edgeSet.numNodes() );
+    }
+
+    private void propagate()
+    {
+
+        <var, obj> oldPt1;
+        <var, obj> oldPt2;
+        <var:V1, obj:H1> newPt;
+        <obj:H1, var:V2, fld:FD> objectsBeingStored;
+        <base, fld, obj:H2> fieldPt;
+        <base:H1, fld:FD, dst_var:V2> loadsFromHeap;
+
+        Date start = new Date();
+        pointsTo = allocs;
+        allocs = 0B;
+        do {
+            oldPt1 = pointsTo;
+            System.out.println("Starting outer iteration.");
+            do {
+                oldPt2 = pointsTo;
+
+                // rule 1
+                newPt = (dst=>var) edgeSet {src} <> pointsTo{var}; 
+
+                // apply type filtering and merge into pointsTo relation
+                newPt = newPt & typeFilter;
+                pointsTo = pointsTo | newPt;
+
+            } while( oldPt2 != pointsTo );
+            newPt = 0B;
+
+            // rule 2
+            objectsBeingStored =
+                (dst=>var, fld=>fld) stores  {src} <>
+                (obj=>obj)           pointsTo{var};
+
+            fieldPt = 
+                (fld=>fld, obj=>obj) objectsBeingStored{var} <>
+                (obj=>base)          pointsTo          {var};
+
+            objectsBeingStored = 0B;
+
+            // rule 3
+            loadsFromHeap =  
+                (fld=>fld, dst=>dst_var) loads   {src} <>
+                (obj=>base)              pointsTo{var};
+
+            newPt = 
+                    (dst_var=>var) loadsFromHeap{base,fld} <>
+                    (obj=>obj)     fieldPt      {base,fld};
+
+            loadsFromHeap = 0B;
+
+            // apply type filtering and merge into pointsTo relation
+            newPt &= typeFilter;
+
+            pointsTo |= newPt;
+
+        } while( oldPt1 != pointsTo );
+
+        if( pointsTo == solution ) System.out.println( "solution matches" );
+        else System.out.println( "solution doesn't match" );
+
+        System.out.println( "Nodes in points-to BDD: "+pointsTo.numNodes() );
+        System.out.println( "Nodes in solution BDD: "+solution.numNodes() );
+        
+        Jedd.v().gbc();
+
+    }
+}
+

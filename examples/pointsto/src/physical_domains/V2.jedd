@@ -1,0 +1,5 @@
+package physical_domains;
+import jedd.*;
+
+public class V2() extends PhysicalDomain {
+}

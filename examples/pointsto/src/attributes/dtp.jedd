@@ -1,0 +1,6 @@
+package attributes;
+import domains.*;
+import jedd.*;
+
+public class dtp(Type) extends Attribute {
+}

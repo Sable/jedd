@@ -1,0 +1,6 @@
+package domains;
+import jedd.*;
+
+public class Field(20) extends Domain {
+    public Numberer numberer() { return IntegerNumberer.v(); }
+}

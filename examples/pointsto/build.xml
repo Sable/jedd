@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+
+    <project default="compile">
+        <property file="ant.settings"/>
+
+        <target name="compile">
+            <apply executable="java" failonerror="true" parallel="true">
+                <arg value="-cp"/>
+                <arg path="${jedd.translator.jar}:${polyglot.jar}"/>
+                <arg value="-Xmx300m"/>
+                <arg value="jedd.Main"/>
+                <arg value="-sourcepath"/>
+                <arg path="src:generated"/>
+                <arg value="-classpath"/>
+                <arg path="${jedd.runtime.jar}"/>
+                <arg value="-c"/>
+                <arg value="-d"/>
+                <arg file="generated"/>
+                <arg value="-s"/>
+                <arg value="${sat.solver.cmd}"/>
+                <arg value="-sc"/>
+                <arg value="${sat.core.cmd}"/>
+                <fileset dir="src" includes="**/*.jedd"/>
+            </apply>
+
+            <javac destdir="classes" classpath="classes:${jedd.runtime.jar}">
+                <src path="src"/>
+                <src path="generated"/>
+            </javac>
+        </target>
+
+        <target name="clean">
+            <delete quiet="true">
+                <fileset dir="classes" includes="**/*.class"/>
+            </delete>
+        </target>
+
+        <target name="veryclean" depends="clean">
+            <delete quiet="true">
+                <fileset dir="generated" includes="**/*.java"/>
+            </delete>
+        </target>
+    </project>
+    

@@ -1,0 +1,6 @@
+package attributes;
+import domains.*;
+import jedd.*;
+
+public class obj(Obj) extends Attribute {
+}

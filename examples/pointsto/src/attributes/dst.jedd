@@ -1,0 +1,6 @@
+package attributes;
+import domains.*;
+import jedd.*;
+
+public class dst(Var) extends Attribute {
+}
