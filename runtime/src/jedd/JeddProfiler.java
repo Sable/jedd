@@ -1,4 +1,4 @@
-/* Jedd - Java extension for decision diagrams
+/* Jedd - A language for implementing relations using BDDs
  * Copyright (C) 2003 Ondrej Lhotak
  *
  * This library is free software; you can redistribute it and/or
