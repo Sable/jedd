@@ -181,8 +181,9 @@ public class PhysDom {
     public void runSat() {
         int numvars = (setMap.size()+litMap.size())/2;
         try {
+            File tmpFile = File.createTempFile("domainassign",".cnf");
             PrintWriter file = new PrintWriter(
-                    new FileOutputStream( new File("domainassign.cnf") ) );
+                    new FileOutputStream( tmpFile ) );
             file.println( "p cnf "+numvars+" "+cnf.size() );
             boolean first = true;
             for( Iterator clauseIt = cnf.iterator(); clauseIt.hasNext(); ) {
@@ -195,7 +196,7 @@ public class PhysDom {
                 }
             }
             file.close();
-            Process p = Runtime.getRuntime().exec("sat domainassign.cnf");
+            Process p = Runtime.getRuntime().exec(satSolver+" "+tmpFile.getAbsolutePath());
             BufferedReader br = new BufferedReader(new InputStreamReader( p.getInputStream() ) );
             String str;
             String soln = null;
@@ -237,6 +238,7 @@ public class PhysDom {
                 Integer i = (Integer) litNumMap.get( lit );
                 if( pos[i.intValue()] ) solution.add( lit );
             }
+            tmpFile.delete();
         } catch( IOException e ) {
             throw new RuntimeException( e.toString() );
         }
