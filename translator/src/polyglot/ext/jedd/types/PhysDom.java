@@ -33,6 +33,8 @@ import java.io.*;
 
 
 public class PhysDom {
+    final static boolean INCLUDE_COMMENTS = false;
+
     private static PhysDom instance = new PhysDom();
     public static PhysDom v() { return instance; }
 
@@ -77,7 +79,7 @@ public class PhysDom {
             return i.intValue();
         }
         public String toString() {
-            return ""+getNum();
+            return Integer.toString(getNum());
         }
     }
     static class NegSetLit implements HasNum {
@@ -110,7 +112,7 @@ public class PhysDom {
             return -(set.getNum());
         }
         public String toString() {
-            return ""+getNum();
+            return Integer.toString(getNum());
         }
     }
     public static Map setMap = new HashMap();
@@ -143,7 +145,7 @@ public class PhysDom {
             return i.intValue();
         }
         public String toString() {
-            return ""+getNum();
+            return Integer.toString(getNum());
         }
     }
     static int nextInt = 0;
@@ -177,23 +179,26 @@ public class PhysDom {
             return -(lit.getNum());
         }
         public String toString() {
-            return ""+getNum();
+            return Integer.toString(getNum());
         }
     }
 
     Set cnf = new HashSet();
 
     public static class Clause extends HashSet {
-        public Clause( String comment ) {
+        public Clause() {
+        }
+        public void setComment( String comment ) {
             this.comment = comment;
         }
         String comment;
         public String toString() {
             StringBuffer ret = new StringBuffer();
-            ret.append( "c "+comment+"\n" );
+            if( comment != null ) ret.append( "c "+comment+"\n" );
             for( Iterator litIt = this.iterator(); litIt.hasNext(); ) {
                 final Object lit = (Object) litIt.next();
-                ret.append( lit.toString()+" " );
+                ret.append( lit.toString() );
+                ret.append( " " );
             }
             ret.append( "0" );
             return ret.toString();
@@ -208,8 +213,8 @@ public class PhysDom {
         this.nf = nf;
         this.ts = ts;
 
-        printDomainsDot();
-        printDomainsRsf();
+        //printDomainsDot();
+        //printDomainsRsf();
 
         createLiterals();
 
@@ -227,7 +232,7 @@ public class PhysDom {
         recordPhys(jobs);
 
         printDomainsDot();
-        printDomainsRsf();
+        //printDomainsRsf();
 
         printStats();
     }
@@ -372,7 +377,7 @@ public class PhysDom {
 
         for( Iterator clauseIt = cnf.iterator(); clauseIt.hasNext(); ) {
 
-            final Set clause = (Set) clauseIt.next();
+            final Clause clause = (Clause) clauseIt.next();
 
             SWIGTYPE_p_DdNode clauseBdd = Cudd.Cudd_ReadLogicZero(manager);
             Cudd.Cudd_Ref(clauseBdd);
@@ -420,7 +425,9 @@ public class PhysDom {
         // Each dnode must be assigned to at least one phys
         for( Iterator dnodeIt = DNode.nodes().iterator(); dnodeIt.hasNext(); ) {
             final DNode dnode = (DNode) dnodeIt.next();
-            Set clause = new Clause("[PHYS>=1] At least one phys for "+dnode);
+            Clause clause = new Clause();
+            if( INCLUDE_COMMENTS ) clause.setComment(
+                    "[PHYS>=1] At least one phys for "+dnode);
             for( Iterator physIt = allPhys.iterator(); physIt.hasNext(); ) {
                 final Type phys = (Type) physIt.next();
                 clause.add( Literal.v( dnode, phys ) );
@@ -436,7 +443,9 @@ public class PhysDom {
                 for( Iterator phys2It = allPhys.iterator(); phys2It.hasNext(); ) {
                     final Type phys2 = (Type) phys2It.next();
                     if( phys == phys2 ) continue;
-                    Set clause = new Clause("[PHYS<=1] At most one phys for "+dnode);
+                    Clause clause = new Clause();
+                    if( INCLUDE_COMMENTS ) clause.setComment(
+                            "[PHYS<=1] At most one phys for "+dnode);
                     clause.add( NegLiteral.v( dnode, phys ) );
                     clause.add( NegLiteral.v( dnode, phys2 ) );
                     cnf.add( clause );
@@ -455,12 +464,15 @@ public class PhysDom {
         // (xa ==> ya) /\ (ya ==> xa) = (ya \/ ~xa) /\ (xa \/ ~ya)
         for( Iterator physIt = allPhys.iterator(); physIt.hasNext(); ) {
             final Type phys = (Type) physIt.next();
-            Set clause = new Clause("[MUSTEQUAL] Must equal edge between "+node1+" and "+node2+" for "+phys);
+            Clause clause = new Clause();
+            if( INCLUDE_COMMENTS ) clause.setComment(
+                    "[MUSTEQUAL] Must equal edge between "+node1+" and "+node2+" for "+phys);
             clause.add( Literal.v( node1, phys ) );
             clause.add( NegLiteral.v( node2, phys ) );
             cnf.add( clause );
 
-            clause = new Clause("[MUSTEQUAL] Must equal edge between "+node1+" and "+node2+" for "+phys);
+            clause = new Clause();
+            if( INCLUDE_COMMENTS ) clause.setComment( "[MUSTEQUAL] Must equal edge between "+node1+" and "+node2+" for "+phys);
             clause.add( NegLiteral.v( node1, phys ) );
             clause.add( Literal.v( node2, phys ) );
             cnf.add( clause );
@@ -487,7 +499,9 @@ public class PhysDom {
         // (xa ==> ~ya) /\ (ya ==> ~xa) = (~ya \/ ~xa)
         for( Iterator physIt = allPhys.iterator(); physIt.hasNext(); ) {
             final Type phys = (Type) physIt.next();
-            Set clause = new Clause("[CONFLICT] Conflict edge between "+node1.toLongString()+" and "+node2.toLongString()+" for "+phys);
+            Clause clause = new Clause();
+            if( INCLUDE_COMMENTS ) clause.setComment( 
+                    "[CONFLICT] Conflict edge between "+node1.toLongString()+" and "+node2.toLongString()+" for "+phys);
             clause.add( NegLiteral.v( node1, phys ) );
             clause.add( NegLiteral.v( node2, phys ) );
             cnf.add( clause );
@@ -571,7 +585,8 @@ outer:
 
             {
                 // at least one path must be active for each node
-                Set clause = new Clause("[PATH>=1] At least one path for "+node);
+                Clause clause = new Clause();
+                if( INCLUDE_COMMENTS ) clause.setComment("[PATH>=1] At least one path for "+node);
                 for( Iterator pathIt = paths.iterator(); pathIt.hasNext(); ) {
                     final Set path = (Set) pathIt.next();
                     clause.add( SetLit.v( path ) );
@@ -590,7 +605,8 @@ outer:
                     for( Iterator nodeOnPathIt = path.iterator(); nodeOnPathIt.hasNext(); ) {
                         final DNode nodeOnPath = (DNode) nodeOnPathIt.next();
                         // a ==> b /\ c /\ d = (b \/ ~a) /\ (c \/ ~a) /\ (d \/ ~a)
-                        Set clause = new Clause("[NODEONPATH] Node "+nodeOnPath+" to node "+node);
+                        Clause clause = new Clause();
+                        if(INCLUDE_COMMENTS) clause.setComment("[NODEONPATH] Node "+nodeOnPath+" to node "+node);
                         clause.add( NegSetLit.v(path) );
                         clause.add( Literal.v( nodeOnPath, phys ) );
                         cnf.add(clause);
@@ -611,7 +627,8 @@ outer:
                 Type phys = (Type) map.get(domain);
                 DNode dnode = DNode.v(expr,domain);
                 if( phys != null ) {
-                    Set clause = new Clause("[SPECIFIED] "+dnode+" specified to be "+phys);
+                    Clause clause = new Clause();
+                    if(INCLUDE_COMMENTS) clause.setComment("[SPECIFIED] "+dnode+" specified to be "+phys);
                     clause.add( Literal.v( dnode, phys ) );
                     if( cnf.add( clause ) ) {;
                         specifiedAttributes++;
