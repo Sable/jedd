@@ -1531,12 +1531,6 @@ replacement ::=
             TypeNode[] ret = { a, null };
             RESULT = ret;
         
-                      :}
- |  ARROW attribute:b {:
-                     
-            TypeNode[] ret = { null, b };
-            RESULT = ret;
-        
                       :};
 
 replacement_tail ::=

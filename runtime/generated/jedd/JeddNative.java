@@ -54,6 +54,10 @@ public class JeddNative {
     return JeddNativeJNI.replace(r, n, from, to);
   }
 
+  public static int copy(int r, int n, int[] from, int[] to) {
+    return JeddNativeJNI.copy(r, n, from, to);
+  }
+
   public static int replacepair(int r, int pair) {
     return JeddNativeJNI.replacepair(r, pair);
   }

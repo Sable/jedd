@@ -31,7 +31,7 @@ import java.util.*;
 
 public class FixPhys_c extends Expr_c implements FixPhys, JeddGenerateJava, JeddPhysicalDomains
 {
-    protected Expr expr;
+    private Expr expr;
     public Expr expr() { return expr; }
     public FixPhys_c(Position pos, Expr expr ) {
         super( pos );
@@ -112,7 +112,6 @@ public class FixPhys_c extends Expr_c implements FixPhys, JeddGenerateJava, Jedd
         return this;
     }
     public Node generateJava( JeddTypeSystem ts, JeddNodeFactory nf ) throws SemanticException {
-        if( this instanceof Replace ) throw new RuntimeException();
         Position p = position();
 
         BDDType type = (BDDType) type();

@@ -33,6 +33,19 @@ public class Jedd {
     public void enableProfiling() {
         profiler = JeddProfiler.v();
     }
+    public int copy( Relation r,
+        PhysicalDomain[] from, PhysicalDomain[] to ) {
+        int ret = copyImpl( r.bdd, from, to );
+        JeddNative.addRef( ret );
+        return ret;
+    }
+    public int copy( int r,
+            PhysicalDomain[] from, PhysicalDomain[] to ) {
+        int ret = copyImpl( r, from, to );
+        JeddNative.addRef( ret );
+        JeddNative.delRef( r );
+        return ret;
+    }
     public int replace( Relation r,
         PhysicalDomain[] from, PhysicalDomain[] to ) {
         int ret = replaceImpl( r.bdd, from, to );
@@ -230,6 +243,19 @@ public class Jedd {
                 ret[nextbit++] = bit++;
             }
         }
+        return ret;
+    }
+    private int copyImpl( int r,
+            PhysicalDomain[] from, PhysicalDomain[] to ) {
+        int ret;
+        int[] cfrom = convertDomains(from);
+        int[] cto = convertDomains(to);
+        if( cfrom.length != cto.length ) throw new RuntimeException();
+
+        if( profiler != null ) profiler.start( "copy", r );
+        ret = JeddNative.copy( r, cfrom.length, cfrom, cto );
+        if( profiler != null ) profiler.finish( "copy", ret );
+
         return ret;
     }
     private int replaceImpl( int r,

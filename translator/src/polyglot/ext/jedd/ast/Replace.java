@@ -23,8 +23,9 @@ import polyglot.ext.jl.ast.*;
 import polyglot.ast.*;
 import java.util.*;
 
-public interface Replace extends FixPhys
+public interface Replace extends Expr
 {
     public List domainPairs();
+    public Expr expr();
 }
 

@@ -704,6 +704,7 @@ extern int literal(int,int []);
 extern int falseBDD();
 extern int trueBDD();
 extern int replace(int,int,int [],int []);
+extern int copy(int,int,int [],int []);
 extern int replacepair(int,int);
 extern int relprod(int,int,int,int []);
 extern int project(int,int,int []);
@@ -945,6 +946,39 @@ JNIEXPORT jint JNICALL Java_jedd_JeddNativeJNI_replace(JNIEnv *jenv, jclass jcls
     if (!SWIG_JavaArrayInInt(jenv, &jarr4, &arg4, jarg4)) return 0; 
     {
         result = (int)replace(arg1,arg2,arg3,arg4);
+        
+        if( bdd_errno ) {
+            SWIG_exception(SWIG_RuntimeError, bdd_errno);
+            bdd_errno = NULL;
+        }
+    }
+    jresult = (jint)result; 
+    SWIG_JavaArrayArgoutInt(jenv, jarr3, arg3, jarg3); 
+    SWIG_JavaArrayArgoutInt(jenv, jarr4, arg4, jarg4); 
+    free(arg3); 
+    free(arg4); 
+    return jresult;
+}
+
+
+JNIEXPORT jint JNICALL Java_jedd_JeddNativeJNI_copy(JNIEnv *jenv, jclass jcls, jint jarg1, jint jarg2, jintArray jarg3, jintArray jarg4) {
+    jint jresult = 0 ;
+    int arg1 ;
+    int arg2 ;
+    int *arg3 ;
+    int *arg4 ;
+    int result;
+    jint *jarr3 ;
+    jint *jarr4 ;
+    
+    (void)jenv;
+    (void)jcls;
+    arg1 = (int)jarg1; 
+    arg2 = (int)jarg2; 
+    if (!SWIG_JavaArrayInInt(jenv, &jarr3, &arg3, jarg3)) return 0; 
+    if (!SWIG_JavaArrayInInt(jenv, &jarr4, &arg4, jarg4)) return 0; 
+    {
+        result = (int)copy(arg1,arg2,arg3,arg4);
         
         if( bdd_errno ) {
             SWIG_exception(SWIG_RuntimeError, bdd_errno);

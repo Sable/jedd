@@ -33,6 +33,7 @@ extern int trueBDD();
 
 // return value of following functions is *not* refed
 extern int replace( int r, int n, int from[], int to[] );
+extern int copy( int r, int n, int from[], int to[] );
 extern int replacepair( int r, int pair );
 extern int relprod( int r1, int r2, int n, int domains[] );
 extern int project( int r, int n, int toRemove[] );

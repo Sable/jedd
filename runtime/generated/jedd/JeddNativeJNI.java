@@ -21,6 +21,7 @@ class JeddNativeJNI {
   public final static native int falseBDD();
   public final static native int trueBDD();
   public final static native int replace(int jarg1, int jarg2, int[] jarg3, int[] jarg4);
+  public final static native int copy(int jarg1, int jarg2, int[] jarg3, int[] jarg4);
   public final static native int replacepair(int jarg1, int jarg2);
   public final static native int relprod(int jarg1, int jarg2, int jarg3, int[] jarg4);
   public final static native int project(int jarg1, int jarg2, int[] jarg3);

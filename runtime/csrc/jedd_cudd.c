@@ -93,6 +93,25 @@ extern int replace( int r, int n, int from[], int to[] ) {
     }
     return (int) Cudd_bddSwapVariables(manager, (DdNode*)r, fromNodes, toNodes, n);
 }
+extern int copy( int r, int n, int from[], int to[] ) {
+    int i;
+    DdNode* ret = (DdNode*) r;
+    for( i=0; i < n; i++ ) {
+        DdNode* b1;
+        DdNode* b2;
+        b1 = Cudd_bddXnor( manager,
+                Cudd_bddIthVar(manager, from[i]),
+                Cudd_bddIthVar(manager, to[i]) );
+        addRef( (int) b1 );
+        addRef( (int) ret );
+        b2 = Cudd_bddAnd( manager, b1, ret );
+        delRef( (int) b1 );
+        delRef( (int) ret );
+        ret = b2;
+    }
+    return (int) ret;
+}
+
 
 extern int relprod( int r1, int r2, int n, int domains[] ) {
     int ret;

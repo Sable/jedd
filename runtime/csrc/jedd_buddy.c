@@ -115,6 +115,21 @@ extern int replace( int r, int n, int from[], int to[] ) {
     bdd_setpairs( pair, from, to, n );
     return bdd_replace( r, pair );
 }
+extern int copy( int r, int n, int from[], int to[] ) {
+    int i;
+    int ret = r;
+    for( i=0; i < n; i++ ) {
+        int b1, b2;
+        b1 = bdd_biimp( bdd_ithvar(from[i]), bdd_ithvar(to[i]) );
+        bdd_addref( b1 );
+        bdd_addref( ret );
+        b2 = bdd_and( b1, ret );
+        bdd_delref( b1 );
+        bdd_delref( ret );
+        ret = b2;
+    }
+    return ret;
+}
 
 extern int makecube( int n, int domains[] ) {
     int cube = bdd_makeset( domains, n );
