@@ -46,7 +46,7 @@ public class PhysDom {
     public Set mustEqualEdges = new HashSet();
     public Collection allPhys = new HashSet();
 
-    private String satSolver = System.getProperty("user.home")+System.getProperty("file.separator")+"zchaff.2003.10.9.linux";
+    private String satSolver = System.getProperty("user.home")+System.getProperty("file.separator")+"zchaff";
     private String satCore = System.getProperty("user.home")+System.getProperty("file.separator")+"zcore";
     public void setSatSolver( String s ) { satSolver = s; }
     public void setSatCore( String s ) { satCore = s; }
@@ -841,7 +841,7 @@ outer:
     private Map bitsMap = new HashMap();
     /** Make sure that the physical domain to which attribute is assigned has
      * at least as many bits as the domain of the attribute. */
-    private void assigned( Type attribute, Type phys ) throws SemanticException {
+    private void assigned( Type attribute, Type phys, BDDExpr expr ) throws SemanticException {
         FieldDecl domainDecl = ts.getField( (ClassType) attribute, "domain" );
         Type domain = domainDecl.declType();
         if( !( domain instanceof ClassType ) ) throw new SemanticException(
@@ -862,6 +862,13 @@ outer:
         Integer physBits = (Integer) bitsMap.get( phys );
         if( physBits == null || physBits.intValue() < bits ) {
             physBits = new Integer( bits );
+            if(DEBUG) {
+                StdErrorQueue seq = new StdErrorQueue( System.err, 0, "" );
+                seq.displayError(
+                        new ErrorInfo(ErrorInfo.WARNING,
+                        "Setting "+phys+" to "+bits,
+                        expr.position()));
+            }
         }
         bitsMap.put( phys, physBits );
     }
@@ -895,7 +902,7 @@ outer:
             }
             for( Iterator pairIt = t.domainPairs().iterator(); pairIt.hasNext(); ) {
                 final Type[] pair = (Type[]) pairIt.next();
-                assigned( pair[0], pair[1] );
+                assigned( pair[0], pair[1], expr );
             }
         }
 

@@ -1,5 +1,5 @@
 /* Jedd - A language for implementing relations using BDDs
- * Copyright (C) 2003 Ondrej Lhotak
+ * Copyright (C) 2003, 2004, 2005 Ondrej Lhotak
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -57,6 +57,11 @@ public class Profiler
         if( e.time > 0 ) events.add( e );
         //events.add( e );
         e.output = new BDD(bdd);
+        if(e.time < 10) {
+            e.inputA.shape = null;
+            e.inputB.shape = null;
+            e.output.shape = null;
+        }
     }
     public void printInfo( PrintStream out ) {
         long totalTime = 0;
@@ -99,6 +104,7 @@ public class Profiler
         StringTokenizer st = new StringTokenizer(stack,"\n");
         String token;
         while(true) {
+            if( !st.hasMoreTokens() ) throw new RuntimeException("error parsing stack trace: "+stack);
             token = st.nextToken();
             if( token.indexOf("at jedd.Relation") >= 0 ) break;
             if( token.indexOf("at jedd.Jedd") >= 0 ) break;
@@ -106,6 +112,7 @@ public class Profiler
             if( token.indexOf("at jedd.internal.Jedd") >= 0 ) break;
         }
         while(true) {
+            if( !st.hasMoreTokens() ) throw new RuntimeException("error parsing stack trace: "+stack);
             token = st.nextToken();
             if( token.indexOf("at jedd.Relation") < 0
             &&  token.indexOf("at jedd.Jedd") < 0
@@ -158,9 +165,11 @@ public class Profiler
         }
         public String toString() {
             StringBuffer b = new StringBuffer();
-            for( int i = 0; i < shape.length; i++ ) {
-                if( shape[i] > 0 ) 
-                    b.append("insert into shapes values( "+id+", "+i+", "+shape[i]+" );\n" );
+            if( shape != null ) {
+                for( int i = 0; i < shape.length; i++ ) {
+                    if( shape[i] > 0 ) 
+                        b.append("insert into shapes values( "+id+", "+i+", "+shape[i]+" );\n" );
+                }
             }
             b.append("insert into sizes values( "+id+", "+nodeCount+" );");
             return b.toString();

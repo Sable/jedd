@@ -1,6 +1,7 @@
 import java.io.*;
 import java.util.*;
 import jedd.*;
+import jedd.order.*;
 import java.util.zip.*;
 import attributes.*;
 import domains.*;
@@ -34,13 +35,10 @@ public class Prop {
         }
     }
     public final void main() throws Exception {
-        PhysicalDomain[] interleaved = { V1.v(), V2.v(), FD.v(), H1.v(), H2.v() };
-        PhysicalDomain[] v1v2 = { V1.v(), V2.v() };
-        Object[] order = { FD.v(), V1.v(), V2.v(), H1.v(), H2.v() };
-        //Object[] order = { FD.v(), v1v2, H1.v(), H2.v() };
-        //Object[] order = { H2.v(), H1.v(), v1v2, FD.v() };
-        //Object[] order = { interleaved };
-        Jedd.v().setOrder( order, true );
+        //Jedd.v().setOrder( new Seq(FD.v(), new Interleave(V1.v(), V2.v()), H1.v(), H2.v()));
+        //Jedd.v().setOrder( new Seq(H2.v(), H2.v(), new Interleave(V1.v(), V2.v()), FD.v()));
+        //Jedd.v().setOrder( new Interleave(FD.v(), V1.v(), V2.v(), H1.v(), H2.v()) );
+        Jedd.v().setOrder( new Seq(FD.v(), V1.v(), V2.v(), H1.v(), H2.v()) );
 
         parseInput();
 

@@ -20,6 +20,7 @@
 package jedd.internal;
 import java.util.*;
 import jedd.*;
+import jedd.order.*;
 
 public class Jedd {
     private static Jedd instance = new Jedd();
@@ -169,45 +170,8 @@ public class Jedd {
         Backend.v().gbc();
     }
 
-    public void setOrder( Object[] order, boolean msbAtTop ) {
-        List newOrder = new ArrayList();
-
-        for( int i = 0; i < order.length; i++ ) {
-            Object o = order[i];
-            if( o instanceof PhysicalDomain ) {
-                PhysicalDomain pd = (PhysicalDomain) o;
-                pd.clearPhysPos();
-                int[] vars = pd.getBits();
-                if( msbAtTop ) reverse( vars );
-                for( int k = 0; k < vars.length; k++ ) {
-                    pd.setPhysPos(newOrder.size());
-                    newOrder.add( new Integer( vars[k] ) );
-                }
-            } else if( o instanceof Object[] ) {
-                PhysicalDomain[] domains = (PhysicalDomain[]) o;
-                int[][] vars = new int[domains.length][];
-                int maxLen = 0;
-                for( int j = 0; j < domains.length; j++ ) {
-                    domains[j].clearPhysPos();
-                    vars[j] = domains[j].getBits();
-                    if( msbAtTop ) reverse( vars[j] );
-                    if( maxLen < vars[j].length ) maxLen = vars[j].length;
-                }
-                boolean change = true;
-                for( int j = 0; change; j++ ) {
-                    change = false;
-                    for( int k = 0; k < vars.length; k++ ) {
-                        int jj = j - (maxLen-vars[k].length);
-                        if( !msbAtTop ) jj = j;
-                        if( jj >= 0 && jj < vars[k].length ) {
-                            domains[k].setPhysPos(newOrder.size());
-                            newOrder.add( new Integer( vars[k][jj] ) );
-                            change = true;
-                        }
-                    }
-                }
-            } else throw new RuntimeException();
-        }
+    public void setOrder( Order order ) {
+        List newOrder = order.listBits();
         int[] buddyOrder = new int[newOrder.size()];
         if( buddyOrder.length != Backend.v().numBits() ) {
             throw new RuntimeException( "Not all domains in variable order" );
@@ -215,6 +179,10 @@ public class Jedd {
         int j = 0;
         for( Iterator iIt = newOrder.iterator(); iIt.hasNext(); ) {
             final Integer i = (Integer) iIt.next();
+            for( Iterator pdIt = physicalDomains.iterator(); pdIt.hasNext(); ) {
+                final PhysicalDomain pd = (PhysicalDomain) pdIt.next();
+                if( pd.hasBit(i.intValue()) ) pd.setPhysPos(j);
+            }
             buddyOrder[j++] = i.intValue();
         }
         Backend.v().setOrder( buddyOrder );

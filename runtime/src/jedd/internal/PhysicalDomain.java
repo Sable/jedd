@@ -20,7 +20,7 @@
 package jedd.internal;
 import java.util.*;
 
-public abstract class PhysicalDomain {
+public abstract class PhysicalDomain implements jedd.order.Order {
     public abstract int bits();
 
     public String name() {
@@ -60,6 +60,13 @@ public abstract class PhysicalDomain {
     private int firstBit;
     public int firstBit() { return firstBit; }
     public int bitAfterLast() { return firstBit + bits(); }
+    public List listBits() {
+        LinkedList ret = new LinkedList();
+        for( int i = 0; i < bits(); i++ ) {
+            ret.addFirst(new Integer(i+firstBit));
+        }
+        return ret;
+    }
 
     public int[] getBits() {
         int[] ret = new int[bits()];
@@ -80,5 +87,10 @@ public abstract class PhysicalDomain {
     public void setPhysPos(int pos) { 
         if( pos < minPhysPos ) minPhysPos = pos;
         if( pos > maxPhysPos ) maxPhysPos = pos;
+    }
+    public boolean hasBit(int bit) {
+        if(bit < firstBit) return false;
+        if(bit >= firstBit + bits()) return false;
+        return true;
     }
 }
