@@ -28,20 +28,13 @@ import polyglot.util.*;
 import polyglot.visit.*;
 import java.util.*;
 
-public class JeddCallExt_c extends JeddExt_c
+public class JeddNewExt_c extends JeddExt_c
 {
     public Node generateJava( JeddTypeSystem ts, JeddNodeFactory nf ) throws SemanticException {
-        Call n = (Call) node();
+        New n = (New) node();
 
         CanonicalTypeNode jeddRelation =  nf.CanonicalTypeNode( n.position(), ts.relation() );
 
-        Receiver target = n.target();
-        if( target instanceof Expr ) {
-            Expr tgt = (Expr) target;
-            if( tgt.type() instanceof BDDType ) {
-                n = n.target( newRelation( ts, nf, (BDDType) tgt.type(), tgt ) );
-            }
-        }
         List newArgs = new LinkedList();
         for( Iterator argIt = n.arguments().iterator(); argIt.hasNext(); ) {
             final Expr arg = (Expr) argIt.next();

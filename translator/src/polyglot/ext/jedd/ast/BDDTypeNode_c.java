@@ -84,7 +84,11 @@ public class BDDTypeNode_c extends TypeNode_c implements BDDTypeNode, JeddGenera
         return ret;
     }
     public Node generateJava( JeddTypeSystem ts, JeddNodeFactory nf ) throws SemanticException {
-        return nf.CanonicalTypeNode( position(), ts.relation()).type(type);
+        return this;
+    }
+    public void translate(CodeWriter w, Translator tr) {
+        tr.nodeFactory().CanonicalTypeNode( position(),
+                ((JeddTypeSystem) tr.typeSystem()).relation()).translate(w, tr);
     }
 }
 

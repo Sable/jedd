@@ -94,12 +94,14 @@ public class Replace_c extends FixPhys_c implements Replace, JeddGenerateJava, J
 
         Set seenAlready = new HashSet();
         List newDomains = new LinkedList();
+outer:
         for( Iterator exprPairIt = exprType.domainPairs().iterator(); exprPairIt.hasNext(); ) {
             final Type[] exprPair = (Type[]) exprPairIt.next();
             Type[] newDomain = new Type[2];
             for( Iterator pairIt = domainPairs.iterator(); pairIt.hasNext(); ) {
                 final TypeNode[] pair = (TypeNode[]) pairIt.next();
                 if( !pair[0].type().equals( exprPair[0] ) ) continue;
+                if( pair[1] == null ) continue outer;
                 if( pair[1].type().isSubtype( ts.physicalDomain() ) ) {
                     if( newDomain[1] != null ) {
                         throw new SemanticException( "Multiple physical domains specified for domain "+pair[0].type() );
@@ -129,13 +131,14 @@ public class Replace_c extends FixPhys_c implements Replace, JeddGenerateJava, J
         BDDType exprType = (BDDType) expr.type();
         Map exprMap = exprType.map();
 
+outer:
         for( Iterator exprPairIt = exprType.domainPairs().iterator(); exprPairIt.hasNext(); ) {
-
             final Type[] exprPair = (Type[]) exprPairIt.next();
             Type[] newDomain = new Type[2];
             for( Iterator pairIt = domainPairs.iterator(); pairIt.hasNext(); ) {
                 final TypeNode[] pair = (TypeNode[]) pairIt.next();
                 if( !pair[0].type().equals( exprPair[0] ) ) continue;
+                if( pair[1] == null ) continue outer;
                 if( pair[1].type().isSubtype( ts.physicalDomain() ) ) {
                     newDomain[1] = pair[1].type();
                 } else {
@@ -162,47 +165,78 @@ public class Replace_c extends FixPhys_c implements Replace, JeddGenerateJava, J
 
         List from = new LinkedList();
         List to = new LinkedList();
+        List project = new LinkedList();
+outer:
         for( Iterator pairIt = exprType.domainPairs().iterator(); pairIt.hasNext(); ) {
             final Type[] pair = (Type[]) pairIt.next();
             Type phys = pair[1];
             for( Iterator repPairIt = domainPairs().iterator(); repPairIt.hasNext(); ) {
                 final TypeNode[] repPair = (TypeNode[]) repPairIt.next();
-                if( repPair[0].type().equals( pair[0] ) ) {
-                    if( repPair[1].type().isSubtype( ts.domain() ) ) {
-                        phys = (Type) map.get( repPair[1].type() );
-                    } else {
-                        phys = repPair[1].type();
-                    }
+                if( !repPair[0].type().equals( pair[0] ) ) continue;
+                if( repPair[1] == null ) {
+                    project.add( nf.Call( p, nf.CanonicalTypeNode( p, phys ), "v" ) );
+                    continue outer;
+                }
+                if( repPair[1].type().isSubtype( ts.domain() ) ) {
+                    phys = (Type) map.get( repPair[1].type() );
+                } else {
+                    phys = repPair[1].type();
                 }
             }
             if( phys.equals( pair[1] ) ) continue;
             from.add( nf.Call( p, nf.CanonicalTypeNode( p, pair[1] ), "v" ) );
             to.add( nf.Call( p, nf.CanonicalTypeNode( p, phys ), "v" ) );
         }
-        if( from.isEmpty() ) return expr().type(type);
 
-        Call getJedd = nf.Call( p, nf.CanonicalTypeNode( p, ts.jedd() ), "v"  ); 
+        Expr ret = expr().type(type);
+        Call getJedd = null;
+        if( !project.isEmpty() ) {
+            if( getJedd == null ) {
+                getJedd = nf.Call( p, nf.CanonicalTypeNode( p, ts.jedd() ), "v"  ); 
+            }
 
-        return nf.Call( 
-                p,
-                getJedd,
-                "replace",
-                expr(),
-                nf.NewArray(
+            ret = nf.Call( 
                     p,
-                    nf.CanonicalTypeNode( p, ts.physicalDomain() ),
-                    new LinkedList(),
-                    1,
-                    nf.ArrayInit( p, from )
-                    ),
-                nf.NewArray(
+                    getJedd,
+                    "project",
+                    ret,
+                    nf.NewArray(
+                        p,
+                        nf.CanonicalTypeNode( p, ts.physicalDomain() ),
+                        new LinkedList(),
+                        1,
+                        nf.ArrayInit( p, project )
+                        )
+                    ).type( type );
+        }
+
+        if( !from.isEmpty() ) {
+            if( getJedd == null ) {
+                getJedd = nf.Call( p, nf.CanonicalTypeNode( p, ts.jedd() ), "v"  ); 
+            }
+
+            ret = nf.Call( 
                     p,
-                    nf.CanonicalTypeNode( p, ts.physicalDomain() ),
-                    new LinkedList(),
-                    1,
-                    nf.ArrayInit( p, to )
-                    )
-                ).type( type );
+                    getJedd,
+                    "replace",
+                    ret,
+                    nf.NewArray(
+                        p,
+                        nf.CanonicalTypeNode( p, ts.physicalDomain() ),
+                        new LinkedList(),
+                        1,
+                        nf.ArrayInit( p, from )
+                        ),
+                    nf.NewArray(
+                        p,
+                        nf.CanonicalTypeNode( p, ts.physicalDomain() ),
+                        new LinkedList(),
+                        1,
+                        nf.ArrayInit( p, to )
+                        )
+                    ).type( type );
+        }
+        return ret;
     }
 }
 
