@@ -655,6 +655,8 @@ extern int bdd_setpairs(bddPair *,int [],int [],int);
 extern int bdd_makeset(int [],int);
 extern void bdd_setvarorder(int []);
 extern void allCubes(int,int []);
+extern int nextCube(int,int,int []);
+extern int firstCube(int,int,int []);
 extern void getShape(int,int []);
 extern char const *bdd_errno;
 extern void setuperrorhandler();
@@ -903,6 +905,64 @@ JNIEXPORT void JNICALL Java_jedd_internal_buddy_BuddyJNI_allCubes(JNIEnv *jenv, 
     }
     SWIG_JavaArrayArgoutInt(jenv, jarr2, arg2, jarg2); 
     free(arg2); 
+}
+
+
+JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_nextCube(JNIEnv *jenv, jclass jcls, jint jarg1, jint jarg2, jintArray jarg3) {
+    jint jresult = 0 ;
+    int arg1 ;
+    int arg2 ;
+    int *arg3 ;
+    int result;
+    jint *jarr3 ;
+    
+    (void)jenv;
+    (void)jcls;
+    arg1 = (int)jarg1; 
+    arg2 = (int)jarg2; 
+    if (!SWIG_JavaArrayInInt(jenv, &jarr3, &arg3, jarg3)) return 0; 
+    {
+        result = (int)nextCube(arg1,arg2,arg3);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
+    jresult = (jint)result; 
+    SWIG_JavaArrayArgoutInt(jenv, jarr3, arg3, jarg3); 
+    free(arg3); 
+    return jresult;
+}
+
+
+JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_firstCube(JNIEnv *jenv, jclass jcls, jint jarg1, jint jarg2, jintArray jarg3) {
+    jint jresult = 0 ;
+    int arg1 ;
+    int arg2 ;
+    int *arg3 ;
+    int result;
+    jint *jarr3 ;
+    
+    (void)jenv;
+    (void)jcls;
+    arg1 = (int)jarg1; 
+    arg2 = (int)jarg2; 
+    if (!SWIG_JavaArrayInInt(jenv, &jarr3, &arg3, jarg3)) return 0; 
+    {
+        result = (int)firstCube(arg1,arg2,arg3);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
+    jresult = (jint)result; 
+    SWIG_JavaArrayArgoutInt(jenv, jarr3, arg3, jarg3); 
+    free(arg3); 
+    return jresult;
 }
 
 

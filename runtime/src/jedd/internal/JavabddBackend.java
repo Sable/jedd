@@ -156,8 +156,8 @@ public class JavabddBackend extends Backend {
         manager.setVarOrder( level2var );
     }
 
-    void allCubes( RelationInstance r, int cubes[] ) {
-        // TODO: implement for javabdd
+    Iterator cubeIterator( RelationInstance r ) {
+        throw new RuntimeException("NYI");
     }
 
     int numNodes( RelationInstance r ) {

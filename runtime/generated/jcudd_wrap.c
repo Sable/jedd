@@ -660,6 +660,10 @@ extern void setPairs(DdManager *,bddPair,int [],int []);
 extern DdNode *swapVariables(DdManager *,DdNode *,bddPair);
 extern int equals(DdNode *,DdNode *);
 extern void allCubes(DdManager *,int,DdNode *,int []);
+extern DdGen *firstCube(DdManager *,DdNode *,int,int []);
+extern int nextCube(DdGen *,int,int []);
+extern void freeIterator(DdGen *);
+extern int isNull(DdGen *);
 
 typedef union {
 	double value;	/* for constant nodes */
@@ -1365,6 +1369,78 @@ JNIEXPORT void JNICALL Java_jedd_internal_cudd_CuddJNI_allCubes(JNIEnv *jenv, jc
     
     SWIG_JavaArrayArgoutInt(jenv, jarr4, arg4, jarg4); 
     free(arg4); 
+}
+
+
+JNIEXPORT jlong JNICALL Java_jedd_internal_cudd_CuddJNI_firstCube(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jint jarg3, jintArray jarg4) {
+    jlong jresult = 0 ;
+    DdManager *arg1 = (DdManager *) 0 ;
+    DdNode *arg2 = (DdNode *) 0 ;
+    int arg3 ;
+    int *arg4 ;
+    DdGen *result;
+    jint *jarr4 ;
+    
+    (void)jenv;
+    (void)jcls;
+    arg1 = *(DdManager **)&jarg1; 
+    arg2 = *(DdNode **)&jarg2; 
+    arg3 = (int)jarg3; 
+    if (!SWIG_JavaArrayInInt(jenv, &jarr4, &arg4, jarg4)) return 0; 
+    result = (DdGen *)firstCube(arg1,arg2,arg3,arg4);
+    
+    *(DdGen **)&jresult = result; 
+    SWIG_JavaArrayArgoutInt(jenv, jarr4, arg4, jarg4); 
+    free(arg4); 
+    return jresult;
+}
+
+
+JNIEXPORT jint JNICALL Java_jedd_internal_cudd_CuddJNI_nextCube(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2, jintArray jarg3) {
+    jint jresult = 0 ;
+    DdGen *arg1 = (DdGen *) 0 ;
+    int arg2 ;
+    int *arg3 ;
+    int result;
+    jint *jarr3 ;
+    
+    (void)jenv;
+    (void)jcls;
+    arg1 = *(DdGen **)&jarg1; 
+    arg2 = (int)jarg2; 
+    if (!SWIG_JavaArrayInInt(jenv, &jarr3, &arg3, jarg3)) return 0; 
+    result = (int)nextCube(arg1,arg2,arg3);
+    
+    jresult = (jint)result; 
+    SWIG_JavaArrayArgoutInt(jenv, jarr3, arg3, jarg3); 
+    free(arg3); 
+    return jresult;
+}
+
+
+JNIEXPORT void JNICALL Java_jedd_internal_cudd_CuddJNI_freeIterator(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+    DdGen *arg1 = (DdGen *) 0 ;
+    
+    (void)jenv;
+    (void)jcls;
+    arg1 = *(DdGen **)&jarg1; 
+    freeIterator(arg1);
+    
+}
+
+
+JNIEXPORT jint JNICALL Java_jedd_internal_cudd_CuddJNI_isNull(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+    jint jresult = 0 ;
+    DdGen *arg1 = (DdGen *) 0 ;
+    int result;
+    
+    (void)jenv;
+    (void)jcls;
+    arg1 = *(DdGen **)&jarg1; 
+    result = (int)isNull(arg1);
+    
+    jresult = (jint)result; 
+    return jresult;
 }
 
 

@@ -14,6 +14,8 @@ class BuddyJNI {
   public final static native int bdd_makeset__SWIG_0(int[] jarg1, int jarg2);
   public final static native void bdd_setvarorder__SWIG_0(int[] jarg1);
   public final static native void allCubes(int jarg1, int[] jarg2);
+  public final static native int nextCube(int jarg1, int jarg2, int[] jarg3);
+  public final static native int firstCube(int jarg1, int jarg2, int[] jarg3);
   public final static native void getShape(int jarg1, int[] jarg2);
   public final static native void set_bdd_errno(String jarg1);
   public final static native String get_bdd_errno();

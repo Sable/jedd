@@ -26,6 +26,14 @@ public class Buddy {
     BuddyJNI.allCubes(r, cubes);
   }
 
+  public static int nextCube(int r, int n, int[] cube) {
+    return BuddyJNI.nextCube(r, n, cube);
+  }
+
+  public static int firstCube(int r, int n, int[] cube) {
+    return BuddyJNI.firstCube(r, n, cube);
+  }
+
   public static void getShape(int bdd, int[] shape) {
     BuddyJNI.getShape(bdd, shape);
   }

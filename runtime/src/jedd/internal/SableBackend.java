@@ -144,6 +144,10 @@ public class SableBackend extends Backend {
         // TODO: implement in SableJBDD
     }
 
+    Iterator cubeIterator( RelationInstance r ) {
+        // TODO: implement in SableJBDD
+        throw new RuntimeException("NYI");
+    }
     void allCubes( RelationInstance r, int cubes[] ) {
         // TODO: implement in SableJBDD
     }

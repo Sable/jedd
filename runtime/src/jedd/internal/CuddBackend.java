@@ -159,9 +159,32 @@ public class CuddBackend extends Backend {
         Cudd.Cudd_ShuffleHeap( manager, level2var );
     }
 
+    Iterator cubeIterator( final RelationInstance r ) {
+        return new Iterator() {
+            int[] cubes = new int[totalBits];
+            SWIGTYPE_p_DdGen iterator = Cudd.firstCube(manager, bdd(r), cubes.length, cubes);
+            public boolean hasNext() { return iterator != null && Cudd.isNull(iterator) == 0; }
+            public Object next() {
+                int[] ret = new int[totalBits];
+                System.arraycopy( cubes, 0, ret, 0, totalBits );
+                boolean done = (0 == Cudd.nextCube(iterator, cubes.length, cubes));
+                if( done ) iterator = null;
+                return ret;
+            }
+            public void remove() {
+                throw new UnsupportedOperationException();
+            }
+            public void finalize() {
+                if( iterator != null && Cudd.isNull(iterator) == 0 ) Cudd.freeIterator(iterator);
+            }
+        };
+    }
+
+    /*
     void allCubes( RelationInstance r, int cubes[] ) {
         Cudd.allCubes( manager, totalBits, bdd(r), cubes );
     }
+    */
 
     int numNodes( RelationInstance r ) {
         return Cudd.Cudd_DagSize(bdd(r));

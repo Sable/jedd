@@ -27,6 +27,10 @@ class CuddJNI {
   public final static native long swapVariables(long jarg1, long jarg2, long jarg3);
   public final static native int equals(long jarg1, long jarg2);
   public final static native void allCubes(long jarg1, int jarg2, long jarg3, int[] jarg4);
+  public final static native long firstCube(long jarg1, long jarg2, int jarg3, int[] jarg4);
+  public final static native int nextCube(long jarg1, int jarg2, int[] jarg3);
+  public final static native void freeIterator(long jarg1);
+  public final static native int isNull(long jarg1);
   public final static native String get_CUDD_VERSION();
   public final static native int get_SIZEOF_VOID_P();
   public final static native int get_SIZEOF_INT();

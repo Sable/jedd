@@ -1,5 +1,5 @@
 /* Jedd - A language for implementing relations using BDDs
- * Copyright (C) 2003 Ondrej Lhotak
+ * Copyright (C) 2003, 2004 Ondrej Lhotak
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -179,29 +179,30 @@ public class RelationContainer implements Relation {
             this.attribute = attribute;
             this.ret = new Object[attribute.length];
             this.ret2 = new Object[attribute.length];
-            ncubes = Backend.v().numPaths( bdd );
             nbits = Backend.v().numBits();
-            cubes = new int[ ncubes * nbits ];
-            Backend.v().allCubes( bdd, cubes );
             curcube = new int[nbits];
-            if( ncubes > 0 ) newCube();
+            cubeIt = Backend.v().cubeIterator(bdd);
+            newCube();
         }
         private int[] cubes;
-        private int ncubes;
         private int nbits;
-        private int current = 0;
         private int[] curcube;
         private Object[] ret;
         private Object[] ret2;
         private PhysicalDomain[] phys;
         private Attribute[] attribute;
+        private Iterator cubeIt;
 
-        public boolean hasNext() { return current < ncubes*nbits; }
+        public boolean hasNext() { return cubes != null; }
         private void newCube() {
-            
+            if( !cubeIt.hasNext() ) {
+                cubes = null;
+                return;
+            }
+            cubes = (int[]) cubeIt.next();
             for( int j = 0; j < phys.length; j++ ) {
                 for( int i = phys[j].firstBit(); i < phys[j].bitAfterLast(); i++ ) {
-                    if( cubes[i+current] == 1 ) curcube[i] = 1;
+                    if( cubes[i] == 1 ) curcube[i] = 1;
                     else curcube[i] = 0;
                 }
             }
@@ -212,12 +213,12 @@ public class RelationContainer implements Relation {
                 ret[i] = attribute[i].numberer().get( phys[i].readBits( curcube ) );
         }
         private void advance() {
-            if( current >= ncubes*nbits ) throw new RuntimeException( "advancing past end of iterator" );
+            if( cubes == null ) throw new RuntimeException( "advancing past end of iterator" );
 
             for( int j = 0; j < phys.length; j++ ) {
                 for( int i = phys[j].bitAfterLast()-1; i >= phys[j].firstBit(); i-- ) {
-                    if( cubes[current+i] == 0 ) continue;
-                    if( cubes[current+i] == 1 ) continue;
+                    if( cubes[i] == 0 ) continue;
+                    if( cubes[i] == 1 ) continue;
                     if( curcube[i] == 1 ) curcube[i] = 0;
                     else {
                         curcube[i] = 1;
@@ -226,12 +227,10 @@ public class RelationContainer implements Relation {
                     }
                 }
             }
-            current += nbits;
-            if( current < ncubes*nbits ) newCube();
+            newCube();
         }
         public Object next() {
             for( int i = 0; i < attribute.length; i++ ) ret2[i] = ret[i];
-            //debug();
             advance();
             return ret2;
         }
@@ -244,86 +243,15 @@ public class RelationContainer implements Relation {
         if( attributes.length != 1 ) {
             throw new RuntimeException( "Can only get iterator over single-attribute BDD." );
         }
-        return new RelationIterator( bdd, phys[0], attributes[0] );
+        return new RelationIterator( bdd, phys, attributes );
     }
     
-    class RelationIterator implements Iterator {
-        RelationIterator( RelationInstance bdd, PhysicalDomain phys, Attribute attribute ) {
-            this.phys = phys;
-            this.attribute = attribute;
-            ncubes = Backend.v().numPaths( bdd );
-            nbits = Backend.v().numBits();
-            cubes = new int[ ncubes * nbits ];
-            Backend.v().allCubes( bdd, cubes );
-            curcube = new int[nbits];
-            if( ncubes > 0 ) newCube();
-        }
-        private int[] cubes;
-        private int ncubes;
-        private int nbits;
-        private int current = 0;
-        private int[] curcube;
-        private Object ret;
-        private PhysicalDomain phys;
-        private Attribute attribute;
-
-        public boolean hasNext() { return current < ncubes*nbits; }
-        private void newCube() {
-            
-            for( int i = phys.firstBit(); i < phys.bitAfterLast(); i++ ) {
-                if( cubes[i+current] == 1 ) curcube[i] = 1;
-                else curcube[i] = 0;
-            }
-            curCubeToObject();
-        }
-        private void curCubeToObject() {
-            ret = attribute.numberer().get( phys.readBits( curcube ) );
-        }
-        private void advance() {
-            if( current >= ncubes*nbits ) throw new RuntimeException( "advancing past end of iterator" );
-
-            for( int i = phys.bitAfterLast()-1; i >= phys.firstBit(); i-- ) {
-                if( cubes[current+i] == 0 ) continue;
-                if( cubes[current+i] == 1 ) continue;
-                if( curcube[i] == 1 ) curcube[i] = 0;
-                else {
-                    curcube[i] = 1;
-                    curCubeToObject();
-                    return;
-                }
-            }
-            current += nbits;
-            if( current < ncubes*nbits ) newCube();
-        }
-        public void debug() {
-            System.out.println( "ncubes = "+ncubes+" nbits = "+nbits+" current = "+current );
-            System.out.print( "cube is: " );
-            for( int i = phys.firstBit(); i < phys.bitAfterLast(); i++ ) System.out.print( cubes[current+i] );
-            System.out.println("");
-            System.out.print( "full cube is: " );
-            for( int i = 0; i < nbits; i++ ) System.out.print( cubes[current+i] );
-            System.out.println("");
-            System.out.println( "all cubes are: " );
-            for( int i = 0; i < ncubes; i++ ) {
-                for( int j = 0; j < nbits; j++ ) {
-                    System.out.print( cubes[i*nbits+j] );
-                }
-                System.out.println("");
-            }
-            System.out.print( "curcube is: " );
-            for( int i = phys.firstBit(); i < phys.bitAfterLast(); i++ ) System.out.print( curcube[i] );
-            System.out.println("");
-            System.out.println( "index is: "+phys.readBits( curcube ) );
-            System.out.println( "object is: "+attribute.numberer().get( phys.readBits( curcube ) ) );
+    class RelationIterator extends MultiRelationIterator {
+        RelationIterator( RelationInstance bdd, PhysicalDomain[] phys, Attribute[] attribute ) {
+            super(bdd, phys, attribute);
         }
         public Object next() {
-            Object r = ret;
-            //debug();
-            advance();
-            return r;
-        }
-        public void remove() {
-            throw new UnsupportedOperationException();
+            return ((Object[]) super.next())[0];
         }
     }
 

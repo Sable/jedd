@@ -4,6 +4,8 @@ extern void     bdd_setvarorder(int[]);
 
 
 extern void     allCubes( int r, int cubes[] );
+extern int      nextCube( int r, int n, int cube[] );
+extern int      firstCube( int r, int n, int cube[] );
 extern void     getShape( int bdd, int shape[] );
 
 extern const char* bdd_errno;

@@ -151,9 +151,28 @@ public class BuddyBackend extends Backend {
         Buddy.bdd_setvarorder( level2var );
     }
 
+    Iterator cubeIterator( final RelationInstance r ) {
+        return new Iterator() {
+            int[] cubes = new int[totalBits];
+            boolean done = (0 == Buddy.firstCube(bdd(r), cubes.length, cubes));
+            public boolean hasNext() { return !done; }
+            public Object next() {
+                int[] ret = new int[totalBits];
+                System.arraycopy( cubes, 0, ret, 0, totalBits );
+                done = (0 == Buddy.nextCube(bdd(r), cubes.length, cubes));
+                return ret;
+            }
+            public void remove() {
+                throw new UnsupportedOperationException();
+            }
+        };
+    }
+
+    /*
     void allCubes( RelationInstance r, int cubes[] ) {
         Buddy.allCubes( bdd(r), cubes );
     }
+    */
 
     int numNodes( RelationInstance r ) {
         return Buddy.bdd_nodecount(bdd(r));

@@ -42,3 +42,32 @@ extern void allCubes( DdManager* manager, int totalBits, DdNode* r, int cubes[] 
     Cudd_GenFree( iterator );
 }
 
+extern DdGen* firstCube( DdManager* manager, DdNode* r, int n, int cube[] ) {
+    CUDD_VALUE_TYPE dummy;
+    int* cubein;
+    DdGen* iterator = Cudd_FirstCube( manager, r, &cubein, &dummy );
+    if( iterator == NULL ) return NULL;
+    memcpy( cube, cubein, n*sizeof(*cube) );
+    return iterator;
+}
+
+extern int nextCube( DdGen* iterator, int n, int cube[] ) {
+    CUDD_VALUE_TYPE dummy;
+    int* cubein;
+    int ret = Cudd_NextCube( iterator, &cubein, &dummy );
+    if( !ret ) {
+        Cudd_GenFree( iterator );
+        return 0;
+    }
+    memcpy( cube, cubein, n*sizeof(*cube) );
+    return 1;
+}
+
+extern int isNull( DdGen* iterator ) {
+    return iterator == NULL;
+}
+
+extern void freeIterator( DdGen* iterator ) {
+    Cudd_GenFree( iterator );
+}
+

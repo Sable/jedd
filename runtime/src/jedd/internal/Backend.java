@@ -59,7 +59,8 @@ public abstract class Backend {
 
     abstract void setOrder( int level2var[] );
 
-    abstract void allCubes( RelationInstance r, int cubes[] );
+    //abstract void allCubes( RelationInstance r, int cubes[] );
+    abstract Iterator cubeIterator( RelationInstance r );
 
     abstract int numNodes( RelationInstance r );
     abstract int numPaths( RelationInstance r );

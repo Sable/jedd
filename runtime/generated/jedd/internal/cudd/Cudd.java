@@ -50,6 +50,23 @@ public class Cudd {
     CuddJNI.allCubes(SWIGTYPE_p_DdManager.getCPtr(manager), totalBits, SWIGTYPE_p_DdNode.getCPtr(r), cubes);
   }
 
+  public static SWIGTYPE_p_DdGen firstCube(SWIGTYPE_p_DdManager manager, SWIGTYPE_p_DdNode r, int n, int[] cube) {
+    long cPtr = CuddJNI.firstCube(SWIGTYPE_p_DdManager.getCPtr(manager), SWIGTYPE_p_DdNode.getCPtr(r), n, cube);
+    return (cPtr == 0) ? null : new SWIGTYPE_p_DdGen(cPtr, false);
+  }
+
+  public static int nextCube(SWIGTYPE_p_DdGen iterator, int n, int[] cube) {
+    return CuddJNI.nextCube(SWIGTYPE_p_DdGen.getCPtr(iterator), n, cube);
+  }
+
+  public static void freeIterator(SWIGTYPE_p_DdGen iterator) {
+    CuddJNI.freeIterator(SWIGTYPE_p_DdGen.getCPtr(iterator));
+  }
+
+  public static int isNull(SWIGTYPE_p_DdGen iterator) {
+    return CuddJNI.isNull(SWIGTYPE_p_DdGen.getCPtr(iterator));
+  }
+
   public static SWIGTYPE_p_DdNode Cudd_addNewVar(SWIGTYPE_p_DdManager dd) {
     long cPtr = CuddJNI.Cudd_addNewVar(SWIGTYPE_p_DdManager.getCPtr(dd));
     return (cPtr == 0) ? null : new SWIGTYPE_p_DdNode(cPtr, false);
