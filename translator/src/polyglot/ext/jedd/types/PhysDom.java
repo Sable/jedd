@@ -1292,8 +1292,8 @@ outer:
                     if( !nodes.contains(adj1) ) continue;
                     for( Iterator adj2It = nodes.iterator(); adj2It.hasNext(); ) {
                         final DNode adj2 = (DNode) adj2It.next();
-                        if( adj1 == adj2 ) continue;
-                        if( adj1 == node ) continue;
+                        if( adj2 == adj1 ) continue;
+                        if( adj2 == node ) continue;
 
                         Clause cl = new Clause();
                         if( INCLUDE_COMMENTS )

@@ -19,6 +19,7 @@
 
 package polyglot.ext.jedd.types;
 
+import polyglot.util.*;
 import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.ext.jl.ast.*;
@@ -119,7 +120,7 @@ public class DNode {
 
             if( phys != null ) {
                 if( rep.phys != null && rep.phys != phys ) {
-                    throw new RuntimeException( "trying to merge node "+this+" with phys "+phys+" with node "+rep+" with phys "+rep.phys );
+                    throw new InternalCompilerError( "trying to merge node "+this+" with phys "+phys+" with node "+rep+" with phys "+rep.phys, rep.expr.position() );
                 }
                 rep.phys = phys;
             }

@@ -29,34 +29,40 @@ import java.util.*;
  * DelFactory for jedd extension.
  */
 public class JeddDelFactory_c extends AbstractDelFactory_c {
-    public JL delBinaryImpl() {
-        return new JeddDel_c();
-    }
     public JL delAssignImpl() {
         return new JeddDel_c();
     }
-    public JL delLocalDeclImpl() {
-        return new JeddDel_c();
-    }
-    public JL delFieldDeclImpl() {
-        return new JeddDel_c();
-    }
-    public JL delLocalImpl() {
-        return new JeddDel_c();
-    }
-    public JL delFieldImpl() {
-        return new JeddDel_c();
-    }
-    public JL delMethodDeclImpl() {
-        return new JeddDel_c();
-    }
-    public JL delConstructorDeclImpl() {
+    public JL delBinaryImpl() {
         return new JeddDel_c();
     }
     public JL delCallImpl() {
         return new JeddDel_c();
     }
     public JL delConstructorCallImpl() {
+        return new JeddDel_c();
+    }
+    public JL delConstructorDeclImpl() {
+        return new JeddDel_c();
+    }
+    public JL delFieldDeclImpl() {
+        return new JeddDel_c();
+    }
+    public JL delFieldImpl() {
+        return new JeddDel_c();
+    }
+    public JL delLocalDeclImpl() {
+        return new JeddDel_c();
+    }
+    public JL delLocalImpl() {
+        return new JeddDel_c();
+    }
+    public JL delMethodDeclImpl() {
+        return new JeddDel_c();
+    }
+    public JL delNewImpl() {
+        return new JeddDel_c();
+    }
+    public JL delReturnImpl() {
         return new JeddDel_c();
     }
 }
