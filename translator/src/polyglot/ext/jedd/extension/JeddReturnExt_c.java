@@ -31,6 +31,15 @@ import java.util.*;
 
 public class JeddReturnExt_c extends JeddExt_c implements JeddPhysicalDomains
 {
+    public Node generateJava( JeddTypeSystem ts, JeddNodeFactory nf ) throws SemanticException {
+        Return n = (Return) node();
+
+        if( n.expr() == null ) return n;
+        if( !( n.expr().type() instanceof BDDType ) ) return n;
+
+        return n.expr( newRelation( ts, nf, (BDDType) n.expr().type(), n.expr() ) );
+    }
+
     public Node physicalDomains( PhysicalDomains pd ) throws SemanticException {
         JeddTypeSystem ts = pd.jeddTypeSystem();
 

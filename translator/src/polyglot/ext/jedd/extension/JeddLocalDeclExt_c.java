@@ -29,7 +29,7 @@ import polyglot.util.*;
 import polyglot.visit.*;
 import java.util.*;
 
-public class JeddLocalDeclExt_c extends JeddExt_c implements JeddTypeCheck
+public class JeddLocalDeclExt_c extends JeddExt_c implements JeddTypeCheck, JeddPhysicalDomains
 {
     public Node typeCheck( TypeChecker tc ) throws SemanticException {
         JeddNodeFactory nf = (JeddNodeFactory) tc.nodeFactory();

@@ -34,8 +34,6 @@ public class JeddCallExt_c extends JeddExt_c implements JeddPhysicalDomains
     public Node generateJava( JeddTypeSystem ts, JeddNodeFactory nf ) throws SemanticException {
         Call n = (Call) node();
 
-        CanonicalTypeNode jeddRelation =  nf.CanonicalTypeNode( n.position(), ts.relation() );
-
         Receiver target = n.target();
         if( target instanceof Expr ) {
             Expr tgt = (Expr) target;
@@ -55,6 +53,7 @@ public class JeddCallExt_c extends JeddExt_c implements JeddPhysicalDomains
 
         return n.arguments( newArgs );
     }
+
     public Node physicalDomains( PhysicalDomains pd ) throws SemanticException {
         JeddTypeSystem ts = pd.jeddTypeSystem();
 

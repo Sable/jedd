@@ -178,7 +178,7 @@ public class PhysDom {
     }
 
     Set solution = new HashSet();
-    public void runSat() {
+    public void runSat() throws SemanticException {
         int numvars = (setMap.size()+litMap.size())/2;
         if( numvars == 0 ) return;
         try {
@@ -223,6 +223,7 @@ public class PhysDom {
             }
             boolean pos[] = new boolean[numvars+1];
             boolean neg[] = new boolean[numvars+1];
+            if( soln == null ) throw new SemanticException( "SAT solver couldn't assign physical domains." );
             StringTokenizer st = new StringTokenizer( soln );
             while( st.hasMoreTokens() ) {
                 String tok = st.nextToken();
@@ -290,8 +291,8 @@ public class PhysDom {
 
     private void createLiterals() {
         for( Iterator exprIt = DNode.exprs().iterator(); exprIt.hasNext(); ) {
-            final Object expr = (Object) exprIt.next();
-            BDDType t = (BDDType) getType(expr);
+            final BDDExpr expr = (BDDExpr) exprIt.next();
+            BDDType t = expr.getType();
             Map map = t.map();
             for( Iterator domainIt = map.keySet().iterator(); domainIt.hasNext(); ) {
                 final Type domain = (Type) domainIt.next();
@@ -354,8 +355,8 @@ public class PhysDom {
 
     public void addConflictEdges() {
         for( Iterator exprIt = DNode.exprs().iterator(); exprIt.hasNext(); ) {
-            final Object expr = (Object) exprIt.next();
-            BDDType t = (BDDType) getType(expr);
+            final BDDExpr expr = (BDDExpr) exprIt.next();
+            BDDType t = expr.getType();
             for( Iterator domainIt = t.map().keySet().iterator(); domainIt.hasNext(); ) {
                 final Type domain = (Type) domainIt.next();
                 for( Iterator domain2It = t.map().keySet().iterator(); domain2It.hasNext(); ) {
@@ -379,8 +380,8 @@ public class PhysDom {
     }
 
     public Type phys(DNode d) {
-        Object expr = d.expr;
-        BDDType t = (BDDType) getType(expr);
+        BDDExpr expr = d.expr;
+        BDDType t = expr.getType();
         Map map = t.map();
         return (Type) map.get(d.dom);
     }
@@ -459,7 +460,7 @@ outer:          for( Iterator newPathIt = ((Set)pathMap.get(node)).iterator(); n
                     clause.add( SetLit.v( path ) );
                 }
                 if( clause.size() == 0 ) {
-                    throwSemanticException( "No physical domains reaching domain "+node.dom, node.expr );
+                    node.expr.throwSemanticException( "No physical domains reaching domain "+node.dom );
                 }
                 cnf.add( clause );
             }
@@ -484,8 +485,8 @@ outer:          for( Iterator newPathIt = ((Set)pathMap.get(node)).iterator(); n
 
     public void setupSpecifiedAssignment() {
         for( Iterator exprIt = DNode.exprs().iterator(); exprIt.hasNext(); ) {
-            final Object expr = (Object) exprIt.next();
-            BDDType t = (BDDType) getType(expr);
+            final BDDExpr expr = (BDDExpr) exprIt.next();
+            BDDType t = expr.getType();
             Map map = t.map();
             for( Iterator domainIt = map.keySet().iterator(); domainIt.hasNext(); ) {
                 final Type domain = (Type) domainIt.next();
@@ -502,8 +503,8 @@ outer:          for( Iterator newPathIt = ((Set)pathMap.get(node)).iterator(); n
 
     public void recordPhys() {
         for( Iterator exprIt = DNode.exprs().iterator(); exprIt.hasNext(); ) {
-            final Object expr = (Object) exprIt.next();
-            BDDType t = (BDDType) getType(expr);
+            final BDDExpr expr = (BDDExpr) exprIt.next();
+            BDDType t = expr.getType();
             for( Iterator pairIt = t.domainPairs().iterator(); pairIt.hasNext(); ) {
                 final Type[] pair = (Type[]) pairIt.next();
                 if( pair[1] != null ) continue;
@@ -517,22 +518,6 @@ outer:          for( Iterator newPathIt = ((Set)pathMap.get(node)).iterator(); n
         }
     }
 
-    private void throwSemanticException( String s, Object expr ) throws SemanticException {
-        if( expr instanceof Node ) {
-            throw new SemanticException( s, ((Node) expr).position() );
-        } else if( expr instanceof TypeObject ) {
-            throw new SemanticException( s, ((TypeObject) expr).position() );
-        } else {
-            throw new SemanticException( s+" in "+expr );
-        }
-    }
-
-    public static Type getType( Object n ) {
-        if( n instanceof Expr ) return ((Expr) n).type();
-        if( n instanceof VarInstance ) return ((VarInstance) n).type();
-        if( n instanceof MethodInstance ) return ((MethodInstance) n).returnType();
-        throw new InternalCompilerError( n.toString()+" of class "+n.getClass().toString() );
-    }
     public void printDomainsDot() {
         try {
             PrintWriter file = new PrintWriter(
@@ -545,10 +530,10 @@ outer:          for( Iterator newPathIt = ((Set)pathMap.get(node)).iterator(); n
             file.println( "  mclimit=10;" );
             file.println( "  nslimit=10;" );
             for( Iterator exprIt = DNode.exprs().iterator(); exprIt.hasNext(); ) {
-                final Object expr = (Object) exprIt.next();
+                final BDDExpr expr = (BDDExpr) exprIt.next();
                 file.println( " subgraph cluster"+ snum++ +" {" );
-                file.println( "  label=\""+DNode.toString(expr)+"\";" );
-                BDDType t = (BDDType) getType(expr);
+                file.println( "  label=\""+expr+"\";" );
+                BDDType t = expr.getType();
                 Map map = t.map();
                 for( Iterator dIt = DNode.nodes().iterator(); dIt.hasNext(); ) {
                     final DNode d = (DNode) dIt.next();

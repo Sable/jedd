@@ -26,12 +26,21 @@ import polyglot.ext.jedd.ast.*;
 import java.util.*;
 
 public class DNode {
-    Object expr;
+    BDDExpr expr;
     Type dom;
     int domNum;
     static int nextDomNum = 0;
-    public static DNode v( Object expr, Type dom ) {
-        BDDType t = (BDDType) PhysDom.getType(expr);
+    public static DNode v( VarInstance expr, Type dom ) {
+        return v( BDDExpr.v(expr), dom );
+    }
+    public static DNode v( MethodInstance expr, Type dom ) {
+        return v( BDDExpr.v(expr), dom );
+    }
+    public static DNode v( Expr expr, Type dom ) {
+        return v( BDDExpr.v(expr), dom );
+    }
+    public static DNode v( BDDExpr expr, Type dom ) {
+        BDDType t = expr.getType();
         if( !t.map().keySet().contains(dom) && !t.map().keySet().isEmpty() ) throw new RuntimeException( "expression "+expr+" doesn't have domain "+dom+"; it has domains "+t.map().keySet());
 
         DNode ret = new DNode( expr, dom );
@@ -57,7 +66,7 @@ public class DNode {
     }
 
     private static Map nodes = new HashMap();
-    private DNode( Object expr, Type dom ) {
+    private DNode( BDDExpr expr, Type dom ) {
         this.expr = expr;
         this.dom = dom;
     }
@@ -71,20 +80,13 @@ public class DNode {
         if( !dom.equals( other.dom ) ) return false;
         return true;
     }
-    public static String toString(Object n ) {
-        String className = n.getClass().getName();
-        className = className.substring( className.lastIndexOf(".") );
-        if( !(n instanceof Node) ) className = n.toString();
-        if( n instanceof FixPhys ) className = "FixPhys "+((FixPhys) n).expr();
-        if( n instanceof Replace ) className = "Replace "+((Replace) n).expr();
-        className = className+":"+System.identityHashCode(n);
-        return className;
-    }
     public String toShortString() {
         return dom.toString();
     }
     public String toString() {
-        String className = toString(expr);
+        String className = expr.toString();
+        if( dom instanceof ClassType ) 
+            return "\""+className+":"+((ClassType)dom).name()+"\"";
         return "\""+className+":"+dom.toString()+"\"";
     }
 }
