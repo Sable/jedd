@@ -186,18 +186,22 @@ public class Jedd {
             } else if( o instanceof Object[] ) {
                 PhysicalDomain[] domains = (PhysicalDomain[]) o;
                 int[][] vars = new int[domains.length][];
+                int maxLen = 0;
                 for( int j = 0; j < domains.length; j++ ) {
                     domains[j].clearPhysPos();
                     vars[j] = domains[j].getBits();
                     if( msbAtTop ) reverse( vars[j] );
+                    if( maxLen < vars[j].length ) maxLen = vars[j].length;
                 }
                 boolean change = true;
                 for( int j = 0; change; j++ ) {
                     change = false;
                     for( int k = 0; k < vars.length; k++ ) {
-                        if( j < vars[k].length ) {
+                        int jj = j - (maxLen-vars[k].length);
+                        if( !msbAtTop ) jj = j;
+                        if( jj >= 0 && jj < vars[k].length ) {
                             domains[k].setPhysPos(newOrder.size());
-                            newOrder.add( new Integer( vars[k][j] ) );
+                            newOrder.add( new Integer( vars[k][jj] ) );
                             change = true;
                         }
                     }
