@@ -25,6 +25,8 @@ import polyglot.ext.jedd.ast.*;
 import polyglot.ext.jl.ast.*;
 import polyglot.ext.jl.types.*;
 import polyglot.util.*;
+import polyglot.visit.*;
+import polyglot.frontend.*;
 import java.util.*;
 import java.io.*;
 //import polyglot.ext.jedd.cudd.*;
@@ -40,10 +42,16 @@ public class PhysDom {
     public Set mustEqualEdges = new HashSet();
     public Set allPhys = new HashSet();
 
-    private String satSolver = System.getProperty("user.home")+System.getProperty("file.separator")+"sat";
+    private String satSolver = System.getProperty("user.home")+System.getProperty("file.separator")+"zchaff.2003.10.9.linux";
+    private String satCore = System.getProperty("user.home")+System.getProperty("file.separator")+"zcore";
     public void setSatSolver( String s ) { satSolver = s; }
+    public void setSatCore( String s ) { satCore = s; }
 
-    static class SetLit {
+    static interface HasNum {
+        public int getNum();
+    }
+
+    static class SetLit implements HasNum {
         Set set;
         private SetLit( Set set ) {
             this.set = set;
@@ -63,13 +71,16 @@ public class PhysDom {
             return true;
         }
         public int hashCode() { return set.hashCode(); }
-        public String toString() {
+        public int getNum() {
             Integer i = (Integer) litNumMap.get(this);
             if( i == null ) litNumMap.put( this, i = new Integer(++nextInt) );
-            return i.toString();
+            return i.intValue();
+        }
+        public String toString() {
+            return ""+getNum();
         }
     }
-    static class NegSetLit {
+    static class NegSetLit implements HasNum {
         SetLit set;
         private NegSetLit( SetLit set ) {
             this.set = set;
@@ -95,13 +106,16 @@ public class PhysDom {
             return true;
         }
         public int hashCode() { return set.hashCode() + 1; }
+        public int getNum() {
+            return -(set.getNum());
+        }
         public String toString() {
-            return "-"+set;
+            return ""+getNum();
         }
     }
     public static Map setMap = new HashMap();
 
-    static class Literal {
+    static class Literal implements HasNum {
         DNode dnode;
         Type phys;
         private Literal( DNode dnode, Type phys ) {
@@ -123,17 +137,20 @@ public class PhysDom {
             return true;
         }
         public int hashCode() { return dnode.hashCode() + phys.hashCode(); }
-        public String toString() {
+        public int getNum() {
             Integer i = (Integer) litNumMap.get(this);
             if( i == null ) litNumMap.put( this, i = new Integer(++nextInt) );
-            return i.toString();
+            return i.intValue();
+        }
+        public String toString() {
+            return ""+getNum();
         }
     }
     static int nextInt = 0;
     public static Map litMap = new HashMap();
     public static Map litNumMap = new HashMap();
     
-    static class NegLiteral {
+    static class NegLiteral implements HasNum {
         Literal lit;
         private NegLiteral( Literal lit ) {
             this.lit = lit;
@@ -156,8 +173,11 @@ public class PhysDom {
             return true;
         }
         public int hashCode() { return lit.hashCode() + 1; }
+        public int getNum() {
+            return -(lit.getNum());
+        }
         public String toString() {
-            return "-"+lit;
+            return ""+getNum();
         }
     }
 
@@ -180,8 +200,14 @@ public class PhysDom {
         }
     }
 
+    JeddNodeFactory nf;
+    JeddTypeSystem ts;
 
-    public void findAssignment() throws SemanticException {
+    public void findAssignment( JeddNodeFactory nf, JeddTypeSystem ts, Collection jobs ) throws SemanticException {
+
+        this.nf = nf;
+        this.ts = ts;
+
         printDomainsDot();
         printDomainsRsf();
 
@@ -198,7 +224,7 @@ public class PhysDom {
         //tryWithBDDsJustForKicks();
         runSat();
 
-        recordPhys();
+        recordPhys(jobs);
 
         printDomainsDot();
         printDomainsRsf();
@@ -246,7 +272,10 @@ public class PhysDom {
             }
             boolean pos[] = new boolean[numvars+1];
             boolean neg[] = new boolean[numvars+1];
-            if( soln == null ) throw new SemanticException( "SAT solver couldn't assign physical domains." );
+            if( soln == null ) {
+                unsatCore( tmpFile );
+                throw new SemanticException( "SAT solver couldn't assign physical domains." );
+            }
             StringTokenizer st = new StringTokenizer( soln );
             while( st.hasMoreTokens() ) {
                 String tok = st.nextToken();
@@ -266,6 +295,68 @@ public class PhysDom {
             //tmpFile.delete();
         } catch( IOException e ) {
             throw new RuntimeException( e.toString() );
+        }
+    }
+
+    private void unsatCore( File tmpFile ) {
+        System.err.println( "Attemptimg to extract unsat core." );
+        try {
+            File coreFile = File.createTempFile( "satcore", ".cnf" );
+            Process p = Runtime.getRuntime().exec(satCore+" "+tmpFile.getAbsolutePath()+" resolve_trace "+coreFile.getAbsolutePath());
+            BufferedReader br = new BufferedReader(new InputStreamReader( p.getInputStream() ) );
+            String line;
+
+            while ((line = br.readLine()) != null) {
+                System.err.println( line );
+            }
+            try {
+                p.waitFor();
+            } catch( InterruptedException e ) {}
+
+            br = new BufferedReader(new InputStreamReader(new FileInputStream( coreFile )));
+
+    line:
+            while ((line = br.readLine()) != null) {
+                if( Character.isLetter( line.charAt(0) ) ) continue;
+                Integer i1 = null;
+                Integer i2 = null;
+                StringTokenizer tok = new StringTokenizer(line);
+                while( tok.hasMoreTokens() ) {
+                    String token = tok.nextToken();
+                    Integer i = Integer.decode( token );
+                    int ival = i.intValue();
+                    if( ival > 0 ) continue line;
+                    if( ival == 0 ) {
+                        if( i2 == null ) continue line;
+                        break;
+                    }
+                    if( i1 == null ) i1 = i;
+                    else if( i2 == null ) i2 = i;
+                    else continue line;
+                }
+                // got a conflict clause
+    clause:
+                for( Iterator clIt = cnf.iterator(); clIt.hasNext(); ) {
+                    final Clause cl = (Clause) clIt.next();
+                    if( cl.size() != 2 ) continue;
+                    NegLiteral nl1 = null;
+                    NegLiteral nl2 = null;
+                    for( Iterator litIt = cl.iterator(); litIt.hasNext(); ) {
+                        final HasNum lit = (HasNum) litIt.next();
+                        if( lit.getNum() != i1.intValue() 
+                        && lit.getNum() != i2.intValue() ) continue clause;
+                        if( nl1 == null ) nl1 = (NegLiteral) lit;
+                        else nl2 = (NegLiteral) lit;
+                    }
+                    if( cl.comment.indexOf("[CONFLICT]") < 0 ) continue line;
+                    System.err.println( "Conflict between\n"+
+                            nl1.lit.dnode.toLongString()+"\nand\n"+
+                            nl2.lit.dnode.toLongString()+"\nover physical domain "+
+                            nl1.lit.phys );
+                }
+            }
+        } catch( IOException e ) {
+            throw new RuntimeException( "Problem extracting unsat core: "+e );
         }
     }
 
@@ -458,7 +549,8 @@ public class PhysDom {
                 final DNode onode = (DNode) onodeIt.next();
                 if( phys(onode) != null ) continue;
                 boolean changed = false;
-outer:          for( Iterator newPathIt = ((Set)pathMap.get(node)).iterator(); newPathIt.hasNext(); ) {              final Set newPath = (Set) newPathIt.next();
+outer:
+                for( Iterator newPathIt = ((Set)pathMap.get(node)).iterator(); newPathIt.hasNext(); ) {              final Set newPath = (Set) newPathIt.next();
                     Set newPath2 = new HashSet(newPath);
                     newPath2.add( onode );
                     for( Iterator oldPathIt = ((Set)pathMap.get(onode)).iterator(); oldPathIt.hasNext(); ) {
@@ -529,7 +621,34 @@ outer:          for( Iterator newPathIt = ((Set)pathMap.get(node)).iterator(); n
         }
     }
 
-    public void recordPhys() {
+    private Map bitsMap = new HashMap();
+    /** Make sure that the physical domain to which attribute is assigned has
+     * at least as many bits as the domain of the attribute. */
+    private void assigned( Type attribute, Type phys ) throws SemanticException {
+        FieldDecl domainDecl = ts.getField( (ClassType) attribute, "domain" );
+        Type domain = domainDecl.declType();
+        if( !( domain instanceof ClassType ) ) throw new SemanticException(
+                "Domain of attribute "+attribute+" is not of reference type.",
+                domainDecl.position() );
+
+        FieldDecl attrBits = ts.getField( (ClassType) domain, "bits" );
+        Expr init = attrBits.init();
+        if( init == null ) throw new SemanticException(
+                "Field bits of attribute "+attribute+" has no initializer.",
+                attrBits.position() );
+        if( !(init instanceof IntLit) ) throw new SemanticException( 
+                "Initializer of field bits of attribute "+attribute+" is not "+
+                "an integer literal.", attrBits.position() );
+        IntLit initLit = (IntLit) init;
+        int bits = (int) initLit.value();
+
+        Integer physBits = (Integer) bitsMap.get( phys );
+        if( physBits == null || physBits.intValue() < bits ) {
+            physBits = new Integer( bits );
+        }
+        bitsMap.put( phys, physBits );
+    }
+    public void recordPhys(Collection jobs) throws SemanticException {
         for( Iterator exprIt = DNode.exprs().iterator(); exprIt.hasNext(); ) {
             final BDDExpr expr = (BDDExpr) exprIt.next();
             BDDType t = expr.getType();
@@ -543,7 +662,62 @@ outer:          for( Iterator newPathIt = ((Set)pathMap.get(node)).iterator(); n
                     }
                 }
             }
+            for( Iterator pairIt = t.domainPairs().iterator(); pairIt.hasNext(); ) {
+                final Type[] pair = (Type[]) pairIt.next();
+                assigned( pair[0], pair[1] );
+            }
         }
+        for( Iterator physIt = bitsMap.keySet().iterator(); physIt.hasNext(); ) {
+            final ClassType phys = (ClassType) physIt.next();
+            ClassDecl cd = (ClassDecl) ts.instance2Decl().get(phys);
+            if( cd == null ) throw new SemanticException( 
+                    "No class declaration for physical domain "+phys+"." );
+            ClassBody cb = cd.body();
+            if( cb == null ) throw new SemanticException( 
+                    "No class body for physical domain "+phys+"." );
+        }
+        NodeVisitor v = new NodeVisitor() {
+            public Node leave(Node parent, Node old, Node n, NodeVisitor v) {
+                if( !( n instanceof ClassDecl ) ) return n;
+                ClassDecl cd = (ClassDecl) n;
+                Type t = cd.type();
+                Integer bits = (Integer) bitsMap.get(t);
+                if( bits == null ) return n;
+
+                Position pos = cd.position();
+
+                ClassBody cb = cd.body();
+
+                List newMembers = new ArrayList();
+                for( Iterator memberIt = cb.members().iterator(); memberIt.hasNext(); ) {
+                    final ClassMember member = (ClassMember) memberIt.next();
+                    if( member instanceof MethodDecl) {
+                        MethodDecl md = (MethodDecl) member;
+                        if( md.name().equals( "bits" ) 
+                        && md.formals().isEmpty() ) {
+                            md = (MethodDecl) md.body(
+                                nf.Block( pos,
+                                    nf.Return( pos,
+                                        nf.IntLit( pos,
+                                            IntLit.INT,
+                                            bits.intValue()))));
+                            newMembers.add( md );
+                            continue;
+                        }
+                    }
+                    newMembers.add( member );
+                }
+
+                return cd.body( cb.members( newMembers ) );
+            }
+        };
+        v.begin();
+        for( Iterator jobIt = jobs.iterator(); jobIt.hasNext(); ) {
+            final Job job = (Job) jobIt.next();
+            Node ast = job.ast();
+            if( ast != null ) job.ast( ast.visit(v) );
+        }
+        v.finish();
     }
 
     public void printDomainsRsf() {

@@ -17,33 +17,39 @@
  * Boston, MA 02111-1307, USA.
  */
 
-package jedd;
+package jedd.internal;
 import java.util.*;
 import java.io.*;
 
-public class JeddProfiler
+public class Profiler
 { 
-    private static JeddProfiler instance = new JeddProfiler();
-    public static JeddProfiler v() { return instance; }
+    private static Profiler instance;
+    public static Profiler v() { return instance; }
+    public static boolean enabled() {
+        return instance != null;
+    }
+    public static void enable() {
+        instance = new Profiler();
+    }
 
     LinkedList events = new LinkedList();
     LinkedList stack = new LinkedList();
     Map stackMap = new HashMap();
     static int nextStackTrace = 1;
 
-    public void start( String eventName, int bdd ) {
-        int fls = JeddNative.falseBDD();
-        JeddNative.delRef( fls );
+    public void start( String eventName, RelationInstance bdd ) {
+        RelationInstance fls = Backend.v().falseBDD();
+        Backend.v().delRef( fls );
         start( eventName, bdd, fls );
     }
-    public void start( String eventName, int bdd1, int bdd2 ) {
+    public void start( String eventName, RelationInstance bdd1, RelationInstance bdd2 ) {
         Event e = new Event();
         e.inputA = new BDD(bdd1);
         e.inputB = new BDD(bdd2);
         e.startTime = new Date();
         stack.addLast( e );
     }
-    public void finish( String eventName, int bdd ) {
+    public void finish( String eventName, RelationInstance bdd ) {
         Event e = (Event) stack.removeLast();
         e.time = new Date().getTime() - e.startTime.getTime();
         e.type = eventName;
@@ -86,11 +92,15 @@ public class JeddProfiler
             token = st.nextToken();
             if( token.indexOf("at jedd.Relation") >= 0 ) break;
             if( token.indexOf("at jedd.Jedd") >= 0 ) break;
+            if( token.indexOf("at jedd.internal.Relation") >= 0 ) break;
+            if( token.indexOf("at jedd.internal.Jedd") >= 0 ) break;
         }
         while(true) {
             token = st.nextToken();
             if( token.indexOf("at jedd.Relation") < 0
-            &&  token.indexOf("at jedd.Jedd") < 0 ) break;
+            &&  token.indexOf("at jedd.Jedd") < 0
+            &&  token.indexOf("at jedd.internal.Relation") < 0
+            &&  token.indexOf("at jedd.internal.Jedd") < 0 ) break;
         }
         return token;
     }
@@ -130,10 +140,10 @@ public class JeddProfiler
         int id;
         int nodeCount = 0;
         int[] shape;
-        BDD( int bdd ) {
+        BDD( RelationInstance bdd ) {
             id = nextBDDId++;
-            shape = new int[JeddNative.numBits()];
-            JeddNative.getShape( bdd, shape );
+            shape = new int[Backend.v().numBits()];
+            Backend.v().getShape( bdd, shape );
             for( int i = 0; i < shape.length; i++ ) nodeCount += shape[i];
         }
         public String toString() {

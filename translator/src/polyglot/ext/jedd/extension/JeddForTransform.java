@@ -17,13 +17,19 @@
  * Boston, MA 02111-1307, USA.
  */
 
-package jedd;
+package polyglot.ext.jedd.extension;
 
-public abstract class Attribute {
-    public abstract Numberer numberer();
+import polyglot.ext.jedd.ast.*;
+import polyglot.ext.jedd.types.*;
+import polyglot.ast.*;
+import polyglot.types.*;
+import polyglot.util.*;
+import polyglot.frontend.*;
+import polyglot.visit.*;
+import java.util.*;
 
-    public String name() {
-        return this.getClass().getName();
-    }
-    public String toString() { return name(); }
+public interface JeddForTransform
+{
+    public Node forTransform( JeddTypeSystem ts, JeddNodeFactory nf ) throws SemanticException;
 }
+

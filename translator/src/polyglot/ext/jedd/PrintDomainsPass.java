@@ -32,19 +32,21 @@ import java.util.*;
  * Extension information for jedd extension.
  */
 public class PrintDomainsPass extends AbstractPass {
+    private JeddNodeFactory nf;
     private JeddTypeSystem ts;
     private Job job;
-    public PrintDomainsPass( Pass.ID id, Job job, TypeSystem ts ) {
+    public PrintDomainsPass( Pass.ID id, Job job, TypeSystem ts, NodeFactory nf ) {
         super(id);
         this.job = job;
         this.ts = (JeddTypeSystem) ts;
+        this.nf = (JeddNodeFactory) nf;
     }
     static boolean runAlready = false;
     public boolean run() {
         if( runAlready ) return true;
         runAlready = true;
         try {
-            ts.physicalDomains();
+            ts.physicalDomains(nf, ((ExtensionInfo) job.extensionInfo()).jobs());
         } catch( SemanticException e ) {
             job.compiler().errorQueue().enqueue(ErrorInfo.SEMANTIC_ERROR,
                                 e.getMessage(), e.position());

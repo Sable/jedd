@@ -443,7 +443,21 @@ class_declaration ::=
     modifiers_opt:a CLASS:n IDENTIFIER:b super_opt:c interfaces_opt:d class_body:e {:
                                                                                    RESULT = parser.nf.ClassDecl(parser.pos(n),
                 a, b.getIdentifier(), c, d, e); 
-                                                                                   :};
+                                                                                   :}
+ |  modifiers_opt:a CLASS:n IDENTIFIER:b LPAREN class_type:domain RPAREN super_opt:c interfaces_opt:d class_body:e {:
+                                                                                                                   RESULT = parser.nf.ClassDeclAttribute(parser.pos(n),
+                a, b.getIdentifier(), c, d, e, domain, parser.ts ); 
+                                                                                                                   :}
+ |  modifiers_opt:a CLASS:n IDENTIFIER:b LPAREN INTEGER_LITERAL:bits RPAREN super_opt:c interfaces_opt:d class_body:e {:
+                                                                                                                      RESULT = parser.nf.ClassDeclDomain(parser.pos(n),
+                a, b.getIdentifier(), c, d, e, 
+                parser.nf.IntLit(parser.pos(bits), IntLit.INT,
+                    bits.getValue().intValue()), parser.ts ); 
+                                                                                                                      :}
+ |  modifiers_opt:a CLASS:n IDENTIFIER:b LPAREN RPAREN super_opt:c interfaces_opt:d class_body:e {:
+                                                                                                 RESULT = parser.nf.ClassDeclPhysDom(parser.pos(n),
+                a, b.getIdentifier(), c, d, e, parser.ts ); 
+                                                                                                 :};
 
 super ::=
     EXTENDS class_type:a {:  RESULT = a;  :};

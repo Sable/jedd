@@ -44,8 +44,12 @@ public class FixPhys_c extends Expr_c implements FixPhys, JeddGenerateJava, Jedd
         FixPhys_c ret = (FixPhys_c) copy();
 
         ret.expr = (Expr) visitChild( expr, v );
+        ret = (FixPhys_c) ret.type( type );
 
-        return ret.type( type );
+        if( ret.expr != expr ) return ret;
+        if( ret.type != type ) return ret;
+
+        return this;
     }
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         BDDType type = (BDDType) type();
@@ -151,6 +155,16 @@ public class FixPhys_c extends Expr_c implements FixPhys, JeddGenerateJava, Jedd
                     nf.ArrayInit( p, to )
                     )
                 ).type( type() );
+    }
+    public String toString() {
+        return "fp("+expr()+")";
+    }
+    public Term entry() {
+        return expr().entry();
+    }
+    public List acceptCFG(CFGBuilder v, List succs) {
+        v.visitCFG(expr(), this);
+        return succs;
     }
 }
 

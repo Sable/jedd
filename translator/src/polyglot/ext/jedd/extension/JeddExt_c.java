@@ -52,6 +52,13 @@ public class JeddExt_c extends Ext_c implements JeddExt {
         }
         return n;
     }
+    public Node forTransform( JeddTypeSystem ts, JeddNodeFactory nf ) throws SemanticException {
+        Node n = node();
+        if( n instanceof JeddForTransform ) {
+            return ((JeddForTransform) n).forTransform( ts, nf );
+        }
+        return n;
+    }
     protected Expr newRelation( JeddTypeSystem ts, JeddNodeFactory nf, BDDType type, Node init ) throws SemanticException {
         Position p = node().position();
         

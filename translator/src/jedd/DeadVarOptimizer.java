@@ -55,7 +55,9 @@ public class DeadVarOptimizer extends BodyTransformer {
                 InvokeExpr ie = s.getInvokeExpr();
                 SootClass cl = ie.getMethod().getDeclaringClass();
                 if( cl.getName().equals( "jedd.Relation" ) ) continue;
+                if( cl.getName().equals( "jedd.internal.RelationContainer" ) ) continue;
                 if( cl.getName().equals( "jedd.Jedd" ) ) continue;
+                if( cl.getName().equals( "jedd.internal.Jedd" ) ) continue;
                 for( Iterator vbIt = s.getUseBoxes().iterator(); vbIt.hasNext(); ) {
                     final ValueBox vb = (ValueBox) vbIt.next();
                     Value v = vb.getValue();
@@ -224,8 +226,8 @@ locals:
             String subSig = m.getSubSignature();
             String[] eqs = { "eq", "eqUnion", "eqIntersect", "eqMinus" };
             for( int i = 0; i < eqs.length; i++ ) {
-                if( subSig.equals( "jedd.Relation "+eqs[i]+"(int)" ) ) return true;
-                if( subSig.equals( "jedd.Relation "+eqs[i]+"(jedd.Relation)" ) )
+                if( subSig.equals( "jedd.internal.RelationContainer "+eqs[i]+"(jedd.internal.RelationContainer)" ) ) return true;
+                if( subSig.equals( "jedd.internal.RelationContainer "+eqs[i]+"(jedd.internal.RelationInstance)" ) )
                     return true;
             }
             return false;

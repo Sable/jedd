@@ -41,18 +41,23 @@ public class Replace_c extends Expr_c implements Replace, JeddGenerateJava, Jedd
         this.domainPairs = domainPairs;
     }
     public Node visitChildren(NodeVisitor v) {
+        boolean changed = false;
         Replace_c ret = (Replace_c) copy();
 
         ret.expr = (Expr) visitChild( expr, v );
+        if( ret.expr != expr ) changed = true;
 
         List newDomains = new LinkedList();
         for( Iterator pairIt = domainPairs.iterator(); pairIt.hasNext(); ) {
             final TypeNode[] pair = (TypeNode[]) pairIt.next();
             TypeNode[] newPair = { (TypeNode) visitChild( pair[0], v ),
                                    (TypeNode) visitChild( pair[1], v ) };
+            if( newPair[0] != pair[0] ) changed = true;
+            if( newPair[1] != pair[1] ) changed = true;
             newDomains.add( newPair );
         }
         ret.domainPairs = newDomains;
+        if( !changed ) return this;
         return ret;
     }
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
@@ -394,6 +399,13 @@ outer:
                     ).type( type );
         }
         return ret;
+    }
+    public Term entry() {
+        return expr.entry();
+    }
+    public List acceptCFG(CFGBuilder v, List succs) {
+        v.visitCFG(expr(), this);
+        return succs;
     }
 }
 

@@ -40,11 +40,16 @@ public class BDDLit_c extends Lit_c implements BDDLit, JeddGenerateJava
         throw new InternalCompilerError( "Jedd should not be treating a BDD as an object." );
     }
     public Node visitChildren(NodeVisitor v) {
+        boolean changed = false;
         List newPieces = new LinkedList();
         for( Iterator pieceIt = pieces.iterator(); pieceIt.hasNext(); ) {
             final BDDLitPiece piece = (BDDLitPiece) pieceIt.next();
-            newPieces.add( visitChild( piece, v ) );
+            BDDLitPiece newPiece = (BDDLitPiece) visitChild( piece, v );
+            newPieces.add( newPiece );
+            if( piece != newPiece ) changed = true;
         }
+
+        if( !changed ) return this;
 
         BDDLit_c ret = (BDDLit_c) copy();
         ret.pieces = newPieces;
@@ -132,6 +137,19 @@ public class BDDLit_c extends Lit_c implements BDDLit, JeddGenerateJava
                     nf.ArrayInit( p, phys )
                     )
                 ).type( type() );
+    }
+    public Term entry() {
+        BDDLitPiece first = (BDDLitPiece) pieces.get(0);
+        return first.e().entry();
+    }
+    public List acceptCFG(CFGBuilder v, List succs) {
+        List toVisit = new ArrayList();
+        for( Iterator pieceIt = pieces.iterator(); pieceIt.hasNext(); ) {
+            final BDDLitPiece piece = (BDDLitPiece) pieceIt.next();
+            toVisit.add( piece.e() );
+        }
+        v.visitCFGList(toVisit, this);
+        return succs;
     }
 }
 

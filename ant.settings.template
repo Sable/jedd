@@ -16,6 +16,12 @@ cudd.loc=${user.home}/cudd-2.3.1
 ## Location of BuDDy distribution
 buddy.loc=${user.home}/buddy22
 
+## Location of SableJBDD distribution
+sablejbdd.loc=${user.home}/sablejbdd-0.01
+
+## Location of JavaBDD distribution
+javabdd.loc=${user.home}/JavaBDD
+
 ## Location of Soot classes
 soot.loc=${user.home}/soot/classes
 

@@ -88,8 +88,8 @@ found_bdd:
         throw new InternalCompilerError( n.toString() );
     }
 
-    public void physicalDomains() throws SemanticException {
-        PhysDom.v().findAssignment();
+    public void physicalDomains( JeddNodeFactory nf, Collection jobs ) throws SemanticException {
+        PhysDom.v().findAssignment( nf, this, jobs );
         //printDomainsDot();
         //findPhys();
     }
@@ -236,7 +236,7 @@ found_bdd:
         }
     }
     public ClassType jedd() {
-        return jeddType( "jedd.Jedd" );
+        return jeddType( "jedd.internal.Jedd" );
     }
     public ClassType attribute() {
         return jeddType( "jedd.Attribute" );
@@ -244,8 +244,11 @@ found_bdd:
     public ClassType physicalDomain() {
         return jeddType( "jedd.PhysicalDomain" );
     }
+    public ClassType domain() {
+        return jeddType( "jedd.Domain" );
+    }
     public ClassType relation() {
-        return jeddType( "jedd.Relation" );
+        return jeddType( "jedd.internal.RelationContainer" );
     }
     public BDDType sameDomains( BDDType t ) {
         List domains = new LinkedList();
@@ -267,6 +270,23 @@ found_bdd:
     private Map instance2Decl = new HashMap();
     public Map instance2Decl() {
         return instance2Decl;
+    }
+
+    public FieldDecl getField( ClassType type, String name ) throws SemanticException {
+        ClassDecl cd = (ClassDecl) instance2Decl.get(type);
+        if( cd == null ) throw new SemanticException(
+                "Need field "+name+" of class "+type+" but it has no declaration." );
+        ClassBody body = cd.body();
+        if( body == null ) throw new SemanticException(
+                "Need field "+name+" of class "+type+" but it has no body." );
+        for( Iterator memberIt = body.members().iterator(); memberIt.hasNext(); ) {
+            final ClassMember member = (ClassMember) memberIt.next();
+            if( !( member instanceof FieldDecl ) ) continue;
+            FieldDecl fd = (FieldDecl) member;
+            if( name.equals( fd.name() ) ) return fd;
+        }
+        throw new SemanticException( "Need field "+name+
+                " of class "+type+" which has no field with that name." );
     }
 
     protected NullType createNull() {

@@ -33,4 +33,5 @@ public interface JeddExt extends Ext {
     public Node physicalDomains(PhysicalDomains pd) throws SemanticException;
     public Node generateJava(JeddTypeSystem ts, JeddNodeFactory nf) throws SemanticException;
     public Node methodDeclMap( JeddTypeSystem ts, JeddNodeFactory nf ) throws SemanticException;
+    public Node forTransform( JeddTypeSystem ts, JeddNodeFactory nf ) throws SemanticException;
 }

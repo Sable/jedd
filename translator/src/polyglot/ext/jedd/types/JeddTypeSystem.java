@@ -19,6 +19,7 @@
 
 package polyglot.ext.jedd.types;
 
+import polyglot.ext.jedd.ast.*;
 import polyglot.ast.*;
 import polyglot.types.*;
 import java.util.*;
@@ -28,13 +29,15 @@ public interface JeddTypeSystem extends TypeSystem {
     public BDDType BDDType( List domainPairs );
     public void addAssignEdge( DNode n1, DNode n2 );
     public void addMustEqualEdge( DNode n1, DNode n2 );
-    public void physicalDomains() throws SemanticException;
+    public void physicalDomains( JeddNodeFactory nf, Collection jobs ) throws SemanticException;
     public ClassType jedd();
     public ClassType attribute();
     public ClassType physicalDomain();
+    public ClassType domain();
     public ClassType relation();
     public BDDType sameDomains( BDDType t );
     public BDDType cloneDomains( BDDType t );
     public Map instance2Decl();
     public void makeBDDFormalsConform(MethodInstance mi, MethodInstance mj) throws SemanticException;
+    public FieldDecl getField( ClassType type, String name ) throws SemanticException;
 }

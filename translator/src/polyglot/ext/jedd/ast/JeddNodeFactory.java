@@ -21,10 +21,8 @@ package polyglot.ext.jedd.ast;
 
 import polyglot.ast.*;
 import polyglot.ext.jl.ast.*;
-import polyglot.types.Flags;
-import polyglot.types.Package;
-import polyglot.types.Type;
-import polyglot.types.Qualifier;
+import polyglot.types.*;
+import polyglot.ext.jedd.types.*;
 import polyglot.util.*;
 import java.util.*;
 
@@ -40,4 +38,7 @@ public interface JeddNodeFactory extends NodeFactory {
     public BDDLit BDDLit( Position pos, List pieces );
     public BDDLitPiece BDDLitPiece( Position pos, Expr e, TypeNode domain, TypeNode phys );
     public BDDTrueFalse BDDTrueFalse( Position pos, boolean value );
+    public ClassDecl ClassDeclDomain( Position pos, Flags flags, String name, TypeNode superClass, List interfaces, ClassBody body, IntLit bits, TypeSystem ts );
+    public ClassDecl ClassDeclAttribute( Position pos, Flags flags, String name, TypeNode superClass, List interfaces, ClassBody body, TypeNode domain, TypeSystem ts );
+    public ClassDecl ClassDeclPhysDom( Position pos, Flags flags, String name, TypeNode superClass, List interfaces, ClassBody body, TypeSystem ts );
 }

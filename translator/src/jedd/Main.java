@@ -33,6 +33,11 @@ public class Main {
                 polyglot.ext.jedd.types.PhysDom.v().setSatSolver( (String) argIt.next() );
                 argIt.remove();
             }
+            if( arg.equals( "-sc" ) ) {
+                argIt.remove();
+                polyglot.ext.jedd.types.PhysDom.v().setSatCore( (String) argIt.next() );
+                argIt.remove();
+            }
             if( arg.equals( "-h" ) || arg.equals( "-?" ) || arg.equals( "-help" )
                     || arg.equals( "--help" ) ) {
                 usage();

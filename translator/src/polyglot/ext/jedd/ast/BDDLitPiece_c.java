@@ -58,7 +58,10 @@ public class BDDLitPiece_c extends Node_c implements BDDLitPiece
         ret.e = (Expr) visitChild( e, v );
         ret.domain = (TypeNode) visitChild( domain, v );
         ret.phys = (TypeNode) visitChild( phys, v );
-        return ret;
+        if( ret.e != e ) return ret;
+        if( ret.domain != domain ) return ret;
+        if( ret.phys != phys ) return ret;
+        return this;
     }
 }
 

@@ -46,20 +46,31 @@ public abstract class Relprod_c extends Expr_c implements Relprod, JeddGenerateJ
         this.rdomains = rdomains;
     }
     public Node visitChildren(NodeVisitor v) {
+        boolean changed = false;
+
         Relprod_c ret = (Relprod_c) copy();
         ret.lhs = (Expr) visitChild( lhs, v );
         ret.rhs = (Expr) visitChild( rhs, v );
+
+        if( ret.lhs != lhs ) changed = true;
+        if( ret.rhs != rhs ) changed = true;
+
         ret.ldomains = new LinkedList();
         for( Iterator domainIt = ldomains.iterator(); domainIt.hasNext(); ) {
             final TypeNode domain = (TypeNode) domainIt.next();
-            ret.ldomains.add( visitChild( domain, v ) );
+            TypeNode newDomain = (TypeNode) visitChild( domain, v );
+            ret.ldomains.add( newDomain );
+            if( newDomain != domain ) changed = true;
         }
         ret.rdomains = new LinkedList();
         for( Iterator domainIt = rdomains.iterator(); domainIt.hasNext(); ) {
             final TypeNode domain = (TypeNode) domainIt.next();
-            ret.rdomains.add( visitChild( domain, v ) );
+            TypeNode newDomain = (TypeNode) visitChild( domain, v );
+            ret.rdomains.add( newDomain );
+            if( newDomain != domain ) changed = true;
         }
-        return ret;
+        if( changed ) return ret;
+        return this;
     }
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.begin(0);
@@ -214,5 +225,13 @@ public abstract class Relprod_c extends Expr_c implements Relprod, JeddGenerateJ
     protected abstract String symbol();
     protected abstract String function();
     protected abstract boolean keepMatchedDomains();
+    public Term entry() {
+        return lhs().entry();
+    }
+    public List acceptCFG(CFGBuilder v, List succs) {
+        v.visitCFG(lhs(), rhs().entry());
+        v.visitCFG(rhs(), this);
+        return succs;
+    }
 }
 

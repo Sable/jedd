@@ -20,7 +20,9 @@
 package polyglot.ext.jedd.ast;
 
 import polyglot.ast.*;
+import polyglot.types.*;
 import polyglot.ext.jl.ast.*;
+import polyglot.ext.jedd.types.*;
 import polyglot.ext.jedd.extension.*;
 import polyglot.util.*;
 import java.util.*;
@@ -65,5 +67,116 @@ public class JeddNodeFactory_c extends NodeFactory_c implements JeddNodeFactory 
     public BDDTrueFalse BDDTrueFalse( Position pos, boolean value ) {
         Node ret = new BDDTrueFalse_c(pos, value );
         return (BDDTrueFalse) ret;
+    }
+    public ClassDecl ClassDeclDomain( Position pos, Flags flags, String name, TypeNode superClass, List interfaces, ClassBody body, IntLit bits, TypeSystem typeSys ) {
+        JeddTypeSystem ts = (JeddTypeSystem) typeSys;
+        body = body.addMember(
+                FieldDecl( pos,
+                    Flags.PUBLIC.set( Flags.FINAL ),
+                    CanonicalTypeNode(pos, ts.Int()),
+                    "bits",
+                    bits ) );
+        body = body.addMember(
+                MethodDecl( pos,
+                    Flags.PUBLIC.set( Flags.STATIC ),
+                    CanonicalTypeNode(pos, ts.domain()),
+                    "v",
+                    Collections.EMPTY_LIST,
+                    Collections.EMPTY_LIST,
+                    Block( pos,
+                        Return( pos, AmbExpr( pos, "instance" ) )
+                        )
+                    )
+                );
+        body = body.addMember(
+                FieldDecl( pos,
+                    Flags.PRIVATE.set( Flags.STATIC ),
+                    CanonicalTypeNode(pos, ts.domain()),
+                    "instance",
+                    New( pos, AmbTypeNode(pos, name), Collections.EMPTY_LIST )
+                    )
+                );
+
+        return ClassDecl(pos, flags, name, superClass, interfaces, body);
+    }
+    public ClassDecl ClassDeclAttribute( Position pos, Flags flags, String name, TypeNode superClass, List interfaces, ClassBody body, TypeNode domain, TypeSystem typeSys ) {
+        JeddTypeSystem ts = (JeddTypeSystem) typeSys;
+        body = body.addMember(
+                FieldDecl( pos,
+                    Flags.PUBLIC.set( Flags.FINAL ),
+                    domain,
+                    "domain",
+                    Cast( pos, domain, Call( pos, domain, "v" ) )) );
+        body = body.addMember(
+                MethodDecl( pos,
+                    Flags.PUBLIC,
+                    CanonicalTypeNode(pos, ts.domain()),
+                    "domain",
+                    Collections.EMPTY_LIST,
+                    Collections.EMPTY_LIST,
+                    Block( pos,
+                        Return( pos, AmbExpr( pos, "domain" ) )
+                        )
+                    )
+                );
+        body = body.addMember(
+                MethodDecl( pos,
+                    Flags.PUBLIC.set( Flags.STATIC ),
+                    CanonicalTypeNode(pos, ts.attribute()),
+                    "v",
+                    Collections.EMPTY_LIST,
+                    Collections.EMPTY_LIST,
+                    Block( pos,
+                        Return( pos, AmbExpr( pos, "instance" ) )
+                        )
+                    )
+                );
+        body = body.addMember(
+                FieldDecl( pos,
+                    Flags.PRIVATE.set( Flags.STATIC ),
+                    CanonicalTypeNode(pos, ts.attribute()),
+                    "instance",
+                    New( pos, AmbTypeNode(pos, name), Collections.EMPTY_LIST )
+                    )
+                );
+
+        return ClassDecl(pos, flags, name, superClass, interfaces, body);
+    }
+    public ClassDecl ClassDeclPhysDom( Position pos, Flags flags, String name, TypeNode superClass, List interfaces, ClassBody body, TypeSystem typeSys ) {
+        JeddTypeSystem ts = (JeddTypeSystem) typeSys;
+        body = body.addMember(
+                MethodDecl( pos,
+                    Flags.PUBLIC,
+                    CanonicalTypeNode(pos, ts.Int()),
+                    "bits",
+                    Collections.EMPTY_LIST,
+                    Collections.EMPTY_LIST,
+                    Block( pos,
+                        Return( pos, Call( pos, This(pos), "bits" ) )
+                        )
+                    )
+                );
+        body = body.addMember(
+                MethodDecl( pos,
+                    Flags.PUBLIC.set( Flags.STATIC ),
+                    CanonicalTypeNode(pos, ts.physicalDomain()),
+                    "v",
+                    Collections.EMPTY_LIST,
+                    Collections.EMPTY_LIST,
+                    Block( pos,
+                        Return( pos, AmbExpr( pos, "instance" ) )
+                        )
+                    )
+                );
+        body = body.addMember(
+                FieldDecl( pos,
+                    Flags.PRIVATE.set( Flags.STATIC ),
+                    CanonicalTypeNode(pos, ts.physicalDomain()),
+                    "instance",
+                    New( pos, AmbTypeNode(pos, name), Collections.EMPTY_LIST )
+                    )
+                );
+
+        return ClassDecl(pos, flags, name, superClass, interfaces, body);
     }
 }

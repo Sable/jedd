@@ -90,13 +90,19 @@ public class BDDTypeNode_c extends TypeNode_c implements BDDTypeNode, JeddGenera
         return this;
     }
     public Node visitChildren(NodeVisitor v) {
+        boolean changed = false;
         List newDomains = new LinkedList();
+
         for( Iterator pairIt = domainPairs.iterator(); pairIt.hasNext(); ) {
+
             final TypeNode[] pair = (TypeNode[]) pairIt.next();
             TypeNode[] newPair = { (TypeNode) visitChild( pair[0], v ),
                                    (TypeNode) visitChild( pair[1], v ) };
+            if( newPair[0] != pair[0] ) changed = true;
+            if( newPair[1] != pair[1] ) changed = true;
             newDomains.add( newPair );
         }
+        if( !changed ) return this;
         BDDTypeNode_c ret = (BDDTypeNode_c) copy();
         ret.domainPairs = newDomains;
         return ret;

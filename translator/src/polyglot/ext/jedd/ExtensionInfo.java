@@ -74,6 +74,8 @@ public class ExtensionInfo extends polyglot.ext.jl.ExtensionInfo {
     public static final Pass.ID INSERT_REPLACE = new Pass.ID("insert-replace");
     public static final Pass.ID GENERATE_JAVA = new Pass.ID("generate-java");
     public static final Pass.ID DOMAINS_BARRIER = new Pass.ID("domains-barrier");
+    public static final Pass.ID FOR_TRANSFORM = new Pass.ID("for-transform");
+    public static final Pass.ID LIVE_VARIABLES = new Pass.ID("live-variables");
 
     private void doRemovePass( List passes, Pass.ID pass ) {
         for( Iterator pIt = passes.iterator(); pIt.hasNext(); ) {
@@ -104,18 +106,24 @@ public class ExtensionInfo extends polyglot.ext.jl.ExtensionInfo {
             doRemovePass( passes, Pass.SERIALIZE );
             doRemovePass( passes, Pass.OUTPUT );
             beforePass(passes, Pass.PRE_OUTPUT_ALL,
-                    new PrintDomainsPass(PRINT_DOMAINS, job, ts ) );
+                    new PrintDomainsPass(PRINT_DOMAINS, job, ts, nf ) );
             return passes;
         }
         beforePass(passes, DOMAINS_BARRIER,
                 new VisitorPass(PHYSICAL_DOMAINS, job,
                     new PhysicalDomains( job, ts, nf ) ) );
         beforePass(passes, Pass.PRE_OUTPUT_ALL,
-                new PrintDomainsPass(PRINT_DOMAINS, job, ts ) );
+                new PrintDomainsPass(PRINT_DOMAINS, job, ts, nf ) );
         /*
         beforePass(passes, Pass.PRE_OUTPUT_ALL,
                 new VisitorPass(INSERT_REPLACE, job,
                     new InsertReplace( job, ts, nf ) ) );
+        beforePass(passes, Pass.PRE_OUTPUT_ALL,
+                new VisitorPass(FOR_TRANSFORM, job,
+                    new ForTransformPass( job, ts, nf ) ) );
+        beforePass(passes, Pass.PRE_OUTPUT_ALL,
+                new VisitorPass(LIVE_VARIABLES, job,
+                    new LiveVariables( job, ts, nf ) ) );
                     */
         beforePass(passes, Pass.PRE_OUTPUT_ALL,
                 new VisitorPass(GENERATE_JAVA, job,
