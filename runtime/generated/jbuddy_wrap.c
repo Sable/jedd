@@ -656,6 +656,8 @@ extern int bdd_makeset(int [],int);
 extern void bdd_setvarorder(int []);
 extern void allCubes(int,int []);
 extern void getShape(int,int []);
+extern char const *bdd_errno;
+extern void setuperrorhandler();
 extern bddinthandler bdd_error_hook(bddinthandler);
 extern bddgbchandler bdd_gbc_hook(bddgbchandler);
 extern bdd2inthandler bdd_resize_hook(bdd2inthandler);
@@ -815,8 +817,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1setpairs_1_1SWIG_1
     if (!SWIG_JavaArrayInInt(jenv, &jarr2, &arg2, jarg2)) return 0; 
     if (!SWIG_JavaArrayInInt(jenv, &jarr3, &arg3, jarg3)) return 0; 
     arg4 = (int)jarg4; 
-    result = (int)bdd_setpairs(arg1,arg2,arg3,arg4);
-    
+    {
+        result = (int)bdd_setpairs(arg1,arg2,arg3,arg4);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     SWIG_JavaArrayArgoutInt(jenv, jarr2, arg2, jarg2); 
     SWIG_JavaArrayArgoutInt(jenv, jarr3, arg3, jarg3); 
@@ -837,8 +846,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1makeset_1_1SWIG_10
     (void)jcls;
     if (!SWIG_JavaArrayInInt(jenv, &jarr1, &arg1, jarg1)) return 0; 
     arg2 = (int)jarg2; 
-    result = (int)bdd_makeset(arg1,arg2);
-    
+    {
+        result = (int)bdd_makeset(arg1,arg2);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     SWIG_JavaArrayArgoutInt(jenv, jarr1, arg1, jarg1); 
     free(arg1); 
@@ -853,8 +869,15 @@ JNIEXPORT void JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1setvarorder_1_1SWI
     (void)jenv;
     (void)jcls;
     if (!SWIG_JavaArrayInInt(jenv, &jarr1, &arg1, jarg1)) return ; 
-    bdd_setvarorder(arg1);
-    
+    {
+        bdd_setvarorder(arg1);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return ;
+        }
+    }
     SWIG_JavaArrayArgoutInt(jenv, jarr1, arg1, jarg1); 
     free(arg1); 
 }
@@ -869,8 +892,15 @@ JNIEXPORT void JNICALL Java_jedd_internal_buddy_BuddyJNI_allCubes(JNIEnv *jenv, 
     (void)jcls;
     arg1 = (int)jarg1; 
     if (!SWIG_JavaArrayInInt(jenv, &jarr2, &arg2, jarg2)) return ; 
-    allCubes(arg1,arg2);
-    
+    {
+        allCubes(arg1,arg2);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return ;
+        }
+    }
     SWIG_JavaArrayArgoutInt(jenv, jarr2, arg2, jarg2); 
     free(arg2); 
 }
@@ -885,10 +915,83 @@ JNIEXPORT void JNICALL Java_jedd_internal_buddy_BuddyJNI_getShape(JNIEnv *jenv, 
     (void)jcls;
     arg1 = (int)jarg1; 
     if (!SWIG_JavaArrayInInt(jenv, &jarr2, &arg2, jarg2)) return ; 
-    getShape(arg1,arg2);
-    
+    {
+        getShape(arg1,arg2);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return ;
+        }
+    }
     SWIG_JavaArrayArgoutInt(jenv, jarr2, arg2, jarg2); 
     free(arg2); 
+}
+
+
+JNIEXPORT void JNICALL Java_jedd_internal_buddy_BuddyJNI_set_1bdd_1errno(JNIEnv *jenv, jclass jcls, jstring jarg1) {
+    char *arg1 ;
+    
+    (void)jenv;
+    (void)jcls;
+    {
+        arg1 = 0;
+        if (jarg1) {
+            arg1 = (char *)(*jenv)->GetStringUTFChars(jenv, jarg1, 0);
+            if (!arg1) return ;
+        }
+    }
+    {
+        {
+            bdd_errno = (char const *) malloc(strlen(arg1)+1);
+            strcpy((char*)bdd_errno,arg1);
+        }
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return ;
+        }
+    }
+    {
+        if (arg1) (*jenv)->ReleaseStringUTFChars(jenv, jarg1, arg1); 
+    }
+}
+
+
+JNIEXPORT jstring JNICALL Java_jedd_internal_buddy_BuddyJNI_get_1bdd_1errno(JNIEnv *jenv, jclass jcls) {
+    jstring jresult = 0 ;
+    char *result;
+    
+    (void)jenv;
+    (void)jcls;
+    {
+        result = (char *)bdd_errno;
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
+    {
+        if(result) jresult = (*jenv)->NewStringUTF(jenv, result); 
+    }
+    return jresult;
+}
+
+
+JNIEXPORT void JNICALL Java_jedd_internal_buddy_BuddyJNI_setuperrorhandler(JNIEnv *jenv, jclass jcls) {
+    (void)jenv;
+    (void)jcls;
+    {
+        setuperrorhandler();
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return ;
+        }
+    }
 }
 
 
@@ -898,8 +1001,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_get_1bddop_1and(JNIEnv 
     
     (void)jenv;
     (void)jcls;
-    result = (int) 0;
-    
+    {
+        result = (int) 0;
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -911,8 +1021,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_get_1bddop_1xor(JNIEnv 
     
     (void)jenv;
     (void)jcls;
-    result = (int) 1;
-    
+    {
+        result = (int) 1;
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -924,8 +1041,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_get_1bddop_1or(JNIEnv *
     
     (void)jenv;
     (void)jcls;
-    result = (int) 2;
-    
+    {
+        result = (int) 2;
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -937,8 +1061,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_get_1bddop_1nand(JNIEnv
     
     (void)jenv;
     (void)jcls;
-    result = (int) 3;
-    
+    {
+        result = (int) 3;
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -950,8 +1081,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_get_1bddop_1nor(JNIEnv 
     
     (void)jenv;
     (void)jcls;
-    result = (int) 4;
-    
+    {
+        result = (int) 4;
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -963,8 +1101,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_get_1bddop_1imp(JNIEnv 
     
     (void)jenv;
     (void)jcls;
-    result = (int) 5;
-    
+    {
+        result = (int) 5;
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -976,8 +1121,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_get_1bddop_1biimp(JNIEn
     
     (void)jenv;
     (void)jcls;
-    result = (int) 6;
-    
+    {
+        result = (int) 6;
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -989,8 +1141,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_get_1bddop_1diff(JNIEnv
     
     (void)jenv;
     (void)jcls;
-    result = (int) 7;
-    
+    {
+        result = (int) 7;
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -1002,8 +1161,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_get_1bddop_1less(JNIEnv
     
     (void)jenv;
     (void)jcls;
-    result = (int) 8;
-    
+    {
+        result = (int) 8;
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -1015,8 +1181,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_get_1bddop_1invimp(JNIE
     
     (void)jenv;
     (void)jcls;
-    result = (int) 9;
-    
+    {
+        result = (int) 9;
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -1028,8 +1201,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_get_1bddop_1not(JNIEnv 
     
     (void)jenv;
     (void)jcls;
-    result = (int) 10;
-    
+    {
+        result = (int) 10;
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -1041,8 +1221,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_get_1bddop_1simplify(JN
     
     (void)jenv;
     (void)jcls;
-    result = (int) 11;
-    
+    {
+        result = (int) 11;
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -1166,8 +1353,15 @@ JNIEXPORT jlong JNICALL Java_jedd_internal_buddy_BuddyJNI_new_1bddPair(JNIEnv *j
     
     (void)jenv;
     (void)jcls;
-    result = (bddPair *)(bddPair *) calloc(1, sizeof(bddPair));
-    
+    {
+        result = (bddPair *)(bddPair *) calloc(1, sizeof(bddPair));
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     *(bddPair **)&jresult = result; 
     return jresult;
 }
@@ -1179,8 +1373,15 @@ JNIEXPORT void JNICALL Java_jedd_internal_buddy_BuddyJNI_delete_1bddPair(JNIEnv 
     (void)jenv;
     (void)jcls;
     arg1 = *(bddPair **)&jarg1; 
-    free((char *) arg1);
-    
+    {
+        free((char *) arg1);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return ;
+        }
+    }
 }
 
 
@@ -1414,8 +1615,15 @@ JNIEXPORT jlong JNICALL Java_jedd_internal_buddy_BuddyJNI_new_1bddStat(JNIEnv *j
     
     (void)jenv;
     (void)jcls;
-    result = (bddStat *)(bddStat *) calloc(1, sizeof(bddStat));
-    
+    {
+        result = (bddStat *)(bddStat *) calloc(1, sizeof(bddStat));
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     *(bddStat **)&jresult = result; 
     return jresult;
 }
@@ -1427,8 +1635,15 @@ JNIEXPORT void JNICALL Java_jedd_internal_buddy_BuddyJNI_delete_1bddStat(JNIEnv 
     (void)jenv;
     (void)jcls;
     arg1 = *(bddStat **)&jarg1; 
-    free((char *) arg1);
-    
+    {
+        free((char *) arg1);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return ;
+        }
+    }
 }
 
 
@@ -1578,8 +1793,15 @@ JNIEXPORT jlong JNICALL Java_jedd_internal_buddy_BuddyJNI_new_1bddGbcStat(JNIEnv
     
     (void)jenv;
     (void)jcls;
-    result = (bddGbcStat *)(bddGbcStat *) calloc(1, sizeof(bddGbcStat));
-    
+    {
+        result = (bddGbcStat *)(bddGbcStat *) calloc(1, sizeof(bddGbcStat));
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     *(bddGbcStat **)&jresult = result; 
     return jresult;
 }
@@ -1591,8 +1813,15 @@ JNIEXPORT void JNICALL Java_jedd_internal_buddy_BuddyJNI_delete_1bddGbcStat(JNIE
     (void)jenv;
     (void)jcls;
     arg1 = *(bddGbcStat **)&jarg1; 
-    free((char *) arg1);
-    
+    {
+        free((char *) arg1);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return ;
+        }
+    }
 }
 
 
@@ -1798,8 +2027,15 @@ JNIEXPORT jlong JNICALL Java_jedd_internal_buddy_BuddyJNI_new_1bddCacheStat(JNIE
     
     (void)jenv;
     (void)jcls;
-    result = (bddCacheStat *)(bddCacheStat *) calloc(1, sizeof(bddCacheStat));
-    
+    {
+        result = (bddCacheStat *)(bddCacheStat *) calloc(1, sizeof(bddCacheStat));
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     *(bddCacheStat **)&jresult = result; 
     return jresult;
 }
@@ -1811,8 +2047,15 @@ JNIEXPORT void JNICALL Java_jedd_internal_buddy_BuddyJNI_delete_1bddCacheStat(JN
     (void)jenv;
     (void)jcls;
     arg1 = *(bddCacheStat **)&jarg1; 
-    free((char *) arg1);
-    
+    {
+        free((char *) arg1);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return ;
+        }
+    }
 }
 
 
@@ -1824,8 +2067,15 @@ JNIEXPORT jlong JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1error_1hook(JNIEn
     (void)jenv;
     (void)jcls;
     arg1 = *(bddinthandler *)&jarg1; 
-    result = (bddinthandler)bdd_error_hook(arg1);
-    
+    {
+        result = (bddinthandler)bdd_error_hook(arg1);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     *(bddinthandler *)&jresult = result; 
     return jresult;
 }
@@ -1839,8 +2089,15 @@ JNIEXPORT jlong JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1gbc_1hook(JNIEnv 
     (void)jenv;
     (void)jcls;
     arg1 = *(bddgbchandler *)&jarg1; 
-    result = (bddgbchandler)bdd_gbc_hook(arg1);
-    
+    {
+        result = (bddgbchandler)bdd_gbc_hook(arg1);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     *(bddgbchandler *)&jresult = result; 
     return jresult;
 }
@@ -1854,8 +2111,15 @@ JNIEXPORT jlong JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1resize_1hook(JNIE
     (void)jenv;
     (void)jcls;
     arg1 = *(bdd2inthandler *)&jarg1; 
-    result = (bdd2inthandler)bdd_resize_hook(arg1);
-    
+    {
+        result = (bdd2inthandler)bdd_resize_hook(arg1);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     *(bdd2inthandler *)&jresult = result; 
     return jresult;
 }
@@ -1869,8 +2133,15 @@ JNIEXPORT jlong JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1reorder_1hook(JNI
     (void)jenv;
     (void)jcls;
     arg1 = *(bddinthandler *)&jarg1; 
-    result = (bddinthandler)bdd_reorder_hook(arg1);
-    
+    {
+        result = (bddinthandler)bdd_reorder_hook(arg1);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     *(bddinthandler *)&jresult = result; 
     return jresult;
 }
@@ -1884,8 +2155,15 @@ JNIEXPORT jlong JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1file_1hook(JNIEnv
     (void)jenv;
     (void)jcls;
     arg1 = *(bddfilehandler *)&jarg1; 
-    result = (bddfilehandler)bdd_file_hook(arg1);
-    
+    {
+        result = (bddfilehandler)bdd_file_hook(arg1);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     *(bddfilehandler *)&jresult = result; 
     return jresult;
 }
@@ -1901,8 +2179,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1init(JNIEnv *jenv,
     (void)jcls;
     arg1 = (int)jarg1; 
     arg2 = (int)jarg2; 
-    result = (int)bdd_init(arg1,arg2);
-    
+    {
+        result = (int)bdd_init(arg1,arg2);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -1911,8 +2196,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1init(JNIEnv *jenv,
 JNIEXPORT void JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1done(JNIEnv *jenv, jclass jcls) {
     (void)jenv;
     (void)jcls;
-    bdd_done();
-    
+    {
+        bdd_done();
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return ;
+        }
+    }
 }
 
 
@@ -1924,8 +2216,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1setvarnum(JNIEnv *
     (void)jenv;
     (void)jcls;
     arg1 = (int)jarg1; 
-    result = (int)bdd_setvarnum(arg1);
-    
+    {
+        result = (int)bdd_setvarnum(arg1);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -1939,8 +2238,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1extvarnum(JNIEnv *
     (void)jenv;
     (void)jcls;
     arg1 = (int)jarg1; 
-    result = (int)bdd_extvarnum(arg1);
-    
+    {
+        result = (int)bdd_extvarnum(arg1);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -1952,8 +2258,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1isrunning(JNIEnv *
     
     (void)jenv;
     (void)jcls;
-    result = (int)bdd_isrunning();
-    
+    {
+        result = (int)bdd_isrunning();
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -1967,8 +2280,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1setmaxnodenum(JNIE
     (void)jenv;
     (void)jcls;
     arg1 = (int)jarg1; 
-    result = (int)bdd_setmaxnodenum(arg1);
-    
+    {
+        result = (int)bdd_setmaxnodenum(arg1);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -1982,8 +2302,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1setmaxincrease(JNI
     (void)jenv;
     (void)jcls;
     arg1 = (int)jarg1; 
-    result = (int)bdd_setmaxincrease(arg1);
-    
+    {
+        result = (int)bdd_setmaxincrease(arg1);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -1997,8 +2324,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1setminfreenodes(JN
     (void)jenv;
     (void)jcls;
     arg1 = (int)jarg1; 
-    result = (int)bdd_setminfreenodes(arg1);
-    
+    {
+        result = (int)bdd_setminfreenodes(arg1);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -2010,8 +2344,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1getnodenum(JNIEnv 
     
     (void)jenv;
     (void)jcls;
-    result = (int)bdd_getnodenum();
-    
+    {
+        result = (int)bdd_getnodenum();
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -2023,8 +2364,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1getallocnum(JNIEnv
     
     (void)jenv;
     (void)jcls;
-    result = (int)bdd_getallocnum();
-    
+    {
+        result = (int)bdd_getallocnum();
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -2036,8 +2384,15 @@ JNIEXPORT jstring JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1versionstr(JNIE
     
     (void)jenv;
     (void)jcls;
-    result = (char *)bdd_versionstr();
-    
+    {
+        result = (char *)bdd_versionstr();
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     {
         if(result) jresult = (*jenv)->NewStringUTF(jenv, result); 
     }
@@ -2051,8 +2406,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1versionnum(JNIEnv 
     
     (void)jenv;
     (void)jcls;
-    result = (int)bdd_versionnum();
-    
+    {
+        result = (int)bdd_versionnum();
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -2064,8 +2426,15 @@ JNIEXPORT void JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1stats(JNIEnv *jenv
     (void)jenv;
     (void)jcls;
     arg1 = *(bddStat **)&jarg1; 
-    bdd_stats(arg1);
-    
+    {
+        bdd_stats(arg1);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return ;
+        }
+    }
 }
 
 
@@ -2075,8 +2444,15 @@ JNIEXPORT void JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1cachestats(JNIEnv 
     (void)jenv;
     (void)jcls;
     arg1 = *(bddCacheStat **)&jarg1; 
-    bdd_cachestats(arg1);
-    
+    {
+        bdd_cachestats(arg1);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return ;
+        }
+    }
 }
 
 
@@ -2086,16 +2462,30 @@ JNIEXPORT void JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1fprintstat(JNIEnv 
     (void)jenv;
     (void)jcls;
     arg1 = *(FILE **)&jarg1; 
-    bdd_fprintstat(arg1);
-    
+    {
+        bdd_fprintstat(arg1);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return ;
+        }
+    }
 }
 
 
 JNIEXPORT void JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1printstat(JNIEnv *jenv, jclass jcls) {
     (void)jenv;
     (void)jcls;
-    bdd_printstat();
-    
+    {
+        bdd_printstat();
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return ;
+        }
+    }
 }
 
 
@@ -2107,8 +2497,15 @@ JNIEXPORT void JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1default_1gbchandle
     (void)jcls;
     arg1 = (int)jarg1; 
     arg2 = *(bddGbcStat **)&jarg2; 
-    bdd_default_gbchandler(arg1,arg2);
-    
+    {
+        bdd_default_gbchandler(arg1,arg2);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return ;
+        }
+    }
 }
 
 
@@ -2118,8 +2515,15 @@ JNIEXPORT void JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1default_1errhandle
     (void)jenv;
     (void)jcls;
     arg1 = (int)jarg1; 
-    bdd_default_errhandler(arg1);
-    
+    {
+        bdd_default_errhandler(arg1);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return ;
+        }
+    }
 }
 
 
@@ -2131,8 +2535,15 @@ JNIEXPORT jstring JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1errstring(JNIEn
     (void)jenv;
     (void)jcls;
     arg1 = (int)jarg1; 
-    result = (char *)bdd_errstring(arg1);
-    
+    {
+        result = (char *)bdd_errstring(arg1);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     {
         if(result) jresult = (*jenv)->NewStringUTF(jenv, result); 
     }
@@ -2143,8 +2554,15 @@ JNIEXPORT jstring JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1errstring(JNIEn
 JNIEXPORT void JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1clear_1error(JNIEnv *jenv, jclass jcls) {
     (void)jenv;
     (void)jcls;
-    bdd_clear_error();
-    
+    {
+        bdd_clear_error();
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return ;
+        }
+    }
 }
 
 
@@ -2154,8 +2572,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1true(JNIEnv *jenv,
     
     (void)jenv;
     (void)jcls;
-    result = (BDD)bdd_true();
-    
+    {
+        result = (BDD)bdd_true();
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -2167,8 +2592,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1false(JNIEnv *jenv
     
     (void)jenv;
     (void)jcls;
-    result = (BDD)bdd_false();
-    
+    {
+        result = (BDD)bdd_false();
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -2180,8 +2612,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1varnum(JNIEnv *jen
     
     (void)jenv;
     (void)jcls;
-    result = (int)bdd_varnum();
-    
+    {
+        result = (int)bdd_varnum();
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -2195,8 +2634,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1ithvar(JNIEnv *jen
     (void)jenv;
     (void)jcls;
     arg1 = (int)jarg1; 
-    result = (BDD)bdd_ithvar(arg1);
-    
+    {
+        result = (BDD)bdd_ithvar(arg1);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -2210,8 +2656,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1nithvar(JNIEnv *je
     (void)jenv;
     (void)jcls;
     arg1 = (int)jarg1; 
-    result = (BDD)bdd_nithvar(arg1);
-    
+    {
+        result = (BDD)bdd_nithvar(arg1);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -2225,8 +2678,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1var(JNIEnv *jenv, 
     (void)jenv;
     (void)jcls;
     arg1 = (BDD)jarg1; 
-    result = (int)bdd_var(arg1);
-    
+    {
+        result = (int)bdd_var(arg1);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -2240,8 +2700,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1low(JNIEnv *jenv, 
     (void)jenv;
     (void)jcls;
     arg1 = (BDD)jarg1; 
-    result = (BDD)bdd_low(arg1);
-    
+    {
+        result = (BDD)bdd_low(arg1);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -2255,8 +2722,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1high(JNIEnv *jenv,
     (void)jenv;
     (void)jcls;
     arg1 = (BDD)jarg1; 
-    result = (BDD)bdd_high(arg1);
-    
+    {
+        result = (BDD)bdd_high(arg1);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -2270,8 +2744,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1varlevel(JNIEnv *j
     (void)jenv;
     (void)jcls;
     arg1 = (int)jarg1; 
-    result = (int)bdd_varlevel(arg1);
-    
+    {
+        result = (int)bdd_varlevel(arg1);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -2285,8 +2766,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1addref(JNIEnv *jen
     (void)jenv;
     (void)jcls;
     arg1 = (BDD)jarg1; 
-    result = (BDD)bdd_addref(arg1);
-    
+    {
+        result = (BDD)bdd_addref(arg1);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -2300,8 +2788,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1delref(JNIEnv *jen
     (void)jenv;
     (void)jcls;
     arg1 = (BDD)jarg1; 
-    result = (BDD)bdd_delref(arg1);
-    
+    {
+        result = (BDD)bdd_delref(arg1);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -2310,8 +2805,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1delref(JNIEnv *jen
 JNIEXPORT void JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1gbc(JNIEnv *jenv, jclass jcls) {
     (void)jenv;
     (void)jcls;
-    bdd_gbc();
-    
+    {
+        bdd_gbc();
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return ;
+        }
+    }
 }
 
 
@@ -2327,8 +2829,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1scanset(JNIEnv *je
     arg1 = (BDD)jarg1; 
     arg2 = *(int ***)&jarg2; 
     arg3 = *(int **)&jarg3; 
-    result = (int)bdd_scanset(arg1,arg2,arg3);
-    
+    {
+        result = (int)bdd_scanset(arg1,arg2,arg3);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -2344,8 +2853,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1makeset_1_1SWIG_11
     (void)jcls;
     arg1 = *(int **)&jarg1; 
     arg2 = (int)jarg2; 
-    result = (BDD)bdd_makeset(arg1,arg2);
-    
+    {
+        result = (BDD)bdd_makeset(arg1,arg2);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -2357,8 +2873,15 @@ JNIEXPORT jlong JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1newpair(JNIEnv *j
     
     (void)jenv;
     (void)jcls;
-    result = (bddPair *)bdd_newpair();
-    
+    {
+        result = (bddPair *)bdd_newpair();
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     *(bddPair **)&jresult = result; 
     return jresult;
 }
@@ -2376,8 +2899,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1setpair(JNIEnv *je
     arg1 = *(bddPair **)&jarg1; 
     arg2 = (int)jarg2; 
     arg3 = (int)jarg3; 
-    result = (int)bdd_setpair(arg1,arg2,arg3);
-    
+    {
+        result = (int)bdd_setpair(arg1,arg2,arg3);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -2397,8 +2927,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1setpairs_1_1SWIG_1
     arg2 = *(int **)&jarg2; 
     arg3 = *(int **)&jarg3; 
     arg4 = (int)jarg4; 
-    result = (int)bdd_setpairs(arg1,arg2,arg3,arg4);
-    
+    {
+        result = (int)bdd_setpairs(arg1,arg2,arg3,arg4);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -2416,8 +2953,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1setbddpair(JNIEnv 
     arg1 = *(bddPair **)&jarg1; 
     arg2 = (int)jarg2; 
     arg3 = (BDD)jarg3; 
-    result = (int)bdd_setbddpair(arg1,arg2,arg3);
-    
+    {
+        result = (int)bdd_setbddpair(arg1,arg2,arg3);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -2437,8 +2981,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1setbddpairs(JNIEnv
     arg2 = *(int **)&jarg2; 
     arg3 = *(BDD **)&jarg3; 
     arg4 = (int)jarg4; 
-    result = (int)bdd_setbddpairs(arg1,arg2,arg3,arg4);
-    
+    {
+        result = (int)bdd_setbddpairs(arg1,arg2,arg3,arg4);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -2450,8 +3001,15 @@ JNIEXPORT void JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1resetpair(JNIEnv *
     (void)jenv;
     (void)jcls;
     arg1 = *(bddPair **)&jarg1; 
-    bdd_resetpair(arg1);
-    
+    {
+        bdd_resetpair(arg1);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return ;
+        }
+    }
 }
 
 
@@ -2461,8 +3019,15 @@ JNIEXPORT void JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1freepair(JNIEnv *j
     (void)jenv;
     (void)jcls;
     arg1 = *(bddPair **)&jarg1; 
-    bdd_freepair(arg1);
-    
+    {
+        bdd_freepair(arg1);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return ;
+        }
+    }
 }
 
 
@@ -2474,8 +3039,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1setcacheratio(JNIE
     (void)jenv;
     (void)jcls;
     arg1 = (int)jarg1; 
-    result = (int)bdd_setcacheratio(arg1);
-    
+    {
+        result = (int)bdd_setcacheratio(arg1);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -2493,8 +3065,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1buildcube(JNIEnv *
     arg1 = (int)jarg1; 
     arg2 = (int)jarg2; 
     arg3 = *(BDD **)&jarg3; 
-    result = (BDD)bdd_buildcube(arg1,arg2,arg3);
-    
+    {
+        result = (BDD)bdd_buildcube(arg1,arg2,arg3);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -2512,8 +3091,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1ibuildcube(JNIEnv 
     arg1 = (int)jarg1; 
     arg2 = (int)jarg2; 
     arg3 = *(int **)&jarg3; 
-    result = (BDD)bdd_ibuildcube(arg1,arg2,arg3);
-    
+    {
+        result = (BDD)bdd_ibuildcube(arg1,arg2,arg3);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -2527,8 +3113,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1not(JNIEnv *jenv, 
     (void)jenv;
     (void)jcls;
     arg1 = (BDD)jarg1; 
-    result = (BDD)bdd_not(arg1);
-    
+    {
+        result = (BDD)bdd_not(arg1);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -2546,8 +3139,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1apply(JNIEnv *jenv
     arg1 = (BDD)jarg1; 
     arg2 = (BDD)jarg2; 
     arg3 = (int)jarg3; 
-    result = (BDD)bdd_apply(arg1,arg2,arg3);
-    
+    {
+        result = (BDD)bdd_apply(arg1,arg2,arg3);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -2563,8 +3163,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1and(JNIEnv *jenv, 
     (void)jcls;
     arg1 = (BDD)jarg1; 
     arg2 = (BDD)jarg2; 
-    result = (BDD)bdd_and(arg1,arg2);
-    
+    {
+        result = (BDD)bdd_and(arg1,arg2);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -2580,8 +3187,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1or(JNIEnv *jenv, j
     (void)jcls;
     arg1 = (BDD)jarg1; 
     arg2 = (BDD)jarg2; 
-    result = (BDD)bdd_or(arg1,arg2);
-    
+    {
+        result = (BDD)bdd_or(arg1,arg2);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -2597,8 +3211,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1xor(JNIEnv *jenv, 
     (void)jcls;
     arg1 = (BDD)jarg1; 
     arg2 = (BDD)jarg2; 
-    result = (BDD)bdd_xor(arg1,arg2);
-    
+    {
+        result = (BDD)bdd_xor(arg1,arg2);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -2614,8 +3235,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1imp(JNIEnv *jenv, 
     (void)jcls;
     arg1 = (BDD)jarg1; 
     arg2 = (BDD)jarg2; 
-    result = (BDD)bdd_imp(arg1,arg2);
-    
+    {
+        result = (BDD)bdd_imp(arg1,arg2);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -2631,8 +3259,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1biimp(JNIEnv *jenv
     (void)jcls;
     arg1 = (BDD)jarg1; 
     arg2 = (BDD)jarg2; 
-    result = (BDD)bdd_biimp(arg1,arg2);
-    
+    {
+        result = (BDD)bdd_biimp(arg1,arg2);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -2650,8 +3285,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1ite(JNIEnv *jenv, 
     arg1 = (BDD)jarg1; 
     arg2 = (BDD)jarg2; 
     arg3 = (BDD)jarg3; 
-    result = (BDD)bdd_ite(arg1,arg2,arg3);
-    
+    {
+        result = (BDD)bdd_ite(arg1,arg2,arg3);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -2667,8 +3309,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1restrict(JNIEnv *j
     (void)jcls;
     arg1 = (BDD)jarg1; 
     arg2 = (BDD)jarg2; 
-    result = (BDD)bdd_restrict(arg1,arg2);
-    
+    {
+        result = (BDD)bdd_restrict(arg1,arg2);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -2684,8 +3333,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1constrain(JNIEnv *
     (void)jcls;
     arg1 = (BDD)jarg1; 
     arg2 = (BDD)jarg2; 
-    result = (BDD)bdd_constrain(arg1,arg2);
-    
+    {
+        result = (BDD)bdd_constrain(arg1,arg2);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -2701,8 +3357,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1replace(JNIEnv *je
     (void)jcls;
     arg1 = (BDD)jarg1; 
     arg2 = *(bddPair **)&jarg2; 
-    result = (BDD)bdd_replace(arg1,arg2);
-    
+    {
+        result = (BDD)bdd_replace(arg1,arg2);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -2720,8 +3383,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1compose(JNIEnv *je
     arg1 = (BDD)jarg1; 
     arg2 = (BDD)jarg2; 
     arg3 = (BDD)jarg3; 
-    result = (BDD)bdd_compose(arg1,arg2,arg3);
-    
+    {
+        result = (BDD)bdd_compose(arg1,arg2,arg3);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -2737,8 +3407,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1veccompose(JNIEnv 
     (void)jcls;
     arg1 = (BDD)jarg1; 
     arg2 = *(bddPair **)&jarg2; 
-    result = (BDD)bdd_veccompose(arg1,arg2);
-    
+    {
+        result = (BDD)bdd_veccompose(arg1,arg2);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -2754,8 +3431,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1simplify(JNIEnv *j
     (void)jcls;
     arg1 = (BDD)jarg1; 
     arg2 = (BDD)jarg2; 
-    result = (BDD)bdd_simplify(arg1,arg2);
-    
+    {
+        result = (BDD)bdd_simplify(arg1,arg2);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -2771,8 +3455,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1exist(JNIEnv *jenv
     (void)jcls;
     arg1 = (BDD)jarg1; 
     arg2 = (BDD)jarg2; 
-    result = (BDD)bdd_exist(arg1,arg2);
-    
+    {
+        result = (BDD)bdd_exist(arg1,arg2);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -2788,8 +3479,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1forall(JNIEnv *jen
     (void)jcls;
     arg1 = (BDD)jarg1; 
     arg2 = (BDD)jarg2; 
-    result = (BDD)bdd_forall(arg1,arg2);
-    
+    {
+        result = (BDD)bdd_forall(arg1,arg2);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -2805,8 +3503,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1unique(JNIEnv *jen
     (void)jcls;
     arg1 = (BDD)jarg1; 
     arg2 = (BDD)jarg2; 
-    result = (BDD)bdd_unique(arg1,arg2);
-    
+    {
+        result = (BDD)bdd_unique(arg1,arg2);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -2826,8 +3531,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1appex(JNIEnv *jenv
     arg2 = (BDD)jarg2; 
     arg3 = (int)jarg3; 
     arg4 = (BDD)jarg4; 
-    result = (BDD)bdd_appex(arg1,arg2,arg3,arg4);
-    
+    {
+        result = (BDD)bdd_appex(arg1,arg2,arg3,arg4);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -2847,8 +3559,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1appall(JNIEnv *jen
     arg2 = (BDD)jarg2; 
     arg3 = (int)jarg3; 
     arg4 = (BDD)jarg4; 
-    result = (BDD)bdd_appall(arg1,arg2,arg3,arg4);
-    
+    {
+        result = (BDD)bdd_appall(arg1,arg2,arg3,arg4);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -2868,8 +3587,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1appuni(JNIEnv *jen
     arg2 = (BDD)jarg2; 
     arg3 = (int)jarg3; 
     arg4 = (BDD)jarg4; 
-    result = (BDD)bdd_appuni(arg1,arg2,arg3,arg4);
-    
+    {
+        result = (BDD)bdd_appuni(arg1,arg2,arg3,arg4);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -2883,8 +3609,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1support(JNIEnv *je
     (void)jenv;
     (void)jcls;
     arg1 = (BDD)jarg1; 
-    result = (BDD)bdd_support(arg1);
-    
+    {
+        result = (BDD)bdd_support(arg1);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -2898,8 +3631,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1satone(JNIEnv *jen
     (void)jenv;
     (void)jcls;
     arg1 = (BDD)jarg1; 
-    result = (BDD)bdd_satone(arg1);
-    
+    {
+        result = (BDD)bdd_satone(arg1);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -2917,8 +3657,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1satoneset(JNIEnv *
     arg1 = (BDD)jarg1; 
     arg2 = (BDD)jarg2; 
     arg3 = (BDD)jarg3; 
-    result = (BDD)bdd_satoneset(arg1,arg2,arg3);
-    
+    {
+        result = (BDD)bdd_satoneset(arg1,arg2,arg3);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -2932,8 +3679,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1fullsatone(JNIEnv 
     (void)jenv;
     (void)jcls;
     arg1 = (BDD)jarg1; 
-    result = (BDD)bdd_fullsatone(arg1);
-    
+    {
+        result = (BDD)bdd_fullsatone(arg1);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -2947,8 +3701,15 @@ JNIEXPORT void JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1allsat(JNIEnv *jen
     (void)jcls;
     arg1 = (BDD)jarg1; 
     arg2 = *(bddallsathandler *)&jarg2; 
-    bdd_allsat(arg1,arg2);
-    
+    {
+        bdd_allsat(arg1,arg2);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return ;
+        }
+    }
 }
 
 
@@ -2960,8 +3721,15 @@ JNIEXPORT jdouble JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1satcount(JNIEnv
     (void)jenv;
     (void)jcls;
     arg1 = (BDD)jarg1; 
-    result = (double)bdd_satcount(arg1);
-    
+    {
+        result = (double)bdd_satcount(arg1);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jdouble)result; 
     return jresult;
 }
@@ -2977,8 +3745,15 @@ JNIEXPORT jdouble JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1satcountset(JNI
     (void)jcls;
     arg1 = (BDD)jarg1; 
     arg2 = (BDD)jarg2; 
-    result = (double)bdd_satcountset(arg1,arg2);
-    
+    {
+        result = (double)bdd_satcountset(arg1,arg2);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jdouble)result; 
     return jresult;
 }
@@ -2992,8 +3767,15 @@ JNIEXPORT jdouble JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1satcountln(JNIE
     (void)jenv;
     (void)jcls;
     arg1 = (BDD)jarg1; 
-    result = (double)bdd_satcountln(arg1);
-    
+    {
+        result = (double)bdd_satcountln(arg1);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jdouble)result; 
     return jresult;
 }
@@ -3009,8 +3791,15 @@ JNIEXPORT jdouble JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1satcountlnset(J
     (void)jcls;
     arg1 = (BDD)jarg1; 
     arg2 = (BDD)jarg2; 
-    result = (double)bdd_satcountlnset(arg1,arg2);
-    
+    {
+        result = (double)bdd_satcountlnset(arg1,arg2);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jdouble)result; 
     return jresult;
 }
@@ -3024,8 +3813,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1nodecount(JNIEnv *
     (void)jenv;
     (void)jcls;
     arg1 = (BDD)jarg1; 
-    result = (int)bdd_nodecount(arg1);
-    
+    {
+        result = (int)bdd_nodecount(arg1);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -3041,8 +3837,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1anodecount(JNIEnv 
     (void)jcls;
     arg1 = *(BDD **)&jarg1; 
     arg2 = (int)jarg2; 
-    result = (int)bdd_anodecount(arg1,arg2);
-    
+    {
+        result = (int)bdd_anodecount(arg1,arg2);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -3056,8 +3859,15 @@ JNIEXPORT jlong JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1varprofile(JNIEnv
     (void)jenv;
     (void)jcls;
     arg1 = (BDD)jarg1; 
-    result = (int *)bdd_varprofile(arg1);
-    
+    {
+        result = (int *)bdd_varprofile(arg1);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     *(int **)&jresult = result; 
     return jresult;
 }
@@ -3071,8 +3881,15 @@ JNIEXPORT jdouble JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1pathcount(JNIEn
     (void)jenv;
     (void)jcls;
     arg1 = (BDD)jarg1; 
-    result = (double)bdd_pathcount(arg1);
-    
+    {
+        result = (double)bdd_pathcount(arg1);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jdouble)result; 
     return jresult;
 }
@@ -3081,8 +3898,15 @@ JNIEXPORT jdouble JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1pathcount(JNIEn
 JNIEXPORT void JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1printall(JNIEnv *jenv, jclass jcls) {
     (void)jenv;
     (void)jcls;
-    bdd_printall();
-    
+    {
+        bdd_printall();
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return ;
+        }
+    }
 }
 
 
@@ -3092,8 +3916,15 @@ JNIEXPORT void JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1fprintall(JNIEnv *
     (void)jenv;
     (void)jcls;
     arg1 = *(FILE **)&jarg1; 
-    bdd_fprintall(arg1);
-    
+    {
+        bdd_fprintall(arg1);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return ;
+        }
+    }
 }
 
 
@@ -3105,8 +3936,15 @@ JNIEXPORT void JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1fprinttable(JNIEnv
     (void)jcls;
     arg1 = *(FILE **)&jarg1; 
     arg2 = (BDD)jarg2; 
-    bdd_fprinttable(arg1,arg2);
-    
+    {
+        bdd_fprinttable(arg1,arg2);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return ;
+        }
+    }
 }
 
 
@@ -3116,8 +3954,15 @@ JNIEXPORT void JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1printtable(JNIEnv 
     (void)jenv;
     (void)jcls;
     arg1 = (BDD)jarg1; 
-    bdd_printtable(arg1);
-    
+    {
+        bdd_printtable(arg1);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return ;
+        }
+    }
 }
 
 
@@ -3129,8 +3974,15 @@ JNIEXPORT void JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1fprintset(JNIEnv *
     (void)jcls;
     arg1 = *(FILE **)&jarg1; 
     arg2 = (BDD)jarg2; 
-    bdd_fprintset(arg1,arg2);
-    
+    {
+        bdd_fprintset(arg1,arg2);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return ;
+        }
+    }
 }
 
 
@@ -3140,8 +3992,15 @@ JNIEXPORT void JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1printset(JNIEnv *j
     (void)jenv;
     (void)jcls;
     arg1 = (BDD)jarg1; 
-    bdd_printset(arg1);
-    
+    {
+        bdd_printset(arg1);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return ;
+        }
+    }
 }
 
 
@@ -3161,8 +4020,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1fnprintdot(JNIEnv 
         }
     }
     arg2 = (BDD)jarg2; 
-    result = (int)bdd_fnprintdot(arg1,arg2);
-    
+    {
+        result = (int)bdd_fnprintdot(arg1,arg2);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     {
         if (arg1) (*jenv)->ReleaseStringUTFChars(jenv, jarg1, arg1); 
@@ -3179,8 +4045,15 @@ JNIEXPORT void JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1fprintdot(JNIEnv *
     (void)jcls;
     arg1 = *(FILE **)&jarg1; 
     arg2 = (BDD)jarg2; 
-    bdd_fprintdot(arg1,arg2);
-    
+    {
+        bdd_fprintdot(arg1,arg2);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return ;
+        }
+    }
 }
 
 
@@ -3190,8 +4063,15 @@ JNIEXPORT void JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1printdot(JNIEnv *j
     (void)jenv;
     (void)jcls;
     arg1 = (BDD)jarg1; 
-    bdd_printdot(arg1);
-    
+    {
+        bdd_printdot(arg1);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return ;
+        }
+    }
 }
 
 
@@ -3211,8 +4091,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1fnsave(JNIEnv *jen
         }
     }
     arg2 = (BDD)jarg2; 
-    result = (int)bdd_fnsave(arg1,arg2);
-    
+    {
+        result = (int)bdd_fnsave(arg1,arg2);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     {
         if (arg1) (*jenv)->ReleaseStringUTFChars(jenv, jarg1, arg1); 
@@ -3231,8 +4118,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1save(JNIEnv *jenv,
     (void)jcls;
     arg1 = *(FILE **)&jarg1; 
     arg2 = (BDD)jarg2; 
-    result = (int)bdd_save(arg1,arg2);
-    
+    {
+        result = (int)bdd_save(arg1,arg2);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -3254,8 +4148,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1fnload(JNIEnv *jen
         }
     }
     arg2 = *(BDD **)&jarg2; 
-    result = (int)bdd_fnload(arg1,arg2);
-    
+    {
+        result = (int)bdd_fnload(arg1,arg2);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     {
         if (arg1) (*jenv)->ReleaseStringUTFChars(jenv, jarg1, arg1); 
@@ -3274,8 +4175,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1load(JNIEnv *jenv,
     (void)jcls;
     arg1 = *(FILE **)&jarg1; 
     arg2 = *(BDD **)&jarg2; 
-    result = (int)bdd_load(arg1,arg2);
-    
+    {
+        result = (int)bdd_load(arg1,arg2);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -3291,8 +4199,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1swapvar(JNIEnv *je
     (void)jcls;
     arg1 = (int)jarg1; 
     arg2 = (int)jarg2; 
-    result = (int)bdd_swapvar(arg1,arg2);
-    
+    {
+        result = (int)bdd_swapvar(arg1,arg2);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -3304,8 +4219,15 @@ JNIEXPORT void JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1default_1reohandle
     (void)jenv;
     (void)jcls;
     arg1 = (int)jarg1; 
-    bdd_default_reohandler(arg1);
-    
+    {
+        bdd_default_reohandler(arg1);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return ;
+        }
+    }
 }
 
 
@@ -3315,8 +4237,15 @@ JNIEXPORT void JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1reorder(JNIEnv *je
     (void)jenv;
     (void)jcls;
     arg1 = (int)jarg1; 
-    bdd_reorder(arg1);
-    
+    {
+        bdd_reorder(arg1);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return ;
+        }
+    }
 }
 
 
@@ -3326,8 +4255,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1reorder_1gain(JNIE
     
     (void)jenv;
     (void)jcls;
-    result = (int)bdd_reorder_gain();
-    
+    {
+        result = (int)bdd_reorder_gain();
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -3341,8 +4277,15 @@ JNIEXPORT jlong JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1reorder_1probe(JN
     (void)jenv;
     (void)jcls;
     arg1 = *(bddsizehandler *)&jarg1; 
-    result = (bddsizehandler)bdd_reorder_probe(arg1);
-    
+    {
+        result = (bddsizehandler)bdd_reorder_probe(arg1);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     *(bddsizehandler *)&jresult = result; 
     return jresult;
 }
@@ -3351,8 +4294,15 @@ JNIEXPORT jlong JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1reorder_1probe(JN
 JNIEXPORT void JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1clrvarblocks(JNIEnv *jenv, jclass jcls) {
     (void)jenv;
     (void)jcls;
-    bdd_clrvarblocks();
-    
+    {
+        bdd_clrvarblocks();
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return ;
+        }
+    }
 }
 
 
@@ -3366,8 +4316,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1addvarblock(JNIEnv
     (void)jcls;
     arg1 = (BDD)jarg1; 
     arg2 = (int)jarg2; 
-    result = (int)bdd_addvarblock(arg1,arg2);
-    
+    {
+        result = (int)bdd_addvarblock(arg1,arg2);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -3385,8 +4342,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1intaddvarblock(JNI
     arg1 = (int)jarg1; 
     arg2 = (int)jarg2; 
     arg3 = (int)jarg3; 
-    result = (int)bdd_intaddvarblock(arg1,arg2,arg3);
-    
+    {
+        result = (int)bdd_intaddvarblock(arg1,arg2,arg3);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -3395,8 +4359,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1intaddvarblock(JNI
 JNIEXPORT void JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1varblockall(JNIEnv *jenv, jclass jcls) {
     (void)jenv;
     (void)jcls;
-    bdd_varblockall();
-    
+    {
+        bdd_varblockall();
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return ;
+        }
+    }
 }
 
 
@@ -3408,8 +4379,15 @@ JNIEXPORT jlong JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1blockfile_1hook(J
     (void)jenv;
     (void)jcls;
     arg1 = *(bddfilehandler *)&jarg1; 
-    result = (bddfilehandler)bdd_blockfile_hook(arg1);
-    
+    {
+        result = (bddfilehandler)bdd_blockfile_hook(arg1);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     *(bddfilehandler *)&jresult = result; 
     return jresult;
 }
@@ -3423,8 +4401,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1autoreorder(JNIEnv
     (void)jenv;
     (void)jcls;
     arg1 = (int)jarg1; 
-    result = (int)bdd_autoreorder(arg1);
-    
+    {
+        result = (int)bdd_autoreorder(arg1);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -3440,8 +4425,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1autoreorder_1times
     (void)jcls;
     arg1 = (int)jarg1; 
     arg2 = (int)jarg2; 
-    result = (int)bdd_autoreorder_times(arg1,arg2);
-    
+    {
+        result = (int)bdd_autoreorder_times(arg1,arg2);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -3455,8 +4447,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1var2level(JNIEnv *
     (void)jenv;
     (void)jcls;
     arg1 = (int)jarg1; 
-    result = (int)bdd_var2level(arg1);
-    
+    {
+        result = (int)bdd_var2level(arg1);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -3470,8 +4469,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1level2var(JNIEnv *
     (void)jenv;
     (void)jcls;
     arg1 = (int)jarg1; 
-    result = (int)bdd_level2var(arg1);
-    
+    {
+        result = (int)bdd_level2var(arg1);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -3483,8 +4489,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1getreorder_1times(
     
     (void)jenv;
     (void)jcls;
-    result = (int)bdd_getreorder_times();
-    
+    {
+        result = (int)bdd_getreorder_times();
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -3496,8 +4509,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1getreorder_1method
     
     (void)jenv;
     (void)jcls;
-    result = (int)bdd_getreorder_method();
-    
+    {
+        result = (int)bdd_getreorder_method();
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -3506,16 +4526,30 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1getreorder_1method
 JNIEXPORT void JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1enable_1reorder(JNIEnv *jenv, jclass jcls) {
     (void)jenv;
     (void)jcls;
-    bdd_enable_reorder();
-    
+    {
+        bdd_enable_reorder();
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return ;
+        }
+    }
 }
 
 
 JNIEXPORT void JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1disable_1reorder(JNIEnv *jenv, jclass jcls) {
     (void)jenv;
     (void)jcls;
-    bdd_disable_reorder();
-    
+    {
+        bdd_disable_reorder();
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return ;
+        }
+    }
 }
 
 
@@ -3527,8 +4561,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1reorder_1verbose(J
     (void)jenv;
     (void)jcls;
     arg1 = (int)jarg1; 
-    result = (int)bdd_reorder_verbose(arg1);
-    
+    {
+        result = (int)bdd_reorder_verbose(arg1);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -3540,16 +4581,30 @@ JNIEXPORT void JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1setvarorder_1_1SWI
     (void)jenv;
     (void)jcls;
     arg1 = *(int **)&jarg1; 
-    bdd_setvarorder(arg1);
-    
+    {
+        bdd_setvarorder(arg1);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return ;
+        }
+    }
 }
 
 
 JNIEXPORT void JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1printorder(JNIEnv *jenv, jclass jcls) {
     (void)jenv;
     (void)jcls;
-    bdd_printorder();
-    
+    {
+        bdd_printorder();
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return ;
+        }
+    }
 }
 
 
@@ -3559,8 +4614,15 @@ JNIEXPORT void JNICALL Java_jedd_internal_buddy_BuddyJNI_bdd_1fprintorder(JNIEnv
     (void)jenv;
     (void)jcls;
     arg1 = *(FILE **)&jarg1; 
-    bdd_fprintorder(arg1);
-    
+    {
+        bdd_fprintorder(arg1);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return ;
+        }
+    }
 }
 
 
@@ -3570,8 +4632,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_get_1bddfalse(JNIEnv *j
     
     (void)jenv;
     (void)jcls;
-    result = (BDD)(BDD)bddfalse;
-    
+    {
+        result = (BDD)(BDD)bddfalse;
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -3583,8 +4652,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_get_1bddtrue(JNIEnv *je
     
     (void)jenv;
     (void)jcls;
-    result = (BDD)(BDD)bddtrue;
-    
+    {
+        result = (BDD)(BDD)bddtrue;
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -3596,8 +4672,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_get_1BDD_1REORDER_1NONE
     
     (void)jenv;
     (void)jcls;
-    result = (int) 0;
-    
+    {
+        result = (int) 0;
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -3609,8 +4692,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_get_1BDD_1REORDER_1WIN2
     
     (void)jenv;
     (void)jcls;
-    result = (int) 1;
-    
+    {
+        result = (int) 1;
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -3622,8 +4712,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_get_1BDD_1REORDER_1WIN2
     
     (void)jenv;
     (void)jcls;
-    result = (int) 2;
-    
+    {
+        result = (int) 2;
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -3635,8 +4732,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_get_1BDD_1REORDER_1SIFT
     
     (void)jenv;
     (void)jcls;
-    result = (int) 3;
-    
+    {
+        result = (int) 3;
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -3648,8 +4752,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_get_1BDD_1REORDER_1SIFT
     
     (void)jenv;
     (void)jcls;
-    result = (int) 4;
-    
+    {
+        result = (int) 4;
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -3661,8 +4772,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_get_1BDD_1REORDER_1WIN3
     
     (void)jenv;
     (void)jcls;
-    result = (int) 5;
-    
+    {
+        result = (int) 5;
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -3674,8 +4792,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_get_1BDD_1REORDER_1WIN3
     
     (void)jenv;
     (void)jcls;
-    result = (int) 6;
-    
+    {
+        result = (int) 6;
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -3687,8 +4812,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_get_1BDD_1REORDER_1RAND
     
     (void)jenv;
     (void)jcls;
-    result = (int) 7;
-    
+    {
+        result = (int) 7;
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -3700,8 +4832,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_get_1BDD_1REORDER_1FREE
     
     (void)jenv;
     (void)jcls;
-    result = (int) 0;
-    
+    {
+        result = (int) 0;
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -3713,8 +4852,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_get_1BDD_1REORDER_1FIXE
     
     (void)jenv;
     (void)jcls;
-    result = (int) 1;
-    
+    {
+        result = (int) 1;
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -3726,8 +4872,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_get_1BDD_1MEMORY(JNIEnv
     
     (void)jenv;
     (void)jcls;
-    result = (int) (-1);
-    
+    {
+        result = (int) (-1);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -3739,8 +4892,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_get_1BDD_1VAR(JNIEnv *j
     
     (void)jenv;
     (void)jcls;
-    result = (int) (-2);
-    
+    {
+        result = (int) (-2);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -3752,8 +4912,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_get_1BDD_1RANGE(JNIEnv 
     
     (void)jenv;
     (void)jcls;
-    result = (int) (-3);
-    
+    {
+        result = (int) (-3);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -3765,8 +4932,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_get_1BDD_1DEREF(JNIEnv 
     
     (void)jenv;
     (void)jcls;
-    result = (int) (-4);
-    
+    {
+        result = (int) (-4);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -3778,8 +4952,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_get_1BDD_1RUNNING(JNIEn
     
     (void)jenv;
     (void)jcls;
-    result = (int) (-5);
-    
+    {
+        result = (int) (-5);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -3791,8 +4972,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_get_1BDD_1FILE(JNIEnv *
     
     (void)jenv;
     (void)jcls;
-    result = (int) (-6);
-    
+    {
+        result = (int) (-6);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -3804,8 +4992,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_get_1BDD_1FORMAT(JNIEnv
     
     (void)jenv;
     (void)jcls;
-    result = (int) (-7);
-    
+    {
+        result = (int) (-7);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -3817,8 +5012,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_get_1BDD_1ORDER(JNIEnv 
     
     (void)jenv;
     (void)jcls;
-    result = (int) (-8);
-    
+    {
+        result = (int) (-8);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -3830,8 +5032,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_get_1BDD_1BREAK(JNIEnv 
     
     (void)jenv;
     (void)jcls;
-    result = (int) (-9);
-    
+    {
+        result = (int) (-9);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -3843,8 +5052,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_get_1BDD_1VARNUM(JNIEnv
     
     (void)jenv;
     (void)jcls;
-    result = (int) (-10);
-    
+    {
+        result = (int) (-10);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -3856,8 +5072,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_get_1BDD_1NODES(JNIEnv 
     
     (void)jenv;
     (void)jcls;
-    result = (int) (-11);
-    
+    {
+        result = (int) (-11);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -3869,8 +5092,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_get_1BDD_1OP(JNIEnv *je
     
     (void)jenv;
     (void)jcls;
-    result = (int) (-12);
-    
+    {
+        result = (int) (-12);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -3882,8 +5112,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_get_1BDD_1VARSET(JNIEnv
     
     (void)jenv;
     (void)jcls;
-    result = (int) (-13);
-    
+    {
+        result = (int) (-13);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -3895,8 +5132,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_get_1BDD_1VARBLK(JNIEnv
     
     (void)jenv;
     (void)jcls;
-    result = (int) (-14);
-    
+    {
+        result = (int) (-14);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -3908,8 +5152,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_get_1BDD_1DECVNUM(JNIEn
     
     (void)jenv;
     (void)jcls;
-    result = (int) (-15);
-    
+    {
+        result = (int) (-15);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -3921,8 +5172,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_get_1BDD_1REPLACE(JNIEn
     
     (void)jenv;
     (void)jcls;
-    result = (int) (-16);
-    
+    {
+        result = (int) (-16);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -3934,8 +5192,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_get_1BDD_1NODENUM(JNIEn
     
     (void)jenv;
     (void)jcls;
-    result = (int) (-17);
-    
+    {
+        result = (int) (-17);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -3947,8 +5212,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_get_1BDD_1ILLBDD(JNIEnv
     
     (void)jenv;
     (void)jcls;
-    result = (int) (-18);
-    
+    {
+        result = (int) (-18);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -3960,8 +5232,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_get_1BDD_1SIZE(JNIEnv *
     
     (void)jenv;
     (void)jcls;
-    result = (int) (-19);
-    
+    {
+        result = (int) (-19);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -3973,8 +5252,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_get_1BVEC_1SIZE(JNIEnv 
     
     (void)jenv;
     (void)jcls;
-    result = (int) (-20);
-    
+    {
+        result = (int) (-20);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -3986,8 +5272,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_get_1BVEC_1SHIFT(JNIEnv
     
     (void)jenv;
     (void)jcls;
-    result = (int) (-21);
-    
+    {
+        result = (int) (-21);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -3999,8 +5292,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_get_1BVEC_1DIVZERO(JNIE
     
     (void)jenv;
     (void)jcls;
-    result = (int) (-22);
-    
+    {
+        result = (int) (-22);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -4012,8 +5312,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_get_1BDD_1ERRNUM(JNIEnv
     
     (void)jenv;
     (void)jcls;
-    result = (int) 24;
-    
+    {
+        result = (int) 24;
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -4029,8 +5336,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_fdd_1extdomain(JNIEnv *
     (void)jcls;
     arg1 = *(int **)&jarg1; 
     arg2 = (int)jarg2; 
-    result = (int)fdd_extdomain(arg1,arg2);
-    
+    {
+        result = (int)fdd_extdomain(arg1,arg2);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -4046,8 +5360,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_fdd_1overlapdomain(JNIE
     (void)jcls;
     arg1 = (int)jarg1; 
     arg2 = (int)jarg2; 
-    result = (int)fdd_overlapdomain(arg1,arg2);
-    
+    {
+        result = (int)fdd_overlapdomain(arg1,arg2);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -4056,8 +5377,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_fdd_1overlapdomain(JNIE
 JNIEXPORT void JNICALL Java_jedd_internal_buddy_BuddyJNI_fdd_1clearall(JNIEnv *jenv, jclass jcls) {
     (void)jenv;
     (void)jcls;
-    fdd_clearall();
-    
+    {
+        fdd_clearall();
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return ;
+        }
+    }
 }
 
 
@@ -4067,8 +5395,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_fdd_1domainnum(JNIEnv *
     
     (void)jenv;
     (void)jcls;
-    result = (int)fdd_domainnum();
-    
+    {
+        result = (int)fdd_domainnum();
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -4082,8 +5417,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_fdd_1domainsize(JNIEnv 
     (void)jenv;
     (void)jcls;
     arg1 = (int)jarg1; 
-    result = (int)fdd_domainsize(arg1);
-    
+    {
+        result = (int)fdd_domainsize(arg1);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -4097,8 +5439,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_fdd_1varnum(JNIEnv *jen
     (void)jenv;
     (void)jcls;
     arg1 = (int)jarg1; 
-    result = (int)fdd_varnum(arg1);
-    
+    {
+        result = (int)fdd_varnum(arg1);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -4112,8 +5461,15 @@ JNIEXPORT jlong JNICALL Java_jedd_internal_buddy_BuddyJNI_fdd_1vars(JNIEnv *jenv
     (void)jenv;
     (void)jcls;
     arg1 = (int)jarg1; 
-    result = (int *)fdd_vars(arg1);
-    
+    {
+        result = (int *)fdd_vars(arg1);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     *(int **)&jresult = result; 
     return jresult;
 }
@@ -4129,8 +5485,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_fdd_1ithvar(JNIEnv *jen
     (void)jcls;
     arg1 = (int)jarg1; 
     arg2 = (int)jarg2; 
-    result = (BDD)fdd_ithvar(arg1,arg2);
-    
+    {
+        result = (BDD)fdd_ithvar(arg1,arg2);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -4146,8 +5509,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_fdd_1scanvar(JNIEnv *je
     (void)jcls;
     arg1 = (BDD)jarg1; 
     arg2 = (int)jarg2; 
-    result = (int)fdd_scanvar(arg1,arg2);
-    
+    {
+        result = (int)fdd_scanvar(arg1,arg2);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -4161,8 +5531,15 @@ JNIEXPORT jlong JNICALL Java_jedd_internal_buddy_BuddyJNI_fdd_1scanallvar(JNIEnv
     (void)jenv;
     (void)jcls;
     arg1 = (BDD)jarg1; 
-    result = (int *)fdd_scanallvar(arg1);
-    
+    {
+        result = (int *)fdd_scanallvar(arg1);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     *(int **)&jresult = result; 
     return jresult;
 }
@@ -4176,8 +5553,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_fdd_1ithset(JNIEnv *jen
     (void)jenv;
     (void)jcls;
     arg1 = (int)jarg1; 
-    result = (BDD)fdd_ithset(arg1);
-    
+    {
+        result = (BDD)fdd_ithset(arg1);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -4191,8 +5575,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_fdd_1domain(JNIEnv *jen
     (void)jenv;
     (void)jcls;
     arg1 = (int)jarg1; 
-    result = (BDD)fdd_domain(arg1);
-    
+    {
+        result = (BDD)fdd_domain(arg1);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -4208,8 +5599,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_fdd_1equals(JNIEnv *jen
     (void)jcls;
     arg1 = (int)jarg1; 
     arg2 = (int)jarg2; 
-    result = (BDD)fdd_equals(arg1,arg2);
-    
+    {
+        result = (BDD)fdd_equals(arg1,arg2);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -4223,8 +5621,15 @@ JNIEXPORT jlong JNICALL Java_jedd_internal_buddy_BuddyJNI_fdd_1file_1hook(JNIEnv
     (void)jenv;
     (void)jcls;
     arg1 = *(bddfilehandler *)&jarg1; 
-    result = (bddfilehandler)fdd_file_hook(arg1);
-    
+    {
+        result = (bddfilehandler)fdd_file_hook(arg1);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     *(bddfilehandler *)&jresult = result; 
     return jresult;
 }
@@ -4236,8 +5641,15 @@ JNIEXPORT void JNICALL Java_jedd_internal_buddy_BuddyJNI_fdd_1printset(JNIEnv *j
     (void)jenv;
     (void)jcls;
     arg1 = (BDD)jarg1; 
-    fdd_printset(arg1);
-    
+    {
+        fdd_printset(arg1);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return ;
+        }
+    }
 }
 
 
@@ -4249,8 +5661,15 @@ JNIEXPORT void JNICALL Java_jedd_internal_buddy_BuddyJNI_fdd_1fprintset(JNIEnv *
     (void)jcls;
     arg1 = *(FILE **)&jarg1; 
     arg2 = (BDD)jarg2; 
-    fdd_fprintset(arg1,arg2);
-    
+    {
+        fdd_fprintset(arg1,arg2);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return ;
+        }
+    }
 }
 
 
@@ -4266,8 +5685,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_fdd_1scanset(JNIEnv *je
     arg1 = (BDD)jarg1; 
     arg2 = *(int ***)&jarg2; 
     arg3 = *(int **)&jarg3; 
-    result = (int)fdd_scanset(arg1,arg2,arg3);
-    
+    {
+        result = (int)fdd_scanset(arg1,arg2,arg3);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -4283,8 +5709,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_fdd_1makeset(JNIEnv *je
     (void)jcls;
     arg1 = *(int **)&jarg1; 
     arg2 = (int)jarg2; 
-    result = (BDD)fdd_makeset(arg1,arg2);
-    
+    {
+        result = (BDD)fdd_makeset(arg1,arg2);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -4302,8 +5735,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_fdd_1intaddvarblock(JNI
     arg1 = (int)jarg1; 
     arg2 = (int)jarg2; 
     arg3 = (int)jarg3; 
-    result = (int)fdd_intaddvarblock(arg1,arg2,arg3);
-    
+    {
+        result = (int)fdd_intaddvarblock(arg1,arg2,arg3);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -4321,8 +5761,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_fdd_1setpair(JNIEnv *je
     arg1 = *(bddPair **)&jarg1; 
     arg2 = (int)jarg2; 
     arg3 = (int)jarg3; 
-    result = (int)fdd_setpair(arg1,arg2,arg3);
-    
+    {
+        result = (int)fdd_setpair(arg1,arg2,arg3);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }
@@ -4342,8 +5789,15 @@ JNIEXPORT jint JNICALL Java_jedd_internal_buddy_BuddyJNI_fdd_1setpairs(JNIEnv *j
     arg2 = *(int **)&jarg2; 
     arg3 = *(int **)&jarg3; 
     arg4 = (int)jarg4; 
-    result = (int)fdd_setpairs(arg1,arg2,arg3,arg4);
-    
+    {
+        result = (int)fdd_setpairs(arg1,arg2,arg3,arg4);
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return 0;
+        }
+    }
     jresult = (jint)result; 
     return jresult;
 }

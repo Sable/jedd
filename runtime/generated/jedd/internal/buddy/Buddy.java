@@ -30,6 +30,18 @@ public class Buddy {
     BuddyJNI.getShape(bdd, shape);
   }
 
+  public static void setBdd_errno(String value) {
+    BuddyJNI.set_bdd_errno(value);
+  }
+
+  public static String getBdd_errno() {
+    return BuddyJNI.get_bdd_errno();
+  }
+
+  public static void setuperrorhandler() {
+    BuddyJNI.setuperrorhandler();
+  }
+
   public static SWIGTYPE_p_f_int__void bdd_error_hook(SWIGTYPE_p_f_int__void arg0) {
     long cPtr = BuddyJNI.bdd_error_hook(SWIGTYPE_p_f_int__void.getCPtr(arg0));
     return (cPtr == 0) ? null : new SWIGTYPE_p_f_int__void(cPtr, false);

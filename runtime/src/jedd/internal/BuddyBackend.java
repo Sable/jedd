@@ -33,6 +33,7 @@ public class BuddyBackend extends Backend {
     void init() {
         System.loadLibrary("jeddbuddy");
         Buddy.bdd_init( 1*1000*1000, 100*1000 );
+        Buddy.setuperrorhandler();
         Buddy.bdd_disable_reorder();
         Buddy.bdd_setcacheratio(4);
         Buddy.bdd_setmaxincrease(100*1000);

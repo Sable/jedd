@@ -47,3 +47,15 @@ extern int bdd_varlevel(int x) {
     *((int*)0) = 5;
     return x;
 }
+
+
+static void errorhandler(int errorCode) {
+    bdd_errno = bdd_errstring(errorCode);
+    bdd_clear_error();
+}
+
+const char* bdd_errno = NULL;
+extern void setuperrorhandler() {
+    bdd_error_hook(errorhandler);
+}
+
