@@ -159,6 +159,9 @@ public class RelationContainer implements Relation {
                 if( attributes[j] == wanted[i] )
                     physWanted[i] = phys[j];
             }
+            if( physWanted[i] == null ) {
+                throw new RuntimeException( "Request for iterator with attribute "+wanted[i]+" on a relation of type "+typeToString() );
+            }
         }
         return new MultiRelationIterator( bdd, physWanted, wanted );
     }
@@ -411,13 +414,16 @@ public class RelationContainer implements Relation {
                 (PhysicalDomain[]) from.toArray(new PhysicalDomain[from.size()]),
                 (PhysicalDomain[]) to.toArray(new PhysicalDomain[to.size()]));
         } while(false);
-        StringBuffer errorMsg = new StringBuffer();
-        errorMsg.append("<");
+        throw new ClassCastException( typeToString() );
+    }
+    private String typeToString() {
+        StringBuffer ret = new StringBuffer();
+        ret.append("<");
         for( int i = 0; i < attributes.length; i++ ) {
-            if( i > 0 ) errorMsg.append( ", " );
-            errorMsg.append( attributes[i]+":"+phys[i] );
+            if( i > 0 ) ret.append( ", " );
+            ret.append( attributes[i]+":"+phys[i] );
         }
-        errorMsg.append(">");
-        throw new ClassCastException( errorMsg.toString() );
+        ret.append(">");
+        return ret.toString();
     }
 }
