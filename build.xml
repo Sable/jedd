@@ -1,9 +1,11 @@
 <?xml version="1.0"?>
 
-<project default="jars">
+<project default="all">
 
     <taskdef resource="cpptasks.tasks"/>
     <typedef resource="cpptasks.types"/>
+
+    <target name="all" depends="settings,javadoc,jars"/>
 
     <target name="settings">
         <property file="ant.settings"/>
@@ -28,6 +30,17 @@
     </target>
     
     <target name="compile" depends="compile-translator,compile-runtime"/>
+
+    <target name="javadoc">
+        <javadoc
+            sourcepath="runtime/src"
+            destdir="doc/api"
+            windowtitle="Jedd Runtime API"
+            verbose="true"
+        >
+            <fileset dir="runtime/src" includes="jedd/*.java"/>
+        </javadoc>
+    </target>
 
     <target name="compile-runtime" depends="settings,compile-c">
         <mkdir dir="runtime/classes"/>
