@@ -1,0 +1,218 @@
+<?xml version="1.0"?>
+
+<project default="jars">
+
+    <taskdef resource="cpptasks.tasks"/>
+    <typedef resource="cpptasks.types"/>
+
+    <target name="settings">
+        <property file="ant.settings"/>
+        <fail
+            message="Please copy ant.settings.template to ant.settings, and set the variables in it."
+            unless="polyglot.loc"
+        />
+    </target>
+
+    <target name="jars" depends="translator-jar,runtime-jar"/>
+
+    <target name="translator-jar" depends="settings,compile-translator">
+        <jar destfile="translator/lib/jedd-translator.jar">
+            <fileset dir="translator/classes"/>
+        </jar>
+    </target>
+    
+    <target name="runtime-jar" depends="settings,compile-runtime">
+        <jar destfile="runtime/lib/jedd-runtime.jar">
+            <fileset dir="runtime/classes"/>
+        </jar>
+    </target>
+    
+    <target name="compile" depends="compile-translator,compile-runtime"/>
+
+    <target name="compile-runtime" depends="settings,compile-c">
+        <mkdir dir="runtime/classes"/>
+        <javac
+            destdir="runtime/classes"
+            classpath="runtime/classes:${java.class.path}"
+            debug="true"
+        >
+            <src path="runtime/src"/>
+            <src path="runtime/generated"/>
+        </javac>
+    </target>
+
+    <target name="compile-c" depends="swig,compile-cudd,compile-buddy"/>
+
+    <target name="compile-cudd" depends="settings,swig">
+        <cc
+            name="gcc"
+            debug="true"
+            objdir="runtime/generated"
+            outfile="runtime/lib/jeddcudd"
+            link="shared"
+            runtime="dynamic"
+        >
+            <fileset dir="runtime/generated" includes="jedd_wrap.c"/>
+            <fileset dir="runtime/csrc" includes="jedd_cudd.c"/>
+            <libset dir="${cudd.loc}/cudd" libs="cudd"/>
+            <libset dir="${cudd.loc}/mtr" libs="mtr"/>
+
+            <!--
+            Workaround for cctask libs < 3 chars bug
+            <libset dir="${cudd.loc}/st" libs="st"/>
+            -->
+            <linkerarg value="${cudd.loc}/st/libst.a"/>
+
+            <libset dir="${cudd.loc}/util" libs="util"/>
+            <libset dir="${cudd.loc}/epd" libs="epd"/>
+            <includepath path="${java.loc}/include"/>
+            <includepath path="${java.loc}/include/linux"/>
+            <includepath path="runtime/csrc"/>
+            <includepath path="${cudd.loc}/include"/> 
+        </cc>
+    </target>
+
+    <target name="compile-buddy" depends="settings,swig">
+        <cc
+            name="gcc"
+            debug="true"
+            objdir="runtime/generated"
+            outfile="runtime/lib/jeddbuddy"
+            link="shared"
+            runtime="dynamic"
+        >
+            <fileset dir="runtime/generated" includes="jedd_wrap.c"/>
+            <fileset dir="runtime/csrc" includes="jedd_buddy.c"/>
+            <libset dir="${buddy.loc}/src" libs="bdd"/>
+            <includepath path="${java.loc}/include"/>
+            <includepath path="${java.loc}/include/linux"/>
+            <includepath path="runtime/csrc"/>
+            <includepath path="${buddy.loc}/src"/> 
+        </cc>
+    </target>
+
+    <target name="swig" depends="settings,swig-dep" unless="swig-uptodate">
+        <exec dir="runtime/generated" executable="${swig.loc}/bin/swig">
+            <arg line="-I../csrc -I${swig.loc}/lib/swig1.3 -I${swig.loc}/lib/swig1.3/java -java -package jedd jedd.i"/>
+        </exec>
+    </target>
+    <target name="swig-dep" depends="settings">
+        <dependset>
+            <srcfileset dir="runtime/csrc" includes="*.c,*.h,*.i"/>
+            <targetfileset dir="runtime/generated"
+                includes="*.java,*.c"/>
+        </dependset>
+        <condition property="swig-uptodate">
+            <and>
+                <available file="runtime/generated/JeddNative.java"/>
+                <available file="runtime/generated/JeddNativeJNI.java"/>
+                <available file="runtime/generated/jedd_wrap.c"/>
+            </and>
+        </condition>
+    </target>
+
+    <target name="compile-translator" depends="settings,flex-translator,cup-translator">
+        <mkdir dir="translator/classes"/>
+        <javac
+            destdir="translator/classes"
+            debug="true"
+        >
+            <src path="translator/src"/>
+            <src path="translator/generated"/>
+            <classpath>
+                <pathelement location="translator/classes"/>
+                <pathelement location="${polyglot.loc}"/>
+            </classpath>
+        </javac>
+    </target>
+
+    <target name="flex-translator" depends="settings,jflex-dep" unless="jflex-up-to-date">
+        <mkdir dir="translator/generated/polyglot/ext/jedd/parse"/>
+        <java classname="JFlex.Main"
+            fork="true"
+            dir="."
+            failonerror="true"
+        >
+            <classpath>
+                <pathelement location="${jflex.loc}"/>
+            </classpath>
+            <arg line="-d translator/generated/polyglot/ext/jedd/parse translator/src/polyglot/ext/jedd/parse/jedd.flex"/>
+        </java>
+    </target>
+    <target name="jflex-dep" depends="settings">
+        <dependset>
+            <srcfileset dir="translator/src/polyglot/ext/jedd/parse" includes="jedd.flex"/>
+            <targetfileset dir="translator/generated/polyglot/ext/jedd/parse"
+                includes="Lexer_c.java"/>
+        </dependset>
+        <available property="jflex-up-to-date"
+            file="translator/generated/polyglot/ext/jedd/parse/Lexer_c.java"/>
+    </target>
+
+    <target name="cup-translator" depends="settings,flex-translator,cup-dep,ppg-translator" unless="cup-up-to-date">
+        <mkdir dir="translator/generated/polyglot/ext/jedd/parse"/>
+        <java classname="java_cup.Main"
+            fork="true"
+            dir="translator/generated/polyglot/ext/jedd/parse"
+            failonerror="true"
+        >
+            <classpath>
+                <pathelement location="${polyglot.loc}"/>
+            </classpath>
+            <arg line="jedd_ppg.cup"/>
+        </java>
+    </target>
+    <target name="cup-dep" depends="settings">
+        <dependset>
+            <srcfileset dir="translator/generated/polyglot/ext/jedd/parse" includes="jedd_ppg.cup"/>
+            <targetfileset dir="translator/generated/polyglot/ext/jedd/parse"
+                includes="Grm.java,sym.java"/>
+        </dependset>
+        <condition property="cup-up-to-date">
+            <and>
+                <available file="translator/generated/polyglot/ext/jedd/parse/Grm.java"/>
+                <available file="translator/generated/polyglot/ext/jedd/parse/sym.java"/>
+            </and>
+        </condition>
+    </target>
+
+    <target name="ppg-translator" depends="settings,ppg-dep,flex-translator" unless="cup-up-to-date">
+        <mkdir dir="translator/generated/polyglot/ext/jedd/parse"/>
+        <java classname="ppg.PPG"
+            fork="true"
+            dir="translator/src/polyglot/ext/jedd/parse"
+            failonerror="true"
+            output="translator/generated/polyglot/ext/jedd/parse/jedd_ppg.cup"
+        >
+            <classpath>
+                <pathelement location="${polyglot.loc}"/>
+            </classpath>
+            <arg line="jedd.ppg"/>
+        </java>
+    </target>
+    <target name="ppg-dep" depends="settings">
+        <dependset>
+            <srcfileset dir="translator/src/polyglot/ext/jedd/parse" includes="jedd.ppg"/>
+            <targetfileset dir="translator/generated/polyglot/ext/jedd/parse"
+                includes="jedd_ppg.cup"/>
+        </dependset>
+        <available property="ppg-up-to-date"
+            file="generated/polyglot/ext/jedd/parse/jedd_ppg.cup"/>
+    </target>
+
+    <target name="clean" depends="settings">
+        <delete quiet="true">
+            <fileset dir="runtime/classes" includes="**/*.class" />
+            <fileset dir="translator/classes" includes="**/*.class" />
+            <fileset dir="runtime/lib" includes="**/*.jar" />
+            <fileset dir="translator/lib" includes="**/*.jar" />
+        </delete>
+    </target>
+
+    <target name="veryclean" depends="settings,clean">
+        <delete quiet="true">
+            <fileset dir="runtime/generated" includes="**/*" />
+            <fileset dir="translator/generated" includes="**/*" />
+        </delete>
+    </target>
+</project>

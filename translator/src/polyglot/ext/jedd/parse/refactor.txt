@@ -1,0 +1,17 @@
+primary_no_new_array {
+ primary {
+  explicit_constructor_invocation {}
+  explicit_constructor_invocation {}
+  class_instance_creation_expression {}
+  class_instance_creation_expression {}
+  field_access {}
+  method_invocation {}
+  postfix_expression {
+   postincrement_expression {}
+   postdecrement_expression {}
+   unary_expression_not_plus_minus {}
+  }
+ }
+ array_access {}
+}
+

@@ -1,0 +1,241 @@
+include "../../jl/parse/java12.cup"
+
+package polyglot.ext.jedd.parse;
+
+import polyglot.ext.jedd.types.*;
+import polyglot.ext.jedd.ast.*;
+import polyglot.ext.jl.parse.Name;
+
+parser Grm extends polyglot.ext.jl.parse.Grm {:
+    public final JeddTypeSystem ts;
+    public final JeddNodeFactory nf;
+
+    public Grm(Lexer l, TypeSystem t, NodeFactory n, ErrorQueue q) {
+        super(l, t, n, q);
+        ts = (JeddTypeSystem) t;
+        nf = (JeddNodeFactory) n;
+    }
+:};
+
+non terminal TypeNode attribute;
+non terminal TypeNode attribute_opt;
+non terminal TypeNode colon_attribute_opt;
+non terminal LinkedList attribute_tail;
+non terminal BDDTypeNode relation_type;
+non terminal Replace replace;
+non terminal Relprod relprod;
+non terminal TypeNode[] replacement;
+non terminal LinkedList replacement_tail;
+non terminal BDDLit relation_literal;
+non terminal BDDLitPiece relation_literal_piece;
+non terminal LinkedList relation_literal_tail;
+non terminal TypeNode[] attribute_phys;
+non terminal LinkedList attribute_phys_tail;
+non terminal LinkedList attribute_list;
+non terminal Expr relation_expr;
+non terminal Expr relation_expr_or_relprod;
+
+terminal Token ARROW;
+terminal Token BDDFALSE;
+terminal Token BDDTRUE;
+
+start with goal;
+
+extend type ::=
+        relation_type:a
+            {: RESULT = a; :}
+        ;
+
+relation_type ::=
+        LT:p attribute_phys:a attribute_phys_tail:b GT
+        {:
+            b.addFirst(a);
+            RESULT = parser.nf.BDDTypeNode( parser.pos(p), b );
+        :}
+        ;
+
+attribute_phys ::=
+        attribute:a colon_attribute_opt:b
+        {: 
+            TypeNode[] ar = { a, b };
+            RESULT = ar;
+        :}
+        ;
+
+attribute_phys_tail ::=
+        COMMA attribute_phys:a attribute_phys_tail:b
+        {:
+            b.addFirst(a);
+            RESULT = b;
+        :}
+
+        |
+
+        {: RESULT = new LinkedList(); :}
+        ;
+
+attribute ::=
+        class_or_interface_type:a
+        {: RESULT = a; :}
+    ;
+
+attribute_opt ::=
+        attribute:a
+        {: RESULT = a; :}
+        |
+        ;
+
+colon_attribute_opt ::=
+        COLON attribute:a
+        {: RESULT = a; :}
+        |
+        ;
+
+
+drop { unary_expression_not_plus_minus ::= postfix_expression ; }
+
+relation_expr ::=
+        replace:a
+        {: RESULT = a; :}
+        |
+        postfix_expression:a
+        {: RESULT = a; :}
+        ;
+
+extend unary_expression_not_plus_minus ::= relation_expr_or_relprod:a
+        {: RESULT = a; :}
+        ;
+
+relation_expr_or_relprod ::=
+        relprod:a
+        {: RESULT = a; :}
+        |
+        relation_expr:a
+        {: RESULT = a; :}
+        ;
+
+relprod ::=
+        relation_expr_or_relprod:a attribute_list:b GT LT
+        relation_expr:c attribute_list:d
+        {: RESULT = parser.nf.Relprod( parser.pos(a), a, c, b, d ); :}
+        |
+        relation_expr_or_relprod:a attribute_list:b LT GT
+        relation_expr:c attribute_list:d
+        {: RESULT = parser.nf.Relprod( parser.pos(a), a, c, b, d ); :}
+        ;
+
+replace ::=
+        LPAREN:p replacement:a replacement_tail:b RPAREN
+        relation_expr:c
+        {:
+            b.addFirst(a);
+            RESULT = parser.nf.Replace( parser.pos(p), c, b );
+        :}
+        ;
+
+replacement ::=
+        attribute:a ARROW attribute_opt:b
+        {:
+            TypeNode[] ret = { a, b };
+            RESULT = ret;
+        :}
+        ;
+
+replacement_tail ::=
+        COMMA replacement:a replacement_tail:b
+        {:
+            b.addFirst( a );
+            RESULT = b;
+        :}
+        |
+
+        {:
+            RESULT = new LinkedList();
+        :}
+        ;
+
+attribute_list ::= LBRACE attribute:a attribute_tail:b RBRACE 
+            {: b.addFirst( a ); RESULT = b; :}
+            ;
+
+
+
+attribute_tail ::=
+        COMMA attribute:a attribute_tail:b
+        {: b.addFirst( a ); RESULT = b; :}
+        |
+
+        {: RESULT = new LinkedList(); :}
+        ;
+
+extend literal ::=
+            relation_literal:a
+            {: RESULT = a; :}
+        |
+            BDDTRUE:p
+            {: RESULT = parser.nf.BDDTrueFalse( parser.pos(p), true ); :}
+        |
+            BDDFALSE:p
+            {: RESULT = parser.nf.BDDTrueFalse( parser.pos(p), false ); :}
+        ;
+
+relation_literal ::=
+            NEW LBRACE:p relation_literal_piece:a relation_literal_tail:b RBRACE
+            {: 
+                b.addFirst(a);
+                RESULT = parser.nf.BDDLit( parser.pos(p), b );
+            :}
+        ;
+
+relation_literal_piece ::=
+        expression:e ARROW attribute:d colon_attribute_opt:p
+        {: RESULT = parser.nf.BDDLitPiece( parser.pos(e), e, d, p ); :}
+        ;
+
+relation_literal_tail ::=
+        COMMA relation_literal_piece:a relation_literal_tail:b
+        {: 
+            b.addFirst( a );
+            RESULT = b;
+        :}
+        |
+
+        {:
+            RESULT = new LinkedList();
+        :}
+        ;
+
+
+drop { primary_no_new_array ::= class_instance_creation_expression ; }
+
+extend array_access ::= class_instance_creation_expression:a LBRACK expression:b RBRACK 
+        {: RESULT = parser.nf.ArrayAccess(parser.pos(a), a, b); :}
+;
+
+extend explicit_constructor_invocation ::= class_instance_creation_expression:a DOT THIS:n LPAREN argument_list_opt:b RPAREN SEMICOLON 
+        {: RESULT = parser.nf.ThisCall(parser.pos(n), a, b); :}
+;
+
+extend explicit_constructor_invocation ::= class_instance_creation_expression:a DOT SUPER:n LPAREN argument_list_opt:b RPAREN SEMICOLON
+        {: RESULT = parser.nf.SuperCall(parser.pos(n), a, b); :}
+;
+
+extend class_instance_creation_expression ::= class_instance_creation_expression:a DOT NEW simple_name:b LPAREN argument_list_opt:c RPAREN 
+        {: RESULT = parser.nf.New(parser.pos(a), a, b.toType(), c); :}
+;
+
+extend class_instance_creation_expression ::= class_instance_creation_expression:a DOT NEW simple_name:b LPAREN argument_list_opt:c RPAREN class_body:d 
+        {: RESULT = parser.nf.New(parser.pos(a), a, b.toType(), c, d); :}
+;
+
+extend field_access ::= class_instance_creation_expression:a DOT IDENTIFIER:b 
+        {: RESULT = parser.nf.Field(parser.pos(b), a, b.getIdentifier()); :}
+;
+
+extend method_invocation ::= class_instance_creation_expression:a DOT IDENTIFIER:b LPAREN argument_list_opt:c RPAREN 
+        {: RESULT = parser.nf.Call(parser.pos(b), a, b.getIdentifier(), c); :}
+;
+
+extend unary_expression_not_plus_minus ::= class_instance_creation_expression:a
+        {: RESULT = a; :}
+;

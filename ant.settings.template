@@ -1,0 +1,18 @@
+## Location of JDK
+java.loc=/usr/localcc/pkgs/j2sdk1.4.2
+
+## Location of Polyglot classes jar
+polyglot.loc=${user.home}/polyglot-1.0.1.jar
+
+## Location of JFlex classes jar
+jflex.loc=${user.home}/JFlex.jar
+
+## Location of Swig distribution
+swig.loc=${user.home}/swig-1.3.17
+
+## Location of Cudd distribution
+cudd.loc=${user.home}/cudd-2.3.1
+
+## Location of BuDDy distribution
+buddy.loc=${user.home}/buddy22
+

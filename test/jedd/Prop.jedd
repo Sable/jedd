@@ -1,0 +1,49 @@
+public class Prop {
+    public void propagate(
+    int i,
+        <src:V1, dst:V2> edgeSet,
+        <var:V1, obj:H1> pointsTo,
+        <src:V1, fld:FD, dst:V2> loads,
+        <src:V1, fld:FD, dst:V2> stores,
+        <var:V1, obj:H1> typeFilter )
+{
+    <var:V1, obj:H1> newPt;
+
+    do {
+        do {
+
+            // rule 1
+            newPt = (dst => var) edgeSet  { src } ><
+                    (obj => obj) pointsTo { var }; 
+
+            // apply type filtering and merge into pointsTo relation
+            newPt &= typeFilter;
+            pointsTo |= newPt;
+
+        } while( newPt != 0B );
+
+        // rule 2
+        <obj:H2, var:V1, fld:FD> objectsBeingStored = 
+            (dst => var, fld => fld) stores   { src } ><
+            (obj => obj)             pointsTo { var };
+
+        <base:H1, fld:FD, obj:H2> fieldPt = 
+            (fld => fld, obj => obj) objectsBeingStored { var } ><
+            (obj => base)            pointsTo { var };
+
+        // rule 3
+        <base:H1, fld:FD, dst_var:V2> loadsFromHeap = 
+            (fld => fld, dst => dst_var) loads { src } ><
+            (obj => base) pointsTo { var };
+
+        newPt = (dst_var => var) loadsFromHeap { base,fld } ><
+                (obj => obj)     fieldPt       { base,fld };
+
+        // apply type filtering and merge into pointsTo relation
+        newPt &= typeFilter;
+        pointsTo |= newPt;
+
+    } while( newPt != 0B );
+}
+}
+

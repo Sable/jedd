@@ -1,0 +1,206 @@
+package polyglot.ext.jedd.types;
+
+import polyglot.ast.*;
+import polyglot.types.*;
+import polyglot.ext.jedd.ast.*;
+import polyglot.ext.jl.ast.*;
+import polyglot.ext.jl.types.*;
+import polyglot.util.*;
+import java.util.*;
+
+public class JeddTypeSystem_c extends TypeSystem_c implements JeddTypeSystem {
+    // TODO: implement new methods in JeddTypeSystem.
+    // TODO: override methods as needed from TypeSystem_c.
+    public BDDType BDDType( List domainPairs ) {
+        return new BDDType_c( this, domainPairs );
+    }
+    public boolean equals( TypeObject t1, TypeObject t2 ) {
+        if( t1 instanceof BDDType 
+        && t2 instanceof BDDType ) {
+            BDDType bt1 = (BDDType) t1;
+            BDDType bt2 = (BDDType) t2;
+            return bt1.map().equals( bt2.map() );
+        }
+        return super.equals(t1, t2);
+    }
+
+    private Type getType( Object n ) {
+        if( n instanceof Expr ) return ((Expr) n).type();
+        if( n instanceof VarInstance ) return ((VarInstance) n).type();
+        throw new InternalCompilerError( n.toString() );
+    }
+
+    public void physicalDomains() throws SemanticException {
+        PhysDom.v().findAssignment();
+        //printDomainsDot();
+        //findPhys();
+    }
+    /*
+    public void addPhysConstraints() {
+        for( Iterator exprIt = exprs.iterator(); exprIt.hasNext(); ) {
+            final Object expr = (Object) exprIt.next();
+            BDDType t = (BDDType) getType( expr );
+            if( t == null ) {
+                throw new RuntimeException( "type of "+expr+" is null" );
+            }
+            for( Iterator domainIt = t.map().keySet().iterator(); domainIt.hasNext(); ) {
+                final Type domain = (Type) domainIt.next();
+                for( Iterator domain2It = t.map().keySet().iterator(); domain2It.hasNext(); ) {
+                    final Type domain2 = (Type) domain2It.next();
+                    if( domain.equals( domain2 ) ) continue;
+                    addConflictEdge( dnode( expr, domain ), dnode( expr, domain2 ) );
+                }
+            }
+        }
+    }
+    */
+    /*
+    public void addPhys() throws SemanticException {
+        for( Iterator exprIt = exprs.iterator(); exprIt.hasNext(); ) {
+            final Object expr = (Object) exprIt.next();
+            BDDType t = (BDDType) getType( expr );
+            Map map = t.map();
+            for( Iterator domainIt = map.keySet().iterator(); domainIt.hasNext(); ) {
+                final Type domain = (Type) domainIt.next();
+                Type newPhys = (Type) map.get( domain );
+                if( newPhys == null ) continue;
+                Type oldPhys = dnode( expr, domain ).rep().phys;
+                if( oldPhys != null && !oldPhys.equals( newPhys ) ) {
+                    if( expr instanceof Node ) {
+                        throw new SemanticException( "Clash of physical domains "+oldPhys+" and "+newPhys+".", ((Node) expr).position() );
+                    } else if( expr instanceof TypeObject ) {
+                        throw new SemanticException( "Clash of physical domains "+oldPhys+" and "+newPhys+".", ((TypeObject) expr).position() );
+                    } else {
+                        throw new SemanticException( "Clash of physical domains "+oldPhys+" and "+newPhys+" in "+expr+"." );
+                    }
+                }
+                dnode( expr, domain ).rep().phys = newPhys;
+            }
+        }
+    }
+    */
+    /*
+    public void findPhys() throws SemanticException {
+        // First merge all nodes with the same physical domain
+        for( Iterator n1It = dnodes.keySet().iterator(); n1It.hasNext(); ) {
+            final DNode n1 = (DNode) n1It.next();
+            if( n1.rep() != n1 ) continue;
+            if( n1.phys == null ) continue;
+            for( Iterator n2It = dnodes.keySet().iterator(); n2It.hasNext(); ) {
+                final DNode n2 = (DNode) n2It.next();
+                if( n2.rep() != n2 ) continue;
+                if( n1 == n2 ) continue;
+                if( !n1.phys.equals( n2.phys ) ) continue;
+                if( !tryMergeDNodes( n1, n2 ) ) {
+                    throw new InternalCompilerError( "Couldn't merge nodes "+n1+" and "+n2+" with reps "+n1.rep()+" and "+n2.rep() );
+                }
+            }
+        }
+
+        // Now merge any nodes that can be merged
+        boolean changes;
+        do {
+            changes = false;
+            for( Iterator n1It = dnodes.keySet().iterator(); n1It.hasNext(); ) {
+                final DNode n1 = (DNode) n1It.next();
+                if( n1.rep() != n1 ) continue;
+                if( n1.phys == null ) continue;
+                for( Iterator eIt = new ArrayList(assignEdges).iterator(); eIt.hasNext(); ) {
+                    final DNode[] e = (DNode[]) eIt.next();
+                    if( e[0].rep().equals( n1 ) )
+                        changes = tryMergeDNodes( e[1], n1 ) | changes;
+                    if( e[1].rep().equals( n1 ) )
+                        changes = tryMergeDNodes( e[0], n1 ) | changes;
+                }
+            }
+        } while(changes);
+
+        // Now print everything out
+        printDomainsDot();
+
+        for( Iterator exIt = new LinkedList(exprs).iterator(); exIt.hasNext(); ) {
+
+            final Object ex = (Object) exIt.next();
+            BDDType t;
+            t = (BDDType) getType( ex );
+            for( Iterator pairIt = t.domainPairs().iterator(); pairIt.hasNext(); ) {
+                final Type[] pair = (Type[]) pairIt.next();
+                DNode dnode = findDnode( ex, pair[0] );
+                if( pair[1] != null && !pair[1].equals( dnode.rep().phys ) ) {
+                    throw new InternalCompilerError( "Original phys was "+pair[1]+
+                            " but "+dnode.rep().phys+" was assigned for domain "+
+                            pair[0]+" of expression "+ex+" whose class is "+ex.getClass().getName()+"; dnode is "+dnode+" and rep is "+dnode.rep()+"." );
+                }
+                /*
+                if( pair[1] == null ) {
+                    System.out.println( "assigning "+dnode.rep().phys+" from "+dnode.rep()+", rep of "+dnode+" to domain "+pair[0]+" of "+ex+" whose current phys is "+pair[1] );
+                }
+                pair[1] = dnode.rep().phys;
+                if( pair[1] == null ) {
+                    if( ex instanceof Node )
+                        throw new SemanticException( "Couldn't make up a physical domain for the domain "+pair[0]+".", ((Node) ex).position() );
+                    else
+                        throw new SemanticException( "Couldn't make up a physical domain for the domain "+pair[0]+" in "+ex+"." );
+                }
+            }
+        }
+    }
+    */
+
+    //private Set assignEdges = new HashSet();
+    //private Set conflictEdges = new HashSet();
+    //private Set mustEqualEdges = new HashSet();
+    public void addAssignEdge( DNode n1, DNode n2 ) {
+        if( n1 == null ) return;
+        if( n2 == null ) return;
+        PhysDom.v().assignEdges.add( new DNode[] { n1, n2 } );
+    }
+    /*
+    public void addConflictEdge( DNode n1, DNode n2 ) {
+        if( n1 == null ) return;
+        if( n2 == null ) return;
+        conflictEdges.add( new DNode[] { n1, n2 } );
+    }
+    */
+    public void addMustEqualEdge( DNode n1, DNode n2 ) {
+        if( n1 == null ) return;
+        if( n2 == null ) return;
+        PhysDom.v().mustEqualEdges.add( new DNode[] { n1, n2 } );
+    }
+    private ClassType jeddType( String name ) {
+        try {
+            return typeForName(name);
+        } catch( SemanticException e ) {
+            throw new InternalCompilerError( "Couldn't find type "+name );
+        }
+    }
+    public ClassType jedd() {
+        return jeddType( "jedd.Jedd" );
+    }
+    public ClassType domain() {
+        return jeddType( "jedd.Domain" );
+    }
+    public ClassType physicalDomain() {
+        return jeddType( "jedd.PhysicalDomain" );
+    }
+    public ClassType relation() {
+        return jeddType( "jedd.Relation" );
+    }
+    public BDDType sameDomains( BDDType t ) {
+        List domains = new LinkedList();
+        for( Iterator domainIt = t.map().keySet().iterator(); domainIt.hasNext(); ) {
+            final Type domain = (Type) domainIt.next();
+            domains.add( new Type[] { domain, null } );
+        }
+        return BDDType( domains );
+    }
+    public BDDType cloneDomains( BDDType t ) {
+        List domains = new LinkedList();
+        Map map = t.map();
+        for( Iterator domainIt = map.keySet().iterator(); domainIt.hasNext(); ) {
+            final Type domain = (Type) domainIt.next();
+            domains.add( new Type[] { domain, (Type) map.get(domain) } );
+        }
+        return BDDType( domains );
+    }
+}
