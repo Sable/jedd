@@ -1,0 +1,355 @@
+<html>
+<head><title>Jedd: Java Extension for Decision Diagrams</title></head>
+
+<body background="background6.gif" TEXT="#000000" BGCOLOR="#F3F3F3" LINK="#0000CC">
+
+<table border=0 cellpadding=0 cellspacing=3>
+
+<TR>
+
+<!--LeftHandTable-->
+
+<TD ALIGN=LEFT VALIGN=TOP ROWSPACE="1" WIDTH=160>
+
+<p><font face="helvetica,arial" size="+1"><b>Jedd Home</b></font>
+
+<p>
+<a href="#overview"><font face="helvetica,arial" size="+0">Overview</font></a><br>
+
+<p>
+<a href="#using"><font face="helvetica,arial" size="+0">Using Jedd</font></a><br>
+
+<p>
+<a href="#install"><font face="helvetica,arial" size="+0">Installation</font></a><br>
+
+<p>
+<a href="#download"><font face="helvetica,arial" size="+0">Download</font></a><br>
+
+<p>
+<a href="#compile"><font face="helvetica,arial" size="+0">Compiling</font></a><br>
+
+<p>
+<a href="#copyright"><font face="helvetica,arial" size="+0">Copyright</font></a><br>
+
+<p><a href="http://www.sable.mcgill.ca">Sable Home</a>
+
+</td>
+
+<!--ActualContents-->
+
+<td align=left valign=top>
+<center>
+<a name="top"><b><font face="helvetica,arial" size="+2">Jedd: Java Extension for Decision Diagrams</font></b></center></a> <br>
+</center>
+
+
+<!--Overview-->
+<a name="overview"> <table width=100%> <tr>
+<td width=97% align=left><b><font face="helvetica,arial" size="+1">Jedd overview</b></font></td></a>
+<td width=3% align=left><font size="-2"><a href="#top">top</a></td>
+</table>
+
+<blockquote>
+
+<p>Jedd is a Java language extension designed for implementing program analyses
+using binary decision diagrams (BDDs). BDDs are abstracted in Jedd as
+a new primitive data type, database-style relations. A detailed paper about
+Jedd was presented at
+<a href="http://www.cs.umd.edu/~pugh/pldi04/">PLDI 2004</a>, and is available
+from the <a href="http://www.sable.mcgill.ca/publications/papers/#pldi2004">
+Sable publications page</a>.</p>
+
+<p>
+Jedd is based on the <a href="http://www.cs.cornell.edu/Projects/polyglot/">
+Polyglot extensible compiler framework</a>. Currently, Jedd supports four
+BDD libraries as backends:
+<a href="http://www.itu.dk/research/buddy/">BuDDy</a>,
+<a href="http://vlsi.colorado.edu/~fabio/CUDD/">CUDD</a>,
+<a href="http://www.sable.mcgill.ca/~fqian/SableJBDD/">SableJBDD</a>,
+and
+<a href="http://javabdd.sourceforge.net/">JavaBDD</a>.
+When building Jedd from source, these libraries
+should be downloaded separately. The binary distribution of Jedd has these
+libraries linked in.
+</p>
+
+<p>
+Jedd is freely available for <a href="#download">download</a> under the
+<a href="COPYING-LESSER.txt">
+GNU Lesser General Public License</a>.
+</p>
+
+</blockquote>
+
+<br>
+<hr width="85%" noshade> <br>
+
+<!--Using-->
+<a name="using"> <table width=100%> <tr>
+<td width=97% align=left><b><font face="helvetica,arial" size="+1">Using Jedd</b></font></td></a>
+<td width=3% align=left><font size="-2"><a href="#top">top</a></td>
+</table>
+
+<blockquote>
+
+<p>
+A <a href="user.pdf">mini-tutorial</a> on Jedd is available in PDF format.
+</p>
+<p>
+The javadoc documentation of the (rather small) API available to Jedd programs
+is <a href="api/index.html">available</a>. In particular, this includes the
+<tt>jedd.Jedd</tt> class with methods controlling the behaviour of Jedd in general,
+and the <tt>jedd.Relation</tt> interface of methods that can be called on any
+relation type.
+</p>
+
+
+
+</blockquote>
+
+<br>
+<hr width="85%" noshade> <br>
+
+<!--Installation-->
+<a name="install"> <table width=100%> <tr>
+<td width=97% align=left><b><font face="helvetica,arial" size="+1">Installation instructions</b></font></td></a>
+<td width=3% align=left><font size="-2"><a href="#top">top</a></td>
+</table>
+
+<blockquote>
+<p>
+A precompiled binary distribution of Jedd is available for download.
+If you prefer to compile Jedd yourself, please see
+<a href="#compile">the instructions below</a>.
+</p>
+<p>
+To use the Jedd translator to compile Jedd programs, you need the following:
+<ul>
+<li>Add jedd-translator.jar from the Jedd distribution to your CLASSPATH
+environment variable.
+<li>Add the Polyglot classes jar to your CLASSPATH environment variable.
+You can download a pre-compiled jar of Polyglot from the <a href="http://www.sable.mcgill.ca/software/#soot">Soot download page</a>.
+<li>Install a SAT solver. I have been using Jedd with
+<a href="http://www.princeton.edu/~chaff/zchaff.html">Zchaff</a>, but it
+should also work with other SAT solvers such as
+<a href="http://sat.inesc.pt/~jpms/grasp">Grasp</a> and
+<a href="http://www.cs.uiowa.edu/~hzhang/sato.html">Sato</a>.
+The -s switch to Jedd is used to specify the full path of the SAT solver
+binary. If the solver has an unsatisfiable core extractor (like the
+<tt>zcore</tt> program bundled with Zchaff), specify its full path
+using the -sc switch to Jedd.
+</ul>
+</p>
+
+<p>
+<b>(Optional)</b> To browse the output of the Jedd profiler, an SQL
+database, a CGI-capable web server, Python to execute the CGI scripts,
+and a web browser are required. I use SQLite and thttpd because of their
+simplicity and ease-of-installation. The SQL code and CGI scripts are
+somewhat SQLite-specific, but they should work with any CGI-capable
+web server and with any standards-compliant web browser. The version
+numbers of the tools used during Jedd development are given below. Other
+versions may also work.
+<ul>
+<li><a href="http://www.sqlite.org/">SQLite (2.8.13)</a>
+<li><a href="http://www.acme.com/software/thttpd/">thttpd (2.23beta1)</a>
+<li><a href="http://www.python.org/">Python (2.3.4c1)</a>
+<li><a href="http://www.mozilla.org/products/firefox/">Mozilla Firebird (0.7)</a>
+</ul>
+</p>
+
+</blockquote>
+
+<br>
+<hr width="85%" noshade> <br>
+
+<!--Dowload-->
+<a name="download"> <table width=100%> <tr>
+<td width=97% align=left><b><font face="helvetica,arial" size="+1">Download</b></font></td></a>
+<td width=3% align=left><font size="-2"><a href="#top">top</a></td>
+</table>
+
+<blockquote>
+<p><b>Release 0.1 (June 2004)</b><br>
+Initial public release of Jedd.
+<ul>
+<li><a href="http://www.sable.mcgill.ca/software/jedd-0.1.tar.gz">
+GNU/Linux binary</a> (contains jedd-translator.jar, jedd-runtime.jar, libjeddbuddy.so, libjeddcudd.so)
+
+<li><a href="http://www.sable.mcgill.ca/software/jedd-0.1-src.tar.gz">
+Source</a> (contains sources of Jedd only)
+</ul>
+</blockquote>
+
+<br>
+<hr width="85%" noshade> <br>
+
+<!--Compiling Jedd from source-->
+<a name="compile"> <table width=100%> <tr>
+<td width=97% align=left><b><font face="helvetica,arial" size="+1">Compiling Jedd from source</b></font></td></a>
+<td width=3% align=left><font size="-2"><a href="#top">top</a></td>
+</table>
+
+<blockquote>
+
+<p>
+Jedd comes with an <a href="http://ant.apache.org/">Ant</a> build file for
+building it from source. Jedd has been developed on GNU/Linux, but few modifications
+should be required to build it under other operating systems. 
+</p>
+
+<p>
+The following tools are required to build Jedd. The version numbers specify
+the versions of the tools that were used in Jedd development. Other versions
+may also work.
+<ul>
+<li><a href="http://java.sun.com/j2se/">Java SDK (1.4.2)</a>
+<li><a href="http://ant.apache.org/">Ant (1.6.1)</a>
+<li><a href="http://sourceforge.net/projects/ant-contrib">cpptasks (1.0 beta 3)</a>
+<li><a href="http://www.jflex.de/">JFlex (1.3)</a>
+<li><a href="http://www.swig.org/">Swig (1.3.17)</a>
+</ul>
+</p>
+
+<p>
+Jedd links to the following libraries, and these are also required to build
+Jedd.
+<ul>
+<li><a href="http://www.cs.cornell.edu/Projects/polyglot/">Polyglot (1.2.0) (includes PPG and modified version of JavaCUP)</a>
+<li><a href="http://www.itu.dk/research/buddy/">BuDDy (2.2)</a>
+<li><a href="http://vlsi.colorado.edu/~fabio/CUDD/">CUDD (2.3.1)</a>
+<li><a href="http://www.sable.mcgill.ca/~fqian/SableJBDD/">SableJBDD (0.02)</a>
+<li><a href="http://javabdd.sourceforge.net/">JavaBDD (0.6)</a>
+</ul>
+</p>
+
+<p>
+First, download and build/install all the dependencies above.
+After expanding the Jedd source archive, you will find a file named
+<tt>ant.settings.template</tt> in the Jedd directory. Copy this
+file to a <tt>ant.settings</tt>. This file tells the build process where
+to find all the tools needed to build Jedd. Edit the file with a text
+editor to specify the locations of all the tools. Then, just run
+<tt>ant</tt>, and Jedd should be built in the <tt>lib</tt> subdirectory.
+</p>
+
+</blockquote>
+
+<br>
+<hr width="85%" noshade> <br>
+
+<!--Copyright-->
+<a name="copyright"> <table width=100%> <tr>
+<td width=97% align=left><b><font face="helvetica,arial" size="+1">Copyright information</b></font></td></a>
+<td width=3% align=left><font size="-2"><a href="#top">top</a></td>
+</table>
+
+<blockquote>
+
+<p>
+Jedd is Copyright (C) 2003, 2004 Ond&#345;ej Lhot&aacute;k, and is
+distributed under the
+<a href="COPYING-LESSER.txt">
+GNU Lesser General Public License</a>.
+</p>
+
+<p>
+Copyright to Polyglot is held by several people listed on the
+<a href="http://www.cs.cornell.edu/Projects/polyglot/">
+Polyglot home page</a>, and is distributed under the
+<a href="COPYING-LESSER.txt">
+GNU Lesser General Public License</a>.
+</p>
+
+<p>
+The copyright notice of BuDDy is below:
+<blockquote><pre>
+==========================================================================
+                              *** BuDDy ***
+                         Binary Decision Diagrams
+                           Library Package v2.2
+--------------------------------------------------------------------------
+               Copyright (C) 1996-2002 by Jorn Lind-Nielsen
+                            All rights reserved
+
+    Permission is hereby granted, without written agreement and without
+    license or royalty fees, to use, reproduce, prepare derivative
+    works, distribute, and display this software and its documentation
+    for any purpose, provided that (1) the above copyright notice and
+    the following two paragraphs appear in all copies of the source code
+    and (2) redistributions, including without limitation binaries,
+    reproduce these notices in the supporting documentation. Substantial
+    modifications to this software may be copyrighted by their authors
+    and need not follow the licensing terms described here, provided
+    that the new terms are clearly indicated in all files where they apply.
+
+    IN NO EVENT SHALL JORN LIND-NIELSEN, OR DISTRIBUTORS OF THIS
+    SOFTWARE BE LIABLE TO ANY PARTY FOR DIRECT, INDIRECT, SPECIAL,
+    INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OF THIS
+    SOFTWARE AND ITS DOCUMENTATION, EVEN IF THE AUTHORS OR ANY OF THE
+    ABOVE PARTIES HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+    JORN LIND-NIELSEN SPECIFICALLY DISCLAIM ANY WARRANTIES, INCLUDING,
+    BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+    FITNESS FOR A PARTICULAR PURPOSE. THE SOFTWARE PROVIDED HEREUNDER IS
+    ON AN "AS IS" BASIS, AND THE AUTHORS AND DISTRIBUTORS HAVE NO
+    OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR
+    MODIFICATIONS.
+==========================================================================
+</pre></blockquote>
+</p>
+
+<p>
+CUDD is primarily written by Fabio Somenzi at the University of Colorado.
+Its copyright notice is below:
+<blockquote><pre>
+This file was created at the University of Colorado at
+Boulder.  The University of Colorado at Boulder makes no warranty
+about the suitability of this software for any purpose.  It is
+presented on an AS IS basis.
+</pre></blockquote>
+</p>
+
+<p>
+SableJBDD is Copyright (C) 2004 Feng Qian,
+and is distributed under the
+<a href="COPYING-LESSER.txt">
+GNU Lesser General Public License</a>.
+</p>
+
+<p>
+The copyright notice for JavaBDD is below:
+<blockquote><pre>
+Copyright (C) 2003  John Whaley (jwhaley at alum.mit.edu)
+
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Library General Public
+License as published by the Free Software Foundation; either
+version 2 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Library General Public License for more details.
+
+You should have received a copy of the GNU Library General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+</pre></blockquote>
+</p>
+
+</blockquote>
+
+<br>
+<hr width="85%" noshade> <br>
+
+
+
+
+
+
+</td>
+</tr>
+</table>
+
+</html>

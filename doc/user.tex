@@ -1,0 +1,159 @@
+\documentclass{article}
+\usepackage{hyperref}
+
+\title{A brief user's guide to Jedd}
+\author{Ond\v{r}ej Lhot\'ak}
+
+\begin{document}
+\maketitle
+
+\newcommand{\jeddpath}[1]{\href{http://svn.sable.mcgill.ca/soot/jedd/trunk/#1}{\nolinkurl{#1}}}
+
+\section{Preliminaries}
+This mini-tutorial assumes that the reader has
+read the paper~\cite{Lhotak:2004:JBR} about Jedd that
+was presented at PLDI 2004, and is available at
+\url{http://www.sable.mcgill.ca/publications/papers/#pldi2004}.
+
+\section{Example}
+The Jedd distribution contains a directory called \jeddpath{examples}
+containing sample Jedd code. Currently, it contains a single example,
+\jeddpath{examples/pointsto}. This is a Jedd version of the BDD-based points-to
+analysis from~\cite{Berndl:2003:PAU}.
+
+\section{Jedd source files}
+Source files to be processed by Jedd must have one of the extensions
+{\tt .jedd} or {\tt .java}. It is customary to use the extension {\tt .jedd}
+for files containing Jedd-specific constructs, and {\tt .java} for files
+containing plain Java.
+
+Jedd files should import the package {\tt jedd.*} from the Jedd runtime
+library. This package contains interface classes with methods that can
+be called by Jedd programs. In particular, the {\tt jedd.Jedd} class
+is a singleton containing methods affecting the behaviour of Jedd in
+general, and {\tt jedd.Relation} is an interface listing the methods
+that can be called on any Jedd relation type. Jedd files should not
+import the package {\tt jedd.internal.*}.
+
+\section{Defining numberers, domains, attributes and physical domains}
+The first step in writing a Jedd program is to define the numberers,
+domains, attributes, and physical domains that will be used. A numberer
+is a class that generates and maintains a mapping between objects and
+non-negative integers, and must be implemented by the programmer. A
+domain is a set of objects that will form the basis of Jedd relations.
+Each domain must have an associated numberer for its objects. An
+attribute is a domain with an assigned name, used to distinguish
+multiple instances of a domain within the same relation. A physical
+domain is a set of BDD bit positions to which Jedd may map an attribute
+of a relation.
+
+A numberer is a plain Java class implementing the {\tt jedd.Numberer}
+interface. See the file \jeddpath{examples/pointsto/src/domains/IntegerNumberer.java},
+which assigns to {\tt Integer} objects the integer that is their value.
+
+A domain is similar to a Java class, but is defined with a
+slightly different syntax: the class name is immediately followed
+by an integer constant in parentheses. See the file 
+\jeddpath{examples/pointsto/src/domains/Var.jedd} for an example.
+The integer constant specifies how many bits are to be used to represent
+the domain. The maximum number of objects in the domain is $2^b$, where $b$
+is the number of bits specified. Each domain must extend the {\tt jedd.Domain}
+class and implement the {\tt numberer()} method, which returns the
+numberer for the domain.
+
+An attribute is defined similarly to a domain, but the integer constant
+number of bits is replaced with the name of the domain of the attribute.
+See the file \jeddpath{examples/pointsto/src/attributes/var.jedd} for an
+example with the domain {\tt Var}. An attribute must extend the 
+{\tt jedd.Attribute} class. However, it should not implement its
+abstract method {\tt domain()}; Jedd will implement it for you.
+
+A physical domain is defined similarly to a domain or attribute, but
+the parentheses following its name are empty. See the file 
+\jeddpath{examples/pointsto/src/physical_domains/V1} for an example.
+Each physical domain must extend the class {\tt jedd.PhysicalDomain}.
+
+\section{Selecting a backend}
+Jedd currently supports four different BDD libraries as backends:
+BuDDy, CUDD, SableJBDD, and JavaBDD. BuDDy is the backend which has
+the most complete support in Jedd, which is the most tested, and which
+tends to perform best. BuDDy and CUDD are C libraries, so they require
+that their shared library ({\tt .so} or {\tt .dll}) files be available
+on the {\tt LD\_LIBRARY\_PATH}. Before using Jedd in you program,
+you must select one of the backends by calling
+{\tt jedd.Jedd.v().setBackend()}. The argument to this method
+should be one of {\tt "buddy"}, {\tt "cudd"}, {\tt "sablejbdd"} or
+{\tt "javabdd"}.
+
+\section{Selecting a physical domain ordering (optional)}
+By default, Jedd places the various physical domains one after the next
+in the BDD. For performance reasons, you may want to select a different
+ordering. This is done by calling {\tt jedd.Jedd.v().setOrder()}.
+The first argument is an array containing the physical domains in the order
+in which they should appear in the BDD, from the top of the BDD to the bottom
+(constant nodes). To get the physical domain instance (to be placed in the array)
+for a given physical domain, call the method {\tt v()} on it (see the example
+in \jeddpath{examples/pointsto/src/Prop.jedd}). To interleave the bits of
+several physical domains, place them in a separate array, and then
+include this array as an element of the main array. The {\tt jedd.Jedd.setOrder()}
+method takes a second, boolean argument that determines the order of bits within
+each domain. Set it to {\tt true} to order the bits from most significant to least
+significant when moving down the BDD from top to bottom, or to {\tt false} for the
+opposite order.
+
+\section{Writing Jedd code}
+The Jedd grammar and explanations of its operators appear in~\cite{Lhotak:2004:JBR},
+and are outside the scope of this guide. The paper also includes various
+examples of Jedd code. Refer also to the points-to analysis example in
+\jeddpath{examples/pointsto/src/Prop.jedd}.
+
+The javadoc documentation of the (rather small) API available to Jedd programs
+is available in \jeddpath{doc/api}. In particular, this includes the
+{\tt jedd.Jedd} class with methods controlling the behaviour of Jedd in general,
+and the {\tt jedd.Relation} interface of methods that can be called on any
+relation type.
+
+\section{Compiling Jedd code}
+The Jedd compiler is invoked with the command {\tt java jedd.Main}.
+It uses the same command-line format as Polyglot, with two additional
+switches for specifying the path to a SAT solver ({\tt -s}) and a
+SAT core extractor ({\tt -sc}). The simplest way to compile a project
+is to list all the {\tt .jedd} files on the command line. This will
+compile them to {\tt .java} files, and run {\tt javac} on them to
+compile them to classfiles. The {\tt -c} switch disables the {\tt javac}
+pass. If your project consists of both {\tt .jedd} and {\tt .java}
+files, you can put them all on the command line, but be warned that
+Polyglot will overwrite your {\tt .java} files unless you specify
+an alternate output directory with the {\tt -d} switch.
+
+The points-to analysis example includes a simple Ant build file
+which can be modified for use in other projects.
+
+\section{Using the profiler (optional)}
+To use the profiler, it must be enabled before the computation to be profiled
+begins by calling {\tt jedd.Jedd.v().enableProfiling()}. At the end of
+the computation, the recorded profiling data can be written to a file
+in SQL format by calling {\tt jedd.Jedd.v().outputProfile()} with a
+{\tt java.io.PrintStream}. See the file \jeddpath{examples/pointsto/src/Prop.jedd}
+for an example use of the profiler.
+
+Viewing the profile data requires an SQL database and a CGI-capable web
+server. The CGI scripts (found in the \jeddpath{profile_view} directory in the Jedd
+distribution) are specific to SQLite, but should work with any
+web server. They expect the profiling data in a database called
+{\tt profile.db}, in the same directory as the scripts. This file can be
+generated by piping the SQL file to SQLite with the command\\
+{\tt cat profile.sql | sqlite profile.db}\\
+(assuming the SQL file
+is {\tt profile.sql}). thttpd can be started with the command:\\
+{\tt /usr/sbin/thttpd -d /directory/with/cgi/scripts -p 8080 -c '*.cgi'}
+(where {\tt /directory/with/cgi/scripts} is replaced with the directory
+containing the Jedd CGI scripts from \jeddpath{profile_view}). This starts
+the web server on port 8080. To view the profiling data, point your
+web browser to\\
+\url{http://127.0.0.1:8080/main.cgi}.
+
+\bibliographystyle{alpha}
+\bibliography{local}
+
+\end{document}
