@@ -30,9 +30,9 @@ public class JavabddBackend extends Backend {
         return new JavabddInstance( in );
     }
 
-    private BDDFactory manager;
+    private JeddJavaFactory manager;
     synchronized void init() {
-        manager = BDDFactory.init("java", 1*1000*1000, 100*1000 );
+        manager = (JeddJavaFactory) JeddJavaFactory.init( 1*1000*1000, 100*1000 );
     }
 
     protected int totalBits = 0;
@@ -156,8 +156,21 @@ public class JavabddBackend extends Backend {
         manager.setVarOrder( level2var );
     }
 
-    Iterator cubeIterator( RelationInstance r ) {
-        throw new RuntimeException("NYI");
+    synchronized Iterator cubeIterator( final RelationInstance r ) {
+            return new Iterator() {
+            int[] cubes = new int[totalBits];
+            boolean done = (0 == manager.firstCube(bdd(r), cubes.length, cubes));
+            public boolean hasNext() { return !done; }
+            synchronized public Object next() {
+                int[] ret = new int[totalBits];
+                System.arraycopy( cubes, 0, ret, 0, totalBits );
+                done = (0 == manager.nextCube(bdd(r), cubes.length, cubes));
+                return ret;
+            }
+            public void remove() {
+                throw new UnsupportedOperationException();
+            }
+        };
     }
 
     int numNodes( RelationInstance r ) {

@@ -36,7 +36,7 @@ public class BuddyBackend extends Backend {
         Buddy.setuperrorhandler();
         Buddy.bdd_disable_reorder();
         Buddy.bdd_setcacheratio(4);
-        Buddy.bdd_setmaxincrease(100*1000);
+        Buddy.bdd_setmaxincrease(10*1000*1000);
     }
 
     protected int totalBits = 0;
