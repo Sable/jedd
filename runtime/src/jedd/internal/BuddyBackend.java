@@ -174,6 +174,15 @@ public class BuddyBackend extends Backend {
     synchronized void setOrder( int level2var[] ) {
         Buddy.bdd_setvarorder( level2var );
     }
+    synchronized void allowReorder(boolean setting) {
+        if(setting) {
+            Buddy.bdd_autoreorder(Buddy.BDD_REORDER_SIFTITE);
+            Buddy.bdd_reorder_verbose(1);
+            Buddy.bdd_enable_reorder();
+        } else {
+            Buddy.bdd_disable_reorder();
+        }
+    }
 
     synchronized Iterator cubeIterator( final RelationInstance r ) {
         return new Iterator() {

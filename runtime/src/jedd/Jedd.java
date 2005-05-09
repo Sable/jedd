@@ -51,6 +51,11 @@ public class Jedd {
     public void setOrder( Order order ) {
         jedd.internal.Jedd.v().setOrder( order );
     }
+    /** Allows/prevents dynamic BDD variable reordering.
+     */
+    public void allowReorder( boolean setting ) {
+        jedd.internal.Jedd.v().allowReorder( setting );
+    }
     /** Sets the BDD backend that Jedd should use. Currently valid values are
      * "buddy", "cudd", "sablejbdd", and "javabdd".
      */

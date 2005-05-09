@@ -188,6 +188,9 @@ public class Jedd {
         }
         Backend.v().setOrder( buddyOrder );
     }
+    public void allowReorder(boolean setting) {
+        Backend.v().allowReorder(setting);
+    }
     public RelationInstance read( RelationInstance r ) { return r; }
     public RelationInstance read( RelationContainer r ) { return r.bdd(); }
     public int numNodes( RelationContainer r ) {

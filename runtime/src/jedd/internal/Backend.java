@@ -59,6 +59,7 @@ public abstract class Backend {
     abstract boolean equals( RelationInstance r1, RelationInstance r2 );
 
     abstract void setOrder( int level2var[] );
+    void allowReorder( boolean setting ) {}
 
     //abstract void allCubes( RelationInstance r, int cubes[] );
     abstract Iterator cubeIterator( RelationInstance r );
