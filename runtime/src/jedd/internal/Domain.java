@@ -45,6 +45,7 @@ public abstract class Domain {
     }
     public String toString() { return name(); }
     public void setBits( PhysicalDomain physDom, int[] bits, long value ) {
+        long origValue = value;
         if(physDom.bits() < maxUsefulBit()) throw new RuntimeException("Physical domain "+physDom+" is too small for domain "+this );
         int bit = physDom.firstBit();
         for( int i = 0; i < maxUsefulBit(); i++ ) {
@@ -52,7 +53,7 @@ public abstract class Domain {
             bit++;
             value >>>= 1;
         }
-        if( value != 0 ) throw new RuntimeException( "Value "+value+" was too large in domain "+name()+"!" );
+        if( value != 0 ) throw new RuntimeException( "Value "+origValue+" was too large in domain "+name()+"!" );
     }
     public long readBits(PhysicalDomain physDom, int[] bits) {
         if(physDom.bits() < maxUsefulBit()) throw new RuntimeException("Physical domain "+physDom+" is too small for domain "+this );
