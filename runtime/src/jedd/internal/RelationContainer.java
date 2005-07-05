@@ -316,7 +316,7 @@ public class RelationContainer implements Relation {
         // Free up attributeBDD
         attributeBDD.eq(Backend.v().falseBDD());
     }
-    public String toString() {
+    public String oldtoString() {
         StringBuffer b = new StringBuffer();
         b.append( "[" );
         for( int i=0; i < attributes.length; i++ ) {
@@ -325,6 +325,26 @@ public class RelationContainer implements Relation {
             else b.append(", ");
         }
         toString("[", b, 0, bdd);
+        return b.toString();
+    }
+    private void appendTuple( StringBuffer b, Object[] tuple ) {
+        b.append("[");
+        for( int i = 0; i < tuple.length; i++ ) {
+            if( i > 0 ) b.append(", ");
+            b.append(tuple[i]);
+        }
+        b.append("]\n");
+    }
+    public String toString() {
+        StringBuffer b = new StringBuffer();
+        appendTuple(b, attributes);
+        jedd.Attribute[] wanted = new jedd.Attribute[attributes.length];
+        System.arraycopy( attributes, 0, wanted, 0, attributes.length );
+        Iterator it = iterator(wanted);
+        while( it.hasNext() ) {
+            Object[] tuple = (Object[]) it.next();
+            appendTuple(b, tuple);
+        }
         return b.toString();
     }
     public jedd.Relation applyShifter( jedd.Jedd.Shifter s ) {
