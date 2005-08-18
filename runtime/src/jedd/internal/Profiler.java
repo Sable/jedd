@@ -68,6 +68,10 @@ public class Profiler
         e.startTime = new Date();
         stack.addLast( e );
     }
+    private long timeLimit = 10;
+    public static void setTimeLimit(long newLimit) {
+        instance.timeLimit = newLimit;
+    }
     public void finish( String eventName, RelationInstance bdd ) {
         if(VERBOSE) {
             System.out.println(eventName+" "+Backend.v().numNodes(bdd));
@@ -78,7 +82,7 @@ public class Profiler
         e.stackTrace = stackTrace();
         //events.add( e );
         e.output = new BDD(bdd);
-        if(e.time < 10) {
+        if(e.time <= timeLimit) {
             e.inputA.shape = null;
             e.inputB.shape = null;
             e.output.shape = null;

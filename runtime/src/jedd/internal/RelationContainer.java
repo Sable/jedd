@@ -357,10 +357,13 @@ public class RelationContainer implements Relation {
         Backend.v().addRef(copied);
         Backend.v().delRef(projected);
 
-        return new RelationContainer( attributes, phys, "applyShifter", copied );
+        return new RelationContainer( new Attribute[0], new PhysicalDomain[0], "applyShifter", copied );
     }
     RelationInstance cast( Attribute[] newAttributes, PhysicalDomain[] newPhys ) {
         do {
+            if( attributes.length == 0 ) {
+                return Jedd.v().read(this);
+            }
             if( newAttributes.length != attributes.length ) break;
             if( newPhys.length != phys.length ) break;
 

@@ -93,6 +93,10 @@ public class Seq implements Order {
         this(o1, o2, o3, o4, o5, o6, o7, o8, o9, o10, o11, o12, o13, o14);
         this.children.add(o15);
     }
+    public Seq( Order o1, Order o2, Order o3, Order o4, Order o5, Order o6, Order o7, Order o8, Order o9, Order o10, Order o11, Order o12, Order o13, Order o14, Order o15, Order o16 ) {
+        this(o1, o2, o3, o4, o5, o6, o7, o8, o9, o10, o11, o12, o13, o14, o15);
+        this.children.add(o16);
+    }
     public List listBits() {
         List ret = new ArrayList();
         for( Iterator oIt = children.iterator(); oIt.hasNext(); ) {

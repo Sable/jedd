@@ -44,6 +44,7 @@ public abstract class Domain {
         return this.getClass().getName();
     }
     public String toString() { return name(); }
+    long largestPow2 = 0;
     public void setBits( PhysicalDomain physDom, int[] bits, long value ) {
         long origValue = value;
         if(physDom.bits() < maxUsefulBit()) throw new RuntimeException("Physical domain "+physDom+" is too small for domain "+this );
@@ -53,7 +54,22 @@ public abstract class Domain {
             bit++;
             value >>>= 1;
         }
+        long nextPow2 = nextPow2(origValue);
+        if(nextPow2 > largestPow2) {
+            largestPow2 = nextPow2;
+            //System.out.println( "NEED "+name()+" "+largestPow2 );
+        }
         if( value != 0 ) throw new RuntimeException( "Value "+origValue+" was too large in domain "+name()+"!" );
+    }
+    /** Returns the next power of two greater than x. */
+    private long nextPow2(long x) {
+        x |= (x>>>1);
+        x |= (x>>>2);
+        x |= (x>>>4);
+        x |= (x>>>8);
+        x |= (x>>>16);
+        x |= (x>>>32);
+        return x+1;
     }
     public long readBits(PhysicalDomain physDom, int[] bits) {
         if(physDom.bits() < maxUsefulBit()) throw new RuntimeException("Physical domain "+physDom+" is too small for domain "+this );

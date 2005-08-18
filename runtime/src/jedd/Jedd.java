@@ -37,6 +37,11 @@ public class Jedd {
     public void enableProfiling( PrintStream stream ) {
         Profiler.enable(stream);
     }
+    /** Set the time limit for profiling: the profile records the shape of only
+     * those operations which take at least timeLimit ms. Default is 10. */
+    public void setTimeLimit( long timeLimit ) {
+        Profiler.setTimeLimit(timeLimit);
+    }
     /** Outputs the profiling data recorded by the profiler to an SQL file.
      */
     public void outputProfile() {
