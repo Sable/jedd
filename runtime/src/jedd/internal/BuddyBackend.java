@@ -33,10 +33,15 @@ public class BuddyBackend extends Backend {
     synchronized void init() {
         System.loadLibrary("jeddbuddy");
         Buddy.bdd_init( 1*1000*1000, 100*1000 );
+        //Buddy.bdd_init( 41*1000*1000, 100*1000 );
         Buddy.setuperrorhandler();
         Buddy.bdd_disable_reorder();
         Buddy.bdd_setcacheratio(4);
         Buddy.bdd_setmaxincrease(10*1000*1000);
+        //int nodes = Buddy.bdd_getallocnum();
+        //System.out.println("currently alloced: "+nodes);
+        //Buddy.bdd_setmaxnodenum(nodes+1);
+        //Buddy.bdd_setminfreenodes(1);
     }
 
     protected int totalBits = 0;

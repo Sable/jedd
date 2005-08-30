@@ -97,6 +97,82 @@ public class Seq implements Order {
         this(o1, o2, o3, o4, o5, o6, o7, o8, o9, o10, o11, o12, o13, o14, o15);
         this.children.add(o16);
     }
+    public Seq( Order o1, Order o2, Order o3, Order o4, Order o5, Order o6, Order o7, Order o8, Order o9, Order o10, Order o11, Order o12, Order o13, Order o14, Order o15, Order o16, Order o17 ) {
+        this(o1, o2, o3, o4, o5, o6, o7, o8, o9, o10, o11, o12, o13, o14, o15, o16);
+        this.children.add(o17);
+    }
+    public Seq( Order o1, Order o2, Order o3, Order o4, Order o5, Order o6, Order o7, Order o8, Order o9, Order o10, Order o11, Order o12, Order o13, Order o14, Order o15, Order o16, Order o17, Order o18 ) {
+        this(o1, o2, o3, o4, o5, o6, o7, o8, o9, o10, o11, o12, o13, o14, o15, o16, o17);
+        this.children.add(o18);
+    }
+    public Seq( Order o1, Order o2, Order o3, Order o4, Order o5, Order o6, Order o7, Order o8, Order o9, Order o10, Order o11, Order o12, Order o13, Order o14, Order o15, Order o16, Order o17, Order o18, Order o19 ) {
+        this(o1, o2, o3, o4, o5, o6, o7, o8, o9, o10, o11, o12, o13, o14, o15, o16, o17, o18);
+        this.children.add(o19);
+    }
+    public Seq( Order o1, Order o2, Order o3, Order o4, Order o5, Order o6, Order o7, Order o8, Order o9, Order o10, Order o11, Order o12, Order o13, Order o14, Order o15, Order o16, Order o17, Order o18, Order o19, Order o20 ) {
+        this(o1, o2, o3, o4, o5, o6, o7, o8, o9, o10, o11, o12, o13, o14, o15, o16, o17, o18, o19);
+        this.children.add(o20);
+    }
+    public Seq( Order o1, Order o2, Order o3, Order o4, Order o5, Order o6, Order o7, Order o8, Order o9, Order o10, Order o11, Order o12, Order o13, Order o14, Order o15, Order o16, Order o17, Order o18, Order o19, Order o20, Order o21 ) {
+        this(o1, o2, o3, o4, o5, o6, o7, o8, o9, o10, o11, o12, o13, o14, o15, o16, o17, o18, o19, o20);
+        this.children.add(o21);
+    }
+    public Seq( Order o1, Order o2, Order o3, Order o4, Order o5, Order o6, Order o7, Order o8, Order o9, Order o10, Order o11, Order o12, Order o13, Order o14, Order o15, Order o16, Order o17, Order o18, Order o19, Order o20, Order o21, Order o22 ) {
+        this(o1, o2, o3, o4, o5, o6, o7, o8, o9, o10, o11, o12, o13, o14, o15, o16, o17, o18, o19, o20, o21);
+        this.children.add(o22);
+    }
+    public Seq( Order o1, Order o2, Order o3, Order o4, Order o5, Order o6, Order o7, Order o8, Order o9, Order o10, Order o11, Order o12, Order o13, Order o14, Order o15, Order o16, Order o17, Order o18, Order o19, Order o20, Order o21, Order o22, Order o23 ) {
+        this(o1, o2, o3, o4, o5, o6, o7, o8, o9, o10, o11, o12, o13, o14, o15, o16, o17, o18, o19, o20, o21, o22);
+        this.children.add(o23);
+    }
+    public Seq( Order o1, Order o2, Order o3, Order o4, Order o5, Order o6, Order o7, Order o8, Order o9, Order o10, Order o11, Order o12, Order o13, Order o14, Order o15, Order o16, Order o17, Order o18, Order o19, Order o20, Order o21, Order o22, Order o23, Order o24 ) {
+        this(o1, o2, o3, o4, o5, o6, o7, o8, o9, o10, o11, o12, o13, o14, o15, o16, o17, o18, o19, o20, o21, o22, o23);
+        this.children.add(o24);
+    }
+    public Seq( Order o1, Order o2, Order o3, Order o4, Order o5, Order o6, Order o7, Order o8, Order o9, Order o10, Order o11, Order o12, Order o13, Order o14, Order o15, Order o16, Order o17, Order o18, Order o19, Order o20, Order o21, Order o22, Order o23, Order o24, Order o25 ) {
+        this(o1, o2, o3, o4, o5, o6, o7, o8, o9, o10, o11, o12, o13, o14, o15, o16, o17, o18, o19, o20, o21, o22, o23, o24);
+        this.children.add(o25);
+    }
+    public Seq( Order o1, Order o2, Order o3, Order o4, Order o5, Order o6, Order o7, Order o8, Order o9, Order o10, Order o11, Order o12, Order o13, Order o14, Order o15, Order o16, Order o17, Order o18, Order o19, Order o20, Order o21, Order o22, Order o23, Order o24, Order o25, Order o26 ) {
+        this(o1, o2, o3, o4, o5, o6, o7, o8, o9, o10, o11, o12, o13, o14, o15, o16, o17, o18, o19, o20, o21, o22, o23, o24, o25);
+        this.children.add(o26);
+    }
+    public Seq( Order o1, Order o2, Order o3, Order o4, Order o5, Order o6, Order o7, Order o8, Order o9, Order o10, Order o11, Order o12, Order o13, Order o14, Order o15, Order o16, Order o17, Order o18, Order o19, Order o20, Order o21, Order o22, Order o23, Order o24, Order o25, Order o26, Order o27 ) {
+        this(o1, o2, o3, o4, o5, o6, o7, o8, o9, o10, o11, o12, o13, o14, o15, o16, o17, o18, o19, o20, o21, o22, o23, o24, o25, o26);
+        this.children.add(o27);
+    }
+    public Seq( Order o1, Order o2, Order o3, Order o4, Order o5, Order o6, Order o7, Order o8, Order o9, Order o10, Order o11, Order o12, Order o13, Order o14, Order o15, Order o16, Order o17, Order o18, Order o19, Order o20, Order o21, Order o22, Order o23, Order o24, Order o25, Order o26, Order o27, Order o28 ) {
+        this(o1, o2, o3, o4, o5, o6, o7, o8, o9, o10, o11, o12, o13, o14, o15, o16, o17, o18, o19, o20, o21, o22, o23, o24, o25, o26, o27);
+        this.children.add(o28);
+    }
+    public Seq( Order o1, Order o2, Order o3, Order o4, Order o5, Order o6, Order o7, Order o8, Order o9, Order o10, Order o11, Order o12, Order o13, Order o14, Order o15, Order o16, Order o17, Order o18, Order o19, Order o20, Order o21, Order o22, Order o23, Order o24, Order o25, Order o26, Order o27, Order o28, Order o29 ) {
+        this(o1, o2, o3, o4, o5, o6, o7, o8, o9, o10, o11, o12, o13, o14, o15, o16, o17, o18, o19, o20, o21, o22, o23, o24, o25, o26, o27, o28);
+        this.children.add(o29);
+    }
+    public Seq( Order o1, Order o2, Order o3, Order o4, Order o5, Order o6, Order o7, Order o8, Order o9, Order o10, Order o11, Order o12, Order o13, Order o14, Order o15, Order o16, Order o17, Order o18, Order o19, Order o20, Order o21, Order o22, Order o23, Order o24, Order o25, Order o26, Order o27, Order o28, Order o29, Order o30 ) {
+        this(o1, o2, o3, o4, o5, o6, o7, o8, o9, o10, o11, o12, o13, o14, o15, o16, o17, o18, o19, o20, o21, o22, o23, o24, o25, o26, o27, o28, o29);
+        this.children.add(o30);
+    }
+    public Seq( Order o1, Order o2, Order o3, Order o4, Order o5, Order o6, Order o7, Order o8, Order o9, Order o10, Order o11, Order o12, Order o13, Order o14, Order o15, Order o16, Order o17, Order o18, Order o19, Order o20, Order o21, Order o22, Order o23, Order o24, Order o25, Order o26, Order o27, Order o28, Order o29, Order o30, Order o31 ) {
+        this(o1, o2, o3, o4, o5, o6, o7, o8, o9, o10, o11, o12, o13, o14, o15, o16, o17, o18, o19, o20, o21, o22, o23, o24, o25, o26, o27, o28, o29, o30);
+        this.children.add(o31);
+    }
+    public Seq( Order o1, Order o2, Order o3, Order o4, Order o5, Order o6, Order o7, Order o8, Order o9, Order o10, Order o11, Order o12, Order o13, Order o14, Order o15, Order o16, Order o17, Order o18, Order o19, Order o20, Order o21, Order o22, Order o23, Order o24, Order o25, Order o26, Order o27, Order o28, Order o29, Order o30, Order o31, Order o32 ) {
+        this(o1, o2, o3, o4, o5, o6, o7, o8, o9, o10, o11, o12, o13, o14, o15, o16, o17, o18, o19, o20, o21, o22, o23, o24, o25, o26, o27, o28, o29, o30, o31);
+        this.children.add(o32);
+    }
+    public Seq( Order o1, Order o2, Order o3, Order o4, Order o5, Order o6, Order o7, Order o8, Order o9, Order o10, Order o11, Order o12, Order o13, Order o14, Order o15, Order o16, Order o17, Order o18, Order o19, Order o20, Order o21, Order o22, Order o23, Order o24, Order o25, Order o26, Order o27, Order o28, Order o29, Order o30, Order o31, Order o32, Order o33 ) {
+        this(o1, o2, o3, o4, o5, o6, o7, o8, o9, o10, o11, o12, o13, o14, o15, o16, o17, o18, o19, o20, o21, o22, o23, o24, o25, o26, o27, o28, o29, o30, o31, o32);
+        this.children.add(o33);
+    }
+    public Seq( Order o1, Order o2, Order o3, Order o4, Order o5, Order o6, Order o7, Order o8, Order o9, Order o10, Order o11, Order o12, Order o13, Order o14, Order o15, Order o16, Order o17, Order o18, Order o19, Order o20, Order o21, Order o22, Order o23, Order o24, Order o25, Order o26, Order o27, Order o28, Order o29, Order o30, Order o31, Order o32, Order o33, Order o34 ) {
+        this(o1, o2, o3, o4, o5, o6, o7, o8, o9, o10, o11, o12, o13, o14, o15, o16, o17, o18, o19, o20, o21, o22, o23, o24, o25, o26, o27, o28, o29, o30, o31, o32, o33);
+        this.children.add(o34);
+    }
+    public Seq( Order o1, Order o2, Order o3, Order o4, Order o5, Order o6, Order o7, Order o8, Order o9, Order o10, Order o11, Order o12, Order o13, Order o14, Order o15, Order o16, Order o17, Order o18, Order o19, Order o20, Order o21, Order o22, Order o23, Order o24, Order o25, Order o26, Order o27, Order o28, Order o29, Order o30, Order o31, Order o32, Order o33, Order o34, Order o35 ) {
+        this(o1, o2, o3, o4, o5, o6, o7, o8, o9, o10, o11, o12, o13, o14, o15, o16, o17, o18, o19, o20, o21, o22, o23, o24, o25, o26, o27, o28, o29, o30, o31, o32, o33, o34);
+        this.children.add(o35);
+    }
     public List listBits() {
         List ret = new ArrayList();
         for( Iterator oIt = children.iterator(); oIt.hasNext(); ) {
