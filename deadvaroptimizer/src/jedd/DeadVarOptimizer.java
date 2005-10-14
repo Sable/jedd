@@ -105,8 +105,12 @@ locals:
                                 Jimple.v().newInvokeStmt(
                                     Jimple.v().newVirtualInvokeExpr(
                                         l,
-                                        relationType.getSootClass()
-                                            .getMethod( "void kill()" )
+                                        Scene.v().makeMethodRef(
+                                            relationType.getSootClass(),
+                                            "kill",
+                                            new ArrayList(),
+                                            VoidType.v(),
+                                            false)
                                     )
                                 )
                             ,s );
