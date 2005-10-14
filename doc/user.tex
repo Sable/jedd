@@ -7,13 +7,15 @@
 \begin{document}
 \maketitle
 
-\newcommand{\jeddpath}[1]{\href{http://svn.sable.mcgill.ca/soot/jedd/trunk/#1}{\nolinkurl{#1}}}
+\newcommand{\jeddpath}[1]{\href{https://svn.sable.mcgill.ca/soot/jedd/trunk/#1}{\nolinkurl{#1}}}
 
 \section{Preliminaries}
 This mini-tutorial assumes that the reader has
 read the paper~\cite{Lhotak:2004:JBR} about Jedd that
 was presented at PLDI 2004, and is available at
-\url{http://www.sable.mcgill.ca/publications/papers/#pldi2004}.
+\url{http://www.sable.mcgill.ca/publications/papers/#pldi2004},
+as well as Chapter 3 and Appendix B of Ond\v{r}ej Lhot\'ak's
+PhD thesis~\cite{Lhotak:2005:PAU}, available at \url{http://www.sable.mcgill.ca/~olhota/pubs/thesis-olhotak-phd.ps}.
 
 \section{Example}
 The Jedd distribution contains a directory called \jeddpath{examples}
@@ -89,20 +91,15 @@ should be one of {\tt "buddy"}, {\tt "cudd"}, {\tt "sablejbdd"} or
 By default, Jedd places the various physical domains one after the next
 in the BDD. For performance reasons, you may want to select a different
 ordering. This is done by calling {\tt jedd.Jedd.v().setOrder()}.
-The first argument is an array containing the physical domains in the order
-in which they should appear in the BDD, from the top of the BDD to the bottom
-(constant nodes). To get the physical domain instance (to be placed in the array)
-for a given physical domain, call the method {\tt v()} on it (see the example
-in \jeddpath{examples/pointsto/src/Prop.jedd}). To interleave the bits of
-several physical domains, place them in a separate array, and then
-include this array as an element of the main array. The {\tt jedd.Jedd.setOrder()}
-method takes a second, boolean argument that determines the order of bits within
-each domain. Set it to {\tt true} to order the bits from most significant to least
-significant when moving down the BDD from top to bottom, or to {\tt false} for the
-opposite order.
+An example of how this method is called appears in the points-to
+analysis example 
+(see \jeddpath{examples/pointsto/src/Prop.jedd}). A detailed
+explanation of the orderings that can be specified appears in Ond\v{r}ej
+Lhot\'ak's Ph.D.\ thesis~\cite{Lhotak:2005:PAU}, in the section
+titled ``Specifying physical domain ordering'' in Chapter~3.
 
 \section{Writing Jedd code}
-The Jedd grammar and explanations of its operators appear in~\cite{Lhotak:2004:JBR},
+The Jedd grammar and explanations of its operators appear in~\cite{Lhotak:2004:JBR,Lhotak:2005:PAU},
 and are outside the scope of this guide. The paper also includes various
 examples of Jedd code. Refer also to the points-to analysis example in
 \jeddpath{examples/pointsto/src/Prop.jedd}.

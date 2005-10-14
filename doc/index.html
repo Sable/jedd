@@ -57,7 +57,8 @@ a new primitive data type, database-style relations. A detailed paper about
 Jedd was presented at
 <a href="http://www.cs.umd.edu/~pugh/pldi04/">PLDI 2004</a>, and is available
 from the <a href="http://www.sable.mcgill.ca/publications/papers/#pldi2004">
-Sable publications page</a>.</p>
+Sable publications page</a>. Additional information about Jedd can also be
+found in my <a href="http://www.sable.mcgill.ca/~olhota/pubs/thesis-olhotak-phd.ps">PhD thesis</a>, in Chapter 3 and Appendix B.</p>
 
 <p>
 Jedd is based on the <a href="http://www.cs.cornell.edu/Projects/polyglot/">
@@ -128,16 +129,22 @@ To use the Jedd translator to compile Jedd programs, you need the following:
 <li>Add jedd-translator.jar from the Jedd distribution to your CLASSPATH
 environment variable.
 <li>Add the Polyglot classes jar to your CLASSPATH environment variable.
-You can download a pre-compiled jar of Polyglot from the <a href="http://www.sable.mcgill.ca/software/#soot">Soot download page</a>.
+You can download a pre-compiled jar of Polyglot from the <a href="http://www.sable.mcgill.ca/soot/soot_download.html">Soot download page</a>.
 <li>Install a SAT solver. I have been using Jedd with
-<a href="http://www.princeton.edu/~chaff/zchaff.html">Zchaff</a>, but it
+<a href="http://www.princeton.edu/~chaff/zchaff.html">zChaff</a>, but it
 should also work with other SAT solvers such as
 <a href="http://sat.inesc.pt/~jpms/grasp">Grasp</a> and
 <a href="http://www.cs.uiowa.edu/~hzhang/sato.html">Sato</a>.
-The -s switch to Jedd is used to specify the full path of the SAT solver
-binary. If the solver has an unsatisfiable core extractor (like the
-<tt>zcore</tt> program bundled with Zchaff), specify its full path
-using the -sc switch to Jedd.
+The -s switch to Jedd is used to specify the full path of the SAT
+solver binary. If the solver has an unsatisfiable core extractor (like
+the <tt>zcore</tt> program bundled with Zchaff), specify its full
+path using the -sc switch to Jedd. Because the zChaff command-line
+syntax changes from version to version, I have written two shell
+scripts, <tt>zchaff</tt> and <tt>zcore</tt>, for invoking zChaff
+version 2004.5.13 with the correct syntax. The scripts can be found in
+the <tt>scripts</tt> directory of the Jedd distribution. Should the
+command-line syntax change again in future versions of zChaff, the
+scripts can be modified to match the new syntax.
 </ul>
 </p>
 
@@ -155,7 +162,7 @@ versions may also work.
 <li><a href="http://www.acme.com/software/thttpd/">thttpd (2.23beta1)</a>
 <li><a href="http://www.gnuplot.info/">Gnuplot (3.8k)</a>
 <li><a href="http://www.python.org/">Python (2.3.4c1)</a>
-<li><a href="http://www.mozilla.org/products/firefox/">Mozilla Firebird (0.7)</a>
+<li><a href="http://www.mozilla.org/products/firefox/">Mozilla Firefox (1.0.7)</a>
 </ul>
 </p>
 
@@ -169,6 +176,28 @@ versions may also work.
 <td width=97% align=left><b><font face="helvetica,arial" size="+1">Download</b></font></td></a>
 <td width=3% align=left><font size="-2"><a href="#top">top</a></td>
 </table>
+
+<blockquote>
+<p><b>Release 0.3 (October 2005)</b><br>
+The main changes in this release are:
+<ul>
+<li> Updated to BuDDy 2.4 and Polyglot 1.3.2
+<li> More efficient attribute copying operation
+<li> More flexible specification of BDD variable ordering
+<li> Profile graphs now show physical domains
+<li> Bug fixes
+</ul>
+<ul>
+<li><a href="http://www.sable.mcgill.ca/software/jedd-0.3.tar.gz">
+GNU/Linux complete package</a> (contains the sources and everything compiled for GNU/Linux)
+
+<li><a href="http://www.sable.mcgill.ca/software/jedd-0.3.zip">
+Win32 complete package</a> (contains the sources and everything compiled for Windows)
+
+<li><a href="http://www.sable.mcgill.ca/software/jedd-0.3-src.tar.gz">
+Source</a> (contains sources of Jedd only)
+</ul>
+</blockquote>
 
 <blockquote>
 <p><b>Release 0.2 (July 2004)</b><br>
@@ -241,7 +270,7 @@ Jedd links to the following libraries, and these are also required to build
 Jedd.
 <ul>
 <li><a href="http://www.cs.cornell.edu/Projects/polyglot/">Polyglot (1.3) (includes PPG and modified version of JavaCUP)</a>
-<li><a href="http://www.itu.dk/research/buddy/">BuDDy (2.2)</a>
+<li><a href="http://www.itu.dk/research/buddy/">BuDDy (2.4)</a>
 <li><a href="http://vlsi.colorado.edu/~fabio/CUDD/">CUDD (2.3.1)</a>
 <li><a href="http://www.sable.mcgill.ca/~fqian/SableJBDD/">SableJBDD (0.02)</a>
 <li><a href="http://javabdd.sourceforge.net/">JavaBDD (0.6)</a>
@@ -280,7 +309,7 @@ target <tt>compile-deadvaroptimizer</tt>.
 <blockquote>
 
 <p>
-Jedd is Copyright (C) 2003, 2004 Ond&#345;ej Lhot&aacute;k, and is
+Jedd is Copyright (C) 2003-2005 Ond&#345;ej Lhot&aacute;k, and is
 distributed under the
 <a href="COPYING-LESSER.txt">
 GNU Lesser General Public License</a>.

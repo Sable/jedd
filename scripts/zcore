@@ -1,0 +1,3 @@
+#!/bin/sh
+$HOME/zChaff/zverify_df $1 $2 -core
+mv unsat_core.cnf $3

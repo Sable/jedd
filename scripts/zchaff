@@ -1,0 +1,2 @@
+#!/bin/sh
+$HOME/zChaff/zchaff $* | sed 's/Random.*//g'
