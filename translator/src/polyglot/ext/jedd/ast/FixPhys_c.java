@@ -36,9 +36,10 @@ public class FixPhys_c extends Expr_c implements FixPhys, JeddGenerateJava, Jedd
     public FixPhys_c(Position pos, Expr expr ) {
         super( pos );
         this.expr = expr;
-        if( expr instanceof FixPhys && !(expr instanceof Replace) )
+        if( expr instanceof FixPhys && !(expr instanceof Replace) ) {
             throw new RuntimeException(
-                "shouldn't put FixPhys on top of a FixPhys" );
+                "shouldn't put FixPhys on top of a FixPhys; expr is a "+expr.getClass().toString() );
+        }
     }
     public Node visitChildren(NodeVisitor v) {
         FixPhys_c ret = (FixPhys_c) copy();

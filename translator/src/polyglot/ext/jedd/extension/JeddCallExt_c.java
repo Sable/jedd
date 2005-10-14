@@ -39,7 +39,7 @@ public class JeddCallExt_c extends JeddExt_c implements JeddTypeCheck, JeddPhysi
         Call n = (Call) node().typeCheck(tc);
         for( Iterator argIt = n.arguments().iterator(); argIt.hasNext(); ) {
             final Expr arg = (Expr) argIt.next();
-            if( arg.type() instanceof BDDType ) {
+            if( arg.type() instanceof BDDType && !(arg instanceof FixPhys) ) {
                 newArgs.add( nf.FixPhys( arg.position(), arg ).typeCheck(tc) );
             } else {
                 newArgs.add( arg );
