@@ -30,7 +30,7 @@ import java.io.*;
 
 public class CmdLineFileSource extends FileSource {
     public CmdLineFileSource(String name) throws IOException {
-        super(name);
+        super(new File(name));
     }
 }
 

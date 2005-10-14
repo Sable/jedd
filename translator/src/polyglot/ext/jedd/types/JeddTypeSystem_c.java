@@ -227,7 +227,7 @@ found_bdd:
     }
     private ClassType jeddType( String name ) {
         try {
-            ClassType ret = typeForName(name);
+            ClassType ret = (ClassType) typeForName(name);
             if( ret == null ) 
                 throw new InternalCompilerError( "Couldn't find type "+name );
             return ret;

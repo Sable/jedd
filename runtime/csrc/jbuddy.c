@@ -1,5 +1,6 @@
 #include "bdd.h"
 #include "jbuddy.h"
+#include <string.h>
 
 static int* allsatCubes;
 static void allsatHandler( char* cube, int size ) {
