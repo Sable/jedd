@@ -133,6 +133,7 @@ public class PhysDom {
             Literal ret2 = (Literal) litMap.get( ret );
             if( ret2 == null ) {
                 litMap.put( ret2 = ret, ret );
+                NegLiteral.v(dnode, phys);
             }
             return ret2;
         }
@@ -1338,6 +1339,7 @@ outer:
             ArrowLit ret2 = (ArrowLit) arrMap.get( ret );
             if( ret2 == null ) {
                 arrMap.put( ret2 = ret, ret );
+                NegArrowLit.v(src, dst);
             }
             return ret2;
         }
