@@ -35,10 +35,15 @@ public class JeddReturnExt_c extends JeddExt_c implements JeddPhysicalDomains, J
         JeddTypeSystem ts = (JeddTypeSystem) tc.typeSystem();
         JeddNodeFactory nf = (JeddNodeFactory) tc.nodeFactory();
 
-        Return n = (Return) node();
-        if( n.expr() == null ) return n.typeCheck(tc);
+        Return n = (Return) node().typeCheck(tc);
+        if( n.expr() == null ) return n;
         Type t = n.expr().type();
-        if( !(t instanceof BDDType ) ) return n.typeCheck(tc);
+        if( !(t instanceof BDDType ) ) return n;
+        MethodInstance mi = (MethodInstance) tc.context().currentCode();
+        if( !(mi.returnType() instanceof BDDType) ) {
+            throw new SemanticException("Cannot return expression of type " +
+		n.expr().type() + " from " + mi + ".", n.expr().position());
+        }
         n = n.expr( (Expr) nf.FixPhys( n.expr().position(), n.expr() ).typeCheck(tc) );
         return n;
     }
