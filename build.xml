@@ -50,6 +50,7 @@
             destdir="runtime/classes"
             classpath="runtime/classes:${java.class.path}:${sablejbdd.loc}/classes:${javabdd.loc}/javabdd_0.6.jar"
             debug="true"
+        	target="1.4"
         >
             <src path="runtime/src"/>
             <src path="runtime/generated"/>
@@ -264,6 +265,7 @@
         <javac
             destdir="translator/classes"
             debug="true"
+        	target="1.4"
         >
             <src path="translator/src"/>
             <src path="translator/generated"/>
