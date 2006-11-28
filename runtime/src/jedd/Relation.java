@@ -39,6 +39,11 @@ public interface Relation {
      * over it using the other iterator method. The present iterator is more
      * general in that it works for relations with arbitrary numbers of
      * attributes.
+     *
+     * Note: the array returned by the next() method of this iterator is
+     * reused for subsequent calls to next(). If you need to keep the
+     * contents of the array between calls to next(), copy them to
+     * a different data structure.
      */
     public Iterator iterator(Attribute[] wanted);
     /** Returns an iterator over the components in the relation. This method
