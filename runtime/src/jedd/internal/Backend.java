@@ -109,4 +109,7 @@ public abstract class Backend {
     protected int width(RelationInstance bdd, int bit1, int bit2) {
         throw new RuntimeException("NYI");
     }
+
+    synchronized void verboseGC() {
+    }
 }

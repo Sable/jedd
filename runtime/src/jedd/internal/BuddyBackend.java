@@ -44,6 +44,10 @@ public class BuddyBackend extends Backend {
         //Buddy.bdd_setminfreenodes(1);
     }
 
+    synchronized void verboseGC() {
+        Buddy.verbose_gc();
+    }
+
     protected int totalBits = 0;
     int numBits() {
         return totalBits;

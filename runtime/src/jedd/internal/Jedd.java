@@ -440,4 +440,7 @@ public class Jedd {
 
         return ret;
     }
+    public void verboseGC() {
+        Backend.v().verboseGC();
+    }
 }

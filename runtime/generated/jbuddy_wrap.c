@@ -660,6 +660,7 @@ extern int firstCube(int,int,int []);
 extern void getShape(int,int []);
 extern char const *bdd_errno;
 extern void setuperrorhandler();
+extern void verbose_gc();
 extern int bdd_markwidth(int,int,int);
 extern bddinthandler bdd_error_hook(bddinthandler);
 extern bddgbchandler bdd_gbc_hook(bddgbchandler);
@@ -1046,6 +1047,21 @@ JNIEXPORT void JNICALL Java_jedd_internal_buddy_BuddyJNI_setuperrorhandler(JNIEn
     (void)jcls;
     {
         setuperrorhandler();
+        
+        if (bdd_errno) {
+            jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");
+            (*jenv)->ThrowNew(jenv, clazz, bdd_errno);
+            return ;
+        }
+    }
+}
+
+
+JNIEXPORT void JNICALL Java_jedd_internal_buddy_BuddyJNI_verbose_1gc(JNIEnv *jenv, jclass jcls) {
+    (void)jenv;
+    (void)jcls;
+    {
+        verbose_gc();
         
         if (bdd_errno) {
             jclass clazz = (*jenv)->FindClass(jenv, "java/lang/RuntimeException");

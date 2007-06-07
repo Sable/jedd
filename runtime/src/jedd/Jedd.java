@@ -71,5 +71,9 @@ public class Jedd {
     public Shifter makeShifter( int[] fromBits, int[] toBits ) {
         return jedd.internal.Jedd.v().makeShifter(fromBits, toBits);
     }
+    /** Causes the BDD library to print memory usage at each GC. */
+    public void verboseGC() {
+        jedd.internal.Jedd.v().verboseGC();
+    }
     public interface Shifter {}
 }

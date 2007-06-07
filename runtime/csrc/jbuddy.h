@@ -10,5 +10,7 @@ extern void     getShape( int bdd, int shape[] );
 
 extern const char* bdd_errno;
 extern void setuperrorhandler();
+extern void verbose_gc();
 
 extern int      bdd_markwidth(int bdd, int var1, int var2);
+

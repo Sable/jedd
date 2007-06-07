@@ -166,4 +166,7 @@ extern void setuperrorhandler() {
     bdd_error_hook(errorhandler);
     bdd_gbc_hook(NULL);
 }
+extern void verbose_gc() {
+    bdd_gbc_hook(bdd_default_gbchandler);
+}
 

@@ -50,6 +50,10 @@ public class Buddy {
     BuddyJNI.setuperrorhandler();
   }
 
+  public static void verbose_gc() {
+    BuddyJNI.verbose_gc();
+  }
+
   public static int bdd_markwidth(int bdd, int var1, int var2) {
     return BuddyJNI.bdd_markwidth(bdd, var1, var2);
   }
