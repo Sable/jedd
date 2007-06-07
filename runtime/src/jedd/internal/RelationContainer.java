@@ -422,4 +422,19 @@ public class RelationContainer implements Relation {
         return Backend.v().width(bdd, pd.firstBit(), 
                 pd.firstBit()+pd.bits()-1);
     }
+    public void dump() {
+        jedd.Attribute[] attrs = new jedd.Attribute[attributes.length];
+        for(int i = 0; i < attributes.length; i++) {
+            attrs[i] = (jedd.Attribute) attributes[i];
+        }
+        Iterator it = iterator(attrs);
+        while(it.hasNext()) {
+            Object[] ar = (Object[]) it.next();
+            for(int i = 0; i < ar.length; i++) {
+                System.out.print(attributes[i].numberer().get(ar[i]));
+                System.out.print(" ");
+            }
+            System.out.println();
+        }
+    }
 }

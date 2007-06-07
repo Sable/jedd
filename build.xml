@@ -171,6 +171,8 @@
             <compilerarg value="-O3"/>
             <fileset dir="runtime/generated" includes="jbuddy_wrap.c"/>
             <fileset dir="runtime/csrc" includes="jbuddy.c"/>
+            <!-- <fileset dir="runtime/csrc" includes="zbdd.c"/>
+            <fileset dir="runtime/csrc" includes="zbddext.c"/> -->
             <fileset dir="${buddy.loc}/src" includes="*.c"/>
             <includepath path="${java.loc}/include"/>
             <includepath path="${java.loc}/include/linux"/>
@@ -201,6 +203,8 @@
 
             <fileset dir="runtime/generated" includes="jbuddy_wrap.c"/>
             <fileset dir="runtime/csrc" includes="jbuddy.c"/>
+            <!-- <fileset dir="runtime/csrc" includes="zbdd.c"/>
+            <fileset dir="runtime/csrc" includes="zbddext.c"/> -->
             <fileset dir="${buddy.loc}/src" includes="*.c"/>
         </apply>
         <apply executable="dllwrap" verbose="true" parallel="true" failonerror="true">
@@ -219,6 +223,8 @@
         <dependset>
             <srcfileset dir="runtime/generated" includes="jbuddy_wrap.c"/>
             <srcfileset dir="runtime/csrc" includes="jbuddy.c"/>
+            <!-- <srcfileset dir="runtime/csrc" includes="zbdd.c"/>
+            <srcfileset dir="runtime/csrc" includes="zbddext.c"/> -->
             <srcfileset dir="${buddy.loc}/src" includes="*.c"/>
             <targetfileset dir="runtime/lib" includes="libjeddbuddy.so"/>
             <targetfileset dir="runtime/lib" includes="jeddbuddy.dll"/>

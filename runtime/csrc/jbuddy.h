@@ -12,3 +12,6 @@ extern const char* bdd_errno;
 extern void setuperrorhandler();
 
 extern int      bdd_markwidth(int bdd, int var1, int var2);
+
+extern int    bdd_makenode(unsigned int, int, int);
+
