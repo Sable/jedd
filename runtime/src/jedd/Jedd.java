@@ -67,6 +67,16 @@ public class Jedd {
     public void setBackend( String type ) {
         jedd.internal.Jedd.v().setBackend( type );
     }
+    /** Sets the BDD backend that Jedd should use. Currently valid values are
+     * "buddy", "cudd", "sablejbdd", and "javabdd". Also specifies the
+     * total number of BDD nodes. If the number specified is 0, the backend
+     * will grow the number of nodes as required without limit. If a number
+     * other than 0 is specified, that many nodes are allocated immediately,
+     * and the node table is not permitted to grow further.
+     */
+    public void setBackend( String type, int numNodes ) {
+        jedd.internal.Jedd.v().setBackend( type, numNodes );
+    }
     /** Creates a Shifter that can be applied to shift bits within a BDD. */
     public Shifter makeShifter( int[] fromBits, int[] toBits ) {
         return jedd.internal.Jedd.v().makeShifter(fromBits, toBits);

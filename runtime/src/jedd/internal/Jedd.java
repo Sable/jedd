@@ -31,7 +31,10 @@ public class Jedd {
         return instance;
     }
     public void setBackend( String type ) {
-        Backend.init( type );
+        setBackend(type, 0);
+    }
+    public void setBackend( String type, int numNodes ) {
+        Backend.init( type, numNodes );
     }
     public RelationInstance copy( RelationContainer r,
         PhysicalDomain[] from, Attribute[] fromAttr, PhysicalDomain[] to ) {

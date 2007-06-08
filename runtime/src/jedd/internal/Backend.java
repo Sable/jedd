@@ -25,14 +25,18 @@ public abstract class Backend {
     static private Backend instance;
     static Backend v() { return instance; }
     static public void init( String type ) {
+        init(type, 0);
+    }
+    static public void init( String type, int numNodes ) {
         if( type.equals( "buddy" ) ) instance = new BuddyBackend();
         if( type.equals( "cudd" ) ) instance = new CuddBackend();
         if( type.equals( "sablejbdd" ) ) instance = new SableBackend();
         if( type.equals( "javabdd" ) ) instance = new JavabddBackend();
-        v().init();
+        v().init(numNodes);
     }
 
     abstract void init();
+    void init(int numNodes) { init(); }
     abstract void addBits( int bits );
     abstract int numBits();
 

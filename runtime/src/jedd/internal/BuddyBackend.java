@@ -31,8 +31,16 @@ public class BuddyBackend extends Backend {
     }
 
     synchronized void init() {
+        init(0);
+    }
+    synchronized void init(int numNodes) {
         System.loadLibrary("jeddbuddy");
-        Buddy.bdd_init( 1*1000*1000, 100*1000 );
+        if(numNodes == 0) {
+            Buddy.bdd_init( 1*1000*1000, 100*1000 );
+        } else {
+            Buddy.bdd_init( numNodes, numNodes/10 );
+            Buddy.bdd_setmaxnodenum( numNodes );
+        }
         //Buddy.bdd_init( 41*1000*1000, 100*1000 );
         Buddy.setuperrorhandler();
         Buddy.bdd_disable_reorder();
